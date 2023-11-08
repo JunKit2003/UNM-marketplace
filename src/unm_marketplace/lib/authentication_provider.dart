@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:msal_flutter/msal_flutter.dart';
 
 class AuthenticationProvider with ChangeNotifier {
-  bool _isAuthenticated = false;
+  bool _isAuthenticated = true;
   bool get isAuthenticated => _isAuthenticated;
 
   late PublicClientApplication pca;

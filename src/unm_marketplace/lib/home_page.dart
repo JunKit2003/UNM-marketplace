@@ -1,13 +1,15 @@
+// home_page.dart
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import './authentication_provider.dart';
 import './product_list_page.dart';
-import './login_page.dart';
 
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthenticationProvider>(context);
+    // No need to get the AuthenticationProvider for now
+    // final authProvider = Provider.of<AuthenticationProvider>(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -24,19 +26,13 @@ class HomePage extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Check if the user is authenticated
-                if (authProvider.isAuthenticated) {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ProductListPage()));
-                } else {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              LoginPage())); // Redirect to the login page
-                }
+                // Directly navigate to the ProductListPage without authentication
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProductListPage(),
+                  ),
+                );
               },
               child: Text('Browse Products'),
             ),
