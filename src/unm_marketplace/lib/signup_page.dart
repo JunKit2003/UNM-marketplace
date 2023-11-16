@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 
 class SignupPage extends StatefulWidget {
@@ -19,24 +17,24 @@ class _SignupPageState extends State<SignupPage> {
       String password, BuildContext context) async {
     var url =
         Uri.parse('http://localhost:5000/api/register'); // URL for local server
+    Dio dio = Dio(); // Dio instance
+
     try {
       print(firstName);
       print(lastName);
       print(email);
       print(password);
 
-      var response = await http.post(
-        url,
-        headers: {"Content-Type": "application/json"},
-        body: json.encode({
-          'first_name': firstName,
-          'last_name': lastName,
-          'email': email,
-          'password': password,
-        }),
-      );
+      var response = await dio.post(url.toString(),
+          data: {
+            'first_name': firstName,
+            'last_name': lastName,
+            'email': email,
+            'password': password,
+          },
+          options: Options(headers: {"Content-Type": "application/json"}));
 
-      print(response.body);
+      print(response.data);
 
       if (response.statusCode == 200) {
         // Success response
