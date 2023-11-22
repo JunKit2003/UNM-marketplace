@@ -49,6 +49,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.6"
+  dio:
+    dependency: "direct main"
+    description:
+      name: dio
+      sha256: "7d328c4d898a61efc3cd93655a0955858e29a0aa647f0f9e02d59b3bb275e2e8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "4.0.6"
   fake_async:
     dependency: transitive
     description:
@@ -151,10 +159,10 @@ packages:
     dependency: "direct main"
     description:
       name: provider
-      sha256: cdbe7530b12ecd9eb455bdaa2fcb8d4dad22e80b8afb4798b41479d5ce26847f
+      sha256: "9a96a0a19b594dbc5bf0f1f27d2bc67d5f95957359b461cd9feb44ed6ae75096"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.5"
+    version: "6.1.1"
   sky_engine:
     dependency: transitive
     description: flutter
