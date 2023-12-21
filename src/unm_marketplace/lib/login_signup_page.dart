@@ -18,8 +18,17 @@ class LoginSignupPage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => LoginPage()),
                 );
               },
-              child: Text('Login'),
+              child: Text('Login', style: TextStyle(fontSize: 16)),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.blue,
+                onPrimary: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              ),
             ),
+            SizedBox(height: 20), // Adds space between the buttons
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
@@ -27,7 +36,15 @@ class LoginSignupPage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => SignupPage()),
                 );
               },
-              child: Text('Signup'),
+              child: Text('Signup', style: TextStyle(fontSize: 16)),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.green,
+                onPrimary: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+              ),
             ),
           ],
         ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import './listing_page.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -24,9 +25,16 @@ class _LoginPageState extends State<LoginPage> {
       });
 
       // Handle successful response
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Login Successful')));
-      // Navigate to home or dashboard page
+      if (response.statusCode == 200) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => ListingPage()),
+        );
+      } else {
+        // Handle unsuccessful login
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Invalid credentials')));
+      }
     } on DioError catch (e) {
       if (e.response != null && e.response!.statusCode == 401) {
         // Unauthorized or login failed

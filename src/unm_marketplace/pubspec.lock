@@ -131,14 +131,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.1"
-  msal_flutter:
-    dependency: "direct main"
-    description:
-      name: msal_flutter
-      sha256: "5123bda74d513f44dd6489fe30835a138c40299bdf1e33a00df7007607c09258"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.1"
   nested:
     dependency: transitive
     description:
@@ -159,10 +151,10 @@ packages:
     dependency: "direct main"
     description:
       name: provider
-      sha256: cdbe7530b12ecd9eb455bdaa2fcb8d4dad22e80b8afb4798b41479d5ce26847f
+      sha256: "9a96a0a19b594dbc5bf0f1f27d2bc67d5f95957359b461cd9feb44ed6ae75096"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.5"
+    version: "6.1.1"
   sky_engine:
     dependency: transitive
     description: flutter

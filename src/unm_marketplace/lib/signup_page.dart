@@ -10,13 +10,13 @@ class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
   String firstName = '';
   String lastName = '';
+  String username = '';
   String email = '';
   String password = '';
 
   Future<void> registerUser(String firstName, String lastName, String email,
       String password, BuildContext context) async {
-    var url =
-        Uri.parse('http://localhost:5000/api/register'); // URL for local server
+    var url = 'http://localhost:5000/api/signup'; // URL for local server
     Dio dio = Dio(); // Dio instance
 
     try {
@@ -25,10 +25,11 @@ class _SignupPageState extends State<SignupPage> {
       print(email);
       print(password);
 
-      var response = await dio.post(url.toString(),
+      var response = await dio.post(url,
           data: {
             'first_name': firstName,
             'last_name': lastName,
+            'username': username,
             'email': email,
             'password': password,
           },
@@ -45,11 +46,21 @@ class _SignupPageState extends State<SignupPage> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Signup Failed')));
       }
+    } on DioError catch (e) {
+      // Handling DioError separately
+      if (e.response?.statusCode == 400) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(
+                  'This email is already registered. Please try another email.')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('An Unknown Error has occurred')));
+      }
     } catch (e) {
-      // Network error
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error: $e')));
-      print(e);
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An Unknown Error has occurred')));
     }
   }
 
@@ -81,6 +92,12 @@ class _SignupPageState extends State<SignupPage> {
                 validator: (value) =>
                     value!.isEmpty ? 'Please enter your last name' : null,
                 onSaved: (value) => lastName = value!,
+              ),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Username'),
+                validator: (value) =>
+                    value!.isEmpty ? 'Please enter a username' : null,
+                onSaved: (value) => username = value!,
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Email'),
