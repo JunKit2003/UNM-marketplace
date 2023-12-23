@@ -1,93 +1,63 @@
 import 'package:flutter/material.dart';
-import 'package:unm_marketplace/login_signup_page.dart';
+import 'package:dio/dio.dart';
+import 'package:unm_marketplace/DioSingleton.dart';
+import 'package:unm_marketplace/utils.dart';
 
 class ProfilePage extends StatefulWidget {
-  final String firstName;
-  final String lastName;
-  final int accountId;
+  final String username;
 
-  ProfilePage(
-      {Key? key,
-      required this.firstName,
-      required this.lastName,
-      required this.accountId})
-      : super(key: key);
+  ProfilePage({Key? key, required this.username}) : super(key: key);
 
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  String firstName = '';
+  String lastName = '';
+  String email = '';
+  Dio dio = DioSingleton.getInstance();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfileInfo();
+  }
+
+  Future<void> _fetchProfileInfo() async {
+    var url =
+        'http://${getHost()}:5000/api/profile'; // Replace with your server URL
+    try {
+      var response = await dio.post(url, data: {'username': widget.username});
+
+      if (response.statusCode == 200) {
+        var jsonResponse = response.data;
+        setState(() {
+          firstName = jsonResponse['firstName'];
+          lastName = jsonResponse['lastName'];
+          email = jsonResponse['email'];
+        });
+      } else {
+        print('Failed to load profile');
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
       ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-              ),
-              child: Text(
-                'University of Nottingham Malaysia Marketplace',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                ),
-              ),
-            ),
-            ListTile(
-              leading: Icon(Icons.list),
-              title: Text('Listing'),
-              onTap: () {
-                // Handle the tap if necessary
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.person),
-              title: Text('Profile Page'),
-              onTap: () {
-                // Handle the tap if necessary
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.cloud_upload),
-              title: Text('Upload Listing'),
-              onTap: () {
-                // Handle the tap if necessary
-                Navigator.pop(context);
-              },
-            ),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Log out'),
-              onTap: () {
-                
-                // Navigate back to LoginSignupPage
-                Navigator.pop(context); // Close the drawer
-                Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => LoginSignupPage()));
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('Name: ${widget.firstName} ${widget.lastName}',
-                style: TextStyle(fontSize: 20)),
-            SizedBox(height: 10),
-            Text('Account ID: ${widget.accountId}',
-                style: TextStyle(fontSize: 20)),
+            Text('First Name: $firstName'),
+            Text('Last Name: $lastName'),
+            Text('Email: $email'),
           ],
         ),
       ),

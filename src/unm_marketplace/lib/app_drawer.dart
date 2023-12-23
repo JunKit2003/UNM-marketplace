@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:unm_marketplace/login_signup_page.dart';
 import 'package:dio/dio.dart';
+import 'package:unm_marketplace/profile_page.dart';
+import 'package:unm_marketplace/DioSingleton.dart';
+import 'package:unm_marketplace/utils.dart';
 
 class AppDrawer extends StatelessWidget {
   // Add constructor if needed
 
+  Future<String> getUsername() async {
+    Dio dio = DioSingleton.getInstance();
+    final response = await dio.post('http://${getHost()}:5000/api/getUsername');
+    print(response.data['username']);
+    return response.data['username'];
+  }
+
   Future<void> logoutUser(BuildContext context) async {
     var dio = Dio();
-    var url = 'http://localhost:5000/api/logout'; // Adjust as needed
+    var url = 'http://${getHost()}:5000/api/logout'; // Adjust as needed
 
     try {
       var response = await dio.post(url);
@@ -50,11 +60,16 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.person),
             title: Text('Profile Page'),
-            onTap: () {
-              // Handle the tap if necessary
-              Navigator.pop(context);
+            onTap: () async {
+              String username = await getUsername();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ProfilePage(username: username)),
+              );
             },
           ),
+
           ListTile(
             leading: Icon(Icons.cloud_upload),
             title: Text('Upload Listing'),

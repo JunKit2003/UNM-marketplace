@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:unm_marketplace/DioSingleton.dart';
+import 'package:unm_marketplace/utils.dart';
 
 class SignupPage extends StatefulWidget {
   @override
@@ -16,8 +18,8 @@ class _SignupPageState extends State<SignupPage> {
 
   Future<void> registerUser(String firstName, String lastName, String email,
       String password, BuildContext context) async {
-    var url = 'http://localhost:5000/api/signup'; // URL for local server
-    Dio dio = Dio(); // Dio instance
+    var url = 'http://${getHost()}:5000/api/signup'; // URL for local server
+    Dio dio = DioSingleton.getInstance();
 
     try {
       print(firstName);

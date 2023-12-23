@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import './listing_page.dart';
+import 'package:unm_marketplace/DioSingleton.dart';
+import 'package:unm_marketplace/utils.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -14,9 +16,9 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> loginUser(
       String email, String password, BuildContext context) async {
-    var dio = Dio();
+    Dio dio = DioSingleton.getInstance();
     var url =
-        'http://localhost:5000/api/login'; // Adjust the URL as per your server setup
+        'http://${getHost()}:5000/api/login'; // Adjust the URL as per your server setup
 
     try {
       var response = await dio.post(url, data: {

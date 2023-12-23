@@ -12,9 +12,10 @@ app.use(express.json());
 
 
 app.use(cors({
-    origin: '*',
+    origin: 'http://localhost:8000',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
   }));
 
 // Session configuration
