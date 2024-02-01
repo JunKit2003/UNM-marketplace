@@ -3,6 +3,7 @@ import 'package:unm_marketplace/login_signup_page.dart';
 import 'package:dio/dio.dart';
 import 'package:unm_marketplace/profile_page.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
+import 'package:unm_marketplace/upload_listing.dart';
 import 'package:unm_marketplace/utils.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -74,10 +75,14 @@ class AppDrawer extends StatelessWidget {
             leading: Icon(Icons.cloud_upload),
             title: Text('Upload Listing'),
             onTap: () {
-              // Handle the tap if necessary
-              Navigator.pop(context);
+              // Navigate to the UploadListingPage
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => UploadListingPage()),
+              );
             },
           ),
+
           ListTile(
             leading: Icon(Icons.logout),
             title: Text('Log out'),

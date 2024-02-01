@@ -28,6 +28,8 @@ app.use(session({
 
 app.use('/api', appRoutes);
 
+app.use('/images', express.static('images'));
+
 
 app.listen(parsed.PORT_SERVER, () => {
     console.log(`Server started on http://${parsed.HOST}:${parsed.PORT_SERVER}`);

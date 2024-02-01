@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
@@ -16,6 +18,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String firstName = '';
   String lastName = '';
   String email = '';
+  String username = '';
   Dio dio = DioSingleton.getInstance();
 
   @override
@@ -36,6 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
           firstName = jsonResponse['firstName'];
           lastName = jsonResponse['lastName'];
           email = jsonResponse['email'];
+          username = jsonResponse['username'];
         });
       } else {
         print('Failed to load profile');
@@ -58,6 +62,7 @@ class _ProfilePageState extends State<ProfilePage> {
             Text('First Name: $firstName'),
             Text('Last Name: $lastName'),
             Text('Email: $email'),
+            Text('Username: $username'),
           ],
         ),
       ),
