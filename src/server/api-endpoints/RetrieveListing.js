@@ -10,11 +10,9 @@ module.exports = async function retrieveListing(req, res) {
     const listings = await db.query(selectQuery);
 
     // Convert local file paths to HTTP URLs for images
-    const baseURL = 'C:/SEGP/UNM-marketplace/src/server/images/';
     const listingsWithHTTPURLs = listings.map(listing => {
       return {
         ...listing,
-        ImageURL: baseURL + listing.ImageID.split('\\').pop()
       };
     });
 
