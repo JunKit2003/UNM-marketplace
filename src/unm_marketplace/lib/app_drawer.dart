@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:unm_marketplace/listing_page.dart';
 import 'package:unm_marketplace/login_signup_page.dart';
 import 'package:dio/dio.dart';
 import 'package:unm_marketplace/profile_page.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
 import 'package:unm_marketplace/upload_listing.dart';
 import 'package:unm_marketplace/utils.dart';
+import 'package:unm_marketplace/ListedAd.dart'; // Import the ListedAd.dart file
 
 class AppDrawer extends StatelessWidget {
   // Add constructor if needed
@@ -54,8 +56,10 @@ class AppDrawer extends StatelessWidget {
             leading: Icon(Icons.list),
             title: Text('Listing'),
             onTap: () {
-              // Handle the tap if necessary
-              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ListingPage()),
+              );
             },
           ),
           ListTile(
@@ -79,6 +83,23 @@ class AppDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => UploadListingPage()),
+              );
+            },
+          ),
+
+          // In the AppDrawer, where you navigate to the ListedAd page, provide the username parameter
+
+          ListTile(
+            leading: Icon(Icons.list_alt), // Icon for the new option
+            title: Text('Listed Advertisements'), // Text for the new option
+            onTap: () async {
+              String username = await getUsername(); // Fetch the username
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ListedAd(
+                        username:
+                            username)), // Provide the username to ListedAd
               );
             },
           ),

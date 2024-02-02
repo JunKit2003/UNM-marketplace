@@ -127,6 +127,7 @@ class _UploadListingPageState extends State<UploadListingPage> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Listing photo uploaded successfully')),
           );
+          Navigator.pop(context); // Navigate back to the previous screen
         } else {
           // Handle failure
           ScaffoldMessenger.of(context).showSnackBar(
@@ -160,6 +161,12 @@ class _UploadListingPageState extends State<UploadListingPage> {
                     title = value;
                   });
                 },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a title';
+                  }
+                  return null;
+                },
               ),
               ListTile(
                 leading: Icon(Icons.photo),
@@ -182,6 +189,12 @@ class _UploadListingPageState extends State<UploadListingPage> {
                     description = value;
                   });
                 },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a description';
+                  }
+                  return null;
+                },
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Price'),
@@ -190,6 +203,12 @@ class _UploadListingPageState extends State<UploadListingPage> {
                     price = value;
                   });
                 },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a price';
+                  }
+                  return null;
+                },
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Category'),
@@ -197,6 +216,12 @@ class _UploadListingPageState extends State<UploadListingPage> {
                   setState(() {
                     category = value;
                   });
+                },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a category';
+                  }
+                  return null;
                 },
               ),
               ElevatedButton(

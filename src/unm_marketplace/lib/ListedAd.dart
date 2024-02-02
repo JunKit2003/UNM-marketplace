@@ -2,17 +2,20 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:intl/intl.dart'; // Import for DateFormat
-import 'package:unm_marketplace/app_drawer.dart';
-import 'package:unm_marketplace/DioSingleton.dart';
+import 'package:intl/intl.dart';
 import 'package:unm_marketplace/utils.dart';
+import 'package:unm_marketplace/DioSingleton.dart';
 
-class ListingPage extends StatefulWidget {
+class ListedAd extends StatefulWidget {
+  final String username;
+
+  const ListedAd({Key? key, required this.username}) : super(key: key);
+
   @override
-  _ListingPageState createState() => _ListingPageState();
+  _ListedAdState createState() => _ListedAdState();
 }
 
-class _ListingPageState extends State<ListingPage> {
+class _ListedAdState extends State<ListedAd> {
   List<dynamic> listings = [];
   Dio dio = DioSingleton.getInstance();
   late Timer _timer;
@@ -60,12 +63,10 @@ class _ListingPageState extends State<ListingPage> {
     }
   }
 
-  // Method to format the posted date with GMT+8 timezone
   String formatPostedDate(String postedDate) {
     try {
-      DateTime dateTime = DateTime.parse(postedDate).toUtc().add(Duration(
-          hours:
-              8)); // Parse the posted date string and convert to UTC, then add 8 hours
+      DateTime dateTime =
+          DateTime.parse(postedDate).toUtc().add(Duration(hours: 8));
       return DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
     } catch (e) {
       print('Error formatting posted date: $e');
@@ -75,23 +76,26 @@ class _ListingPageState extends State<ListingPage> {
 
   @override
   Widget build(BuildContext context) {
+    List<dynamic> userAds = listings
+        .where((listing) => listing['PostedBy'] == widget.username)
+        .toList();
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Marketplace'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.refresh),
-            onPressed: fetchListings,
-          ),
-        ],
+        title: Text('Your Listed Advertisements'),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to the previous screen
+          },
+        ),
       ),
-      drawer: AppDrawer(),
-      body: listings.isEmpty
-          ? Center(child: Text('No listings available'))
+      body: userAds.isEmpty
+          ? Center(child: Text('You have not listed any advertisements.'))
           : ListView.builder(
-              itemCount: listings.length,
+              itemCount: userAds.length,
               itemBuilder: (context, index) {
-                var listing = listings.reversed.toList()[index];
+                var listing = userAds[index];
                 return Card(
                   child: ListTile(
                     leading: SizedBox(
@@ -122,7 +126,6 @@ class _ListingPageState extends State<ListingPage> {
                         Text(listing['description']),
                         Text('Price: \RM${listing['price']}'),
                         Text('Category: ${listing['category']}'),
-                        Text('Posted By: ${listing['PostedBy']}'),
                         Text(
                             'Posted Date: ${formatPostedDate(listing['postedDate'])}'),
                       ],
