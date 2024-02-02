@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:html';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -19,7 +20,15 @@ class _UploadListingPageState extends State<UploadListingPage> {
   String description = '';
   String price = '';
   String category = '';
+  String PostedBy = '';
   Dio dio = DioSingleton.getInstance();
+
+  Future<String> _getUsername() async {
+    Dio dio = DioSingleton.getInstance();
+    final response = await dio.post('http://${getHost()}:5000/api/getUsername');
+    print(response.data['username']);
+    return response.data['username'];
+  }
 
   Future<void> _pickListingPhoto() async {
     final picker = ImagePicker();
@@ -47,6 +56,7 @@ class _UploadListingPageState extends State<UploadListingPage> {
       print('Description: $description');
       print('Price: $price');
       print('Category: $category');
+      print('PostedBy : $PostedBy');
 
       // Send data
       var url = 'http://${getHost()}:5000/api/UploadListingDetails';
@@ -58,6 +68,7 @@ class _UploadListingPageState extends State<UploadListingPage> {
             'description': description,
             'price': price,
             'category': category,
+            'PostedBy': await _getUsername(),
           },
           options: Options(
             headers: {
@@ -152,12 +163,16 @@ class _UploadListingPageState extends State<UploadListingPage> {
               ),
               ListTile(
                 leading: Icon(Icons.photo),
-                title: _imageBytes == null
-                    ? Text('No image selected')
-                    : Image.memory(
-                        _imageBytes!,
-                        fit: BoxFit.cover,
-                      ),
+                title: Container(
+                  height: 200, // Adjust the height as needed
+                  width: 200, // Adjust the width as needed
+                  child: _imageBytes == null
+                      ? Text('No image selected')
+                      : Image.memory(
+                          _imageBytes!,
+                          fit: BoxFit.scaleDown,
+                        ),
+                ),
                 onTap: _pickListingPhoto,
               ),
               TextFormField(
@@ -186,18 +201,16 @@ class _UploadListingPageState extends State<UploadListingPage> {
               ),
               ElevatedButton(
                 onPressed: () async {
-                  _submitListingDetails();
                   // Inside an asynchronous function or method
                   int listingId = await _submitListingDetails();
                   if (listingId != -1) {
                     // Do something with the listingId
                     print('Listing ID: $listingId');
+                    _submitListingPhoto(listingId);
                   } else {
                     // Handle the case where the submission failed
                     print('Failed to submit listing details');
                   }
-
-                  _submitListingPhoto(listingId);
                 },
                 child: Text('Submit'),
               ),

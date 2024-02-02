@@ -6,3 +6,4 @@ exports.profile = require('./profile');
 exports.getUsername = require('./getUsername');
 exports.UploadListingDetails = require('./UploadListingDetails');
 exports.UploadListingPhoto = require('./UploadListingPhoto');
+exports.RetrieveListing = require('./RetrieveListing');

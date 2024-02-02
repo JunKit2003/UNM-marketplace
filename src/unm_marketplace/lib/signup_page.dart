@@ -51,10 +51,9 @@ class _SignupPageState extends State<SignupPage> {
     } on DioError catch (e) {
       // Handling DioError separately
       if (e.response?.statusCode == 400) {
+        String errorMessage = e.response?.data['message'] ?? 'Signup Failed';
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  'This email is already registered. Please try another email.')),
+          SnackBar(content: Text(errorMessage)),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
