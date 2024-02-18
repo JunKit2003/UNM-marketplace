@@ -1,8 +1,12 @@
+import 'dart:convert';
+import 'dart:html';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
 import 'package:unm_marketplace/utils.dart';
 import 'dart:typed_data';
+import 'package:image_picker/image_picker.dart';
 
 class ProfilePage extends StatefulWidget {
   final String username;
@@ -14,6 +18,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  Uint8List? _imageBytes;
   String firstName = '';
   String lastName = '';
   String email = '';
@@ -26,6 +31,13 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _fetchProfileInfo();
+  }
+
+  Future<String> _getUsername() async {
+    Dio dio = DioSingleton.getInstance();
+    final response = await dio.post('http://${getHost()}:5000/api/getUsername');
+    print(response.data['username']);
+    return response.data['username'];
   }
 
   Future<void> _fetchProfileInfo() async {
@@ -62,8 +74,62 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> _pickProfilePhoto() async {
+    final picker = ImagePicker();
+    try {
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile != null) {
+        final Uint8List bytes = await pickedFile.readAsBytes();
+        setState(() {
+          _imageBytes = bytes;
+        });
+      } else {
+        // User canceled the picker
+      }
+    } catch (e) {
+      print('Error picking listing photo: $e');
+    }
+  }
+
   Future<void> _updateProfilePicture() async {
-    // Implement the logic to update the profile picture here
+    if (_imageBytes != null) {
+      try {
+        FormData formData = FormData.fromMap({
+          'profilePhoto':
+              MultipartFile.fromBytes(_imageBytes!, filename: 'profile.jpg'),
+          'username': username,
+        });
+
+        var response = await dio.post(
+          'http://${getHost()}:5000/api/UpdateProfilePhoto',
+          data: formData,
+          options: Options(
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          ),
+        );
+
+        if (response.statusCode == 200) {
+          // Handle success
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Profile photo uploaded successfully')),
+          );
+          // You might want to refresh the profile page after successful upload
+          _fetchProfileInfo();
+        } else {
+          // Handle failure
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Profile photo upload failed')),
+          );
+        }
+      } catch (e) {
+        print('Error updating profile photo: $e');
+      }
+    } else {
+      print('profilePhoto is null');
+    }
   }
 
   @override
@@ -78,44 +144,38 @@ class _ProfilePageState extends State<ProfilePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Center(
-              child: MouseRegion(
-                onEnter: (_) => setState(() => isHovering = true),
-                onExit: (_) => setState(() => isHovering = false),
-                child: AnimatedContainer(
-                  duration: Duration(milliseconds: 300),
-                  curve: Curves.easeInOut,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: isHovering
-                        ? Border.all(color: Colors.blue, width: 2)
-                        : null,
-                  ),
-                  child: GestureDetector(
-                    onTap: _updateProfilePicture,
-                    child: FutureBuilder<Uint8List>(
-                      future: fetchImageData(
-                        'http://${getHost()}:5000/images/$profilePicture',
-                      ),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Icon(Icons.error);
-                        } else {
-                          return CircleAvatar(
-                            radius: 50,
-                            backgroundColor: Colors.grey[300],
-                            backgroundImage: snapshot.hasData
-                                ? MemoryImage(snapshot.data!)
-                                : AssetImage('assets/default_profile.jpg')
-                                    as ImageProvider<Object>,
-                          );
-                        }
-                      },
+              child: Column(
+                children: [
+                  FutureBuilder<Uint8List>(
+                    future: fetchImageData(
+                      'http://${getHost()}:5000/images/$profilePicture',
                     ),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Icon(Icons.error);
+                      } else {
+                        return CircleAvatar(
+                          radius: 50,
+                          backgroundColor: Colors.grey[300],
+                          backgroundImage: snapshot.hasData
+                              ? MemoryImage(snapshot.data!)
+                              : AssetImage('assets/default_profile.jpg')
+                                  as ImageProvider<Object>,
+                        );
+                      }
+                    },
                   ),
-                ),
+                  SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await _pickProfilePhoto(); // Wait for the user to pick a profile photo
+                      await _updateProfilePicture(); // Submit the picked profile photo
+                    },
+                    child: Text('Change Profile Picture'),
+                  ),
+                ],
               ),
             ),
             SizedBox(height: 20),
