@@ -19,9 +19,31 @@ class _UploadListingPageState extends State<UploadListingPage> {
   String title = '';
   String description = '';
   String price = '';
-  String category = '';
+  String category = ''; // Updated category field
   String PostedBy = '';
   Dio dio = DioSingleton.getInstance();
+
+  // Define a list of categories
+  List<String> categories = [
+    'Books',
+    'Vehicles',
+    'Property Rentals',
+    'Home & Garden',
+    'Electronics',
+    'Hobbies',
+    'Clothing & Accessories',
+    'Family',
+    'Entertainment',
+    'Sports equipment',
+    'Other'
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Set the initial value of category to the first item in the categories list
+    category = categories.isNotEmpty ? categories[0] : '';
+  }
 
   Future<String> _getUsername() async {
     Dio dio = DioSingleton.getInstance();
@@ -210,16 +232,38 @@ class _UploadListingPageState extends State<UploadListingPage> {
                   return null;
                 },
               ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Category'),
-                onChanged: (value) {
-                  setState(() {
-                    category = value;
-                  });
+              // DropdownButtonFormField for category selection
+              FormField<String>(
+                builder: (FormFieldState<String> state) {
+                  return InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'Category',
+                      errorText: state.errorText,
+                    ),
+                    isEmpty: category == '',
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: category,
+                        isDense: true,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            category = newValue!;
+                            state.didChange(newValue);
+                          });
+                        },
+                        items: categories.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  );
                 },
                 validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Please enter a category';
+                  if (value == null || value.isEmpty) {
+                    return 'Please choose a category';
                   }
                   return null;
                 },

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:intl/intl.dart'; // Import for DateFormat
+import 'package:intl/intl.dart';
 import 'package:unm_marketplace/app_drawer.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
 import 'package:unm_marketplace/utils.dart';
@@ -14,6 +14,11 @@ class ListingPage extends StatefulWidget {
 
 class _ListingPageState extends State<ListingPage> {
   List<dynamic> listings = [];
+  List<dynamic> filteredListings = [];
+  TextEditingController searchController = TextEditingController();
+  String? selectedCategory = 'All';
+  double? minPrice;
+  double? maxPrice;
   Dio dio = DioSingleton.getInstance();
   late Timer _timer;
 
@@ -40,6 +45,7 @@ class _ListingPageState extends State<ListingPage> {
       if (response.statusCode == 200) {
         setState(() {
           listings = response.data['listings'];
+          filteredListings = List.from(listings);
         });
       } else {
         print('Error: ${response.statusCode}');
@@ -49,28 +55,35 @@ class _ListingPageState extends State<ListingPage> {
     }
   }
 
-  Future<Uint8List> fetchImageData(String imageUrl) async {
-    try {
-      var response = await dio.get(imageUrl,
-          options: Options(responseType: ResponseType.bytes));
-      return Uint8List.fromList(response.data);
-    } catch (e) {
-      print('Error fetching image data: $e');
-      return Uint8List(0);
-    }
+  void searchListings(String query) {
+    setState(() {
+      filteredListings = listings
+          .where((listing) =>
+              listing['title'].toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
   }
 
-  // Method to format the posted date with GMT+8 timezone
-  String formatPostedDate(String postedDate) {
-    try {
-      DateTime dateTime = DateTime.parse(postedDate).toUtc().add(Duration(
-          hours:
-              8)); // Parse the posted date string and convert to UTC, then add 8 hours
-      return DateFormat('yyyy-MM-dd HH:mm:ss').format(dateTime);
-    } catch (e) {
-      print('Error formatting posted date: $e');
-      return 'Invalid Date';
-    }
+  void applyFilters() {
+    setState(() {
+      if (selectedCategory == 'All') {
+        filteredListings = listings.where((listing) {
+          bool matchesPriceRange =
+              (minPrice == null || listing['price'] >= minPrice!) &&
+                  (maxPrice == null || listing['price'] <= maxPrice!);
+          return matchesPriceRange;
+        }).toList();
+      } else {
+        filteredListings = listings.where((listing) {
+          bool matchesCategory = selectedCategory == null ||
+              listing['category'] == selectedCategory;
+          bool matchesPriceRange =
+              (minPrice == null || listing['price'] >= minPrice!) &&
+                  (maxPrice == null || listing['price'] <= maxPrice!);
+          return matchesCategory && matchesPriceRange;
+        }).toList();
+      }
+    });
   }
 
   @override
@@ -86,54 +99,308 @@ class _ListingPageState extends State<ListingPage> {
         ],
       ),
       drawer: AppDrawer(),
-      body: listings.isEmpty
-          ? Center(child: Text('No listings available'))
-          : ListView.builder(
-              itemCount: listings.length,
-              itemBuilder: (context, index) {
-                var listing = listings.reversed.toList()[index];
-                return Card(
-                  child: ListTile(
-                    leading: SizedBox(
-                      width: 100,
-                      height: 100,
-                      child: FutureBuilder<Uint8List>(
-                        future: fetchImageData(
-                            'http://${getHost()}:5000/images/${listing['ImageID']}'),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          }
-                          if (snapshot.hasError || !snapshot.hasData) {
-                            return Icon(Icons.error);
-                          }
-                          return Image.memory(
-                            snapshot.data!,
-                            fit: BoxFit.cover,
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      labelText: 'Search Listings',
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: searchListings,
+                  ),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Filters'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              DropdownButtonFormField<String>(
+                                value: selectedCategory,
+                                items: [
+                                  DropdownMenuItem(
+                                    value: 'All',
+                                    child: Text('All'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Books',
+                                    child: Text('Books'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Vehicles',
+                                    child: Text('Vehicles'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Property Rentals',
+                                    child: Text('Property Rentals'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Home & Garden',
+                                    child: Text('Home & Garden'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Electronics',
+                                    child: Text('Electronics'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Hobbies',
+                                    child: Text('Hobbies'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Clothing & Accessories',
+                                    child: Text('Clothing & Accessories'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Family',
+                                    child: Text('Family'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Entertainment',
+                                    child: Text('Entertainment'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Sports equipment',
+                                    child: Text('Sports equipment'),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: 'Other',
+                                    child: Text('Other'),
+                                  ),
+                                ],
+                                onChanged: (value) {
+                                  setState(() {
+                                    selectedCategory = value;
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Category',
+                                ),
+                              ),
+                              TextFormField(
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  labelText: 'Min Price',
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    minPrice = double.tryParse(value);
+                                  });
+                                },
+                              ),
+                              TextFormField(
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  labelText: 'Max Price',
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    maxPrice = double.tryParse(value);
+                                  });
+                                },
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                applyFilters();
+                                Navigator.pop(context);
+                              },
+                              child: Text('Apply'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                setState(() {
+                                  selectedCategory = 'All';
+                                  minPrice = null;
+                                  maxPrice = null;
+                                });
+                                applyFilters();
+                                Navigator.pop(context);
+                              },
+                              child: Text('Clear Filters'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
+                  child: Text('Filter'),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: filteredListings.isEmpty
+                ? Center(child: Text('No listings available'))
+                : GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount:
+                          MediaQuery.of(context).size.width > 600 ? 4 : 2,
+                      crossAxisSpacing: 8.0,
+                      mainAxisSpacing: 8.0,
+                      childAspectRatio:
+                          MediaQuery.of(context).size.width > 600 ? 0.75 : 1.0,
+                    ),
+                    itemCount: filteredListings.length,
+                    itemBuilder: (context, index) {
+                      var listing = filteredListings.reversed.toList()[index];
+                      return GestureDetector(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return ListingDetailDialog(listing: listing);
+                            },
                           );
                         },
-                      ),
-                    ),
-                    title: Text(listing['title']),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(listing['description']),
-                        Text('Price: \RM${listing['price']}'),
-                        Text('Category: ${listing['category']}'),
-                        Text('Posted By: ${listing['PostedBy']}'),
-                        Text(
-                            'Posted Date: ${formatPostedDate(listing['postedDate'])}'),
-                      ],
-                    ),
-                    onTap: () {
-                      // Handle tapping on the listing
+                        child: Card(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: FutureBuilder<Uint8List>(
+                                  future: fetchImageData(
+                                      'http://${getHost()}:5000/images/${listing['ImageID']}'),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                          child: CircularProgressIndicator());
+                                    }
+                                    if (snapshot.hasError ||
+                                        !snapshot.hasData) {
+                                      return Icon(Icons.error);
+                                    }
+                                    return Image.memory(
+                                      snapshot.data!,
+                                      fit: BoxFit
+                                          .contain, // Adjust the fit property
+                                      width: double.infinity,
+                                    );
+                                  },
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      listing['title'],
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text('Price: RM ${listing['price']}'),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
                     },
                   ),
-                );
-              },
-            ),
+          ),
+        ],
+      ),
     );
   }
+
+  Future<Uint8List> fetchImageData(String imageUrl) async {
+    try {
+      var response = await dio.get(imageUrl,
+          options: Options(responseType: ResponseType.bytes));
+      return Uint8List.fromList(response.data);
+    } catch (e) {
+      print('Error fetching image data: $e');
+      return Uint8List(0);
+    }
+  }
+}
+
+class ListingDetailDialog extends StatelessWidget {
+  final dynamic listing;
+
+  ListingDetailDialog({required this.listing});
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 300, // Adjust width as needed
+            height: 200, // Adjust height as needed
+            child: Image.network(
+              'http://${getHost()}:5000/images/${listing['ImageID']}',
+              fit: BoxFit.contain, // Adjust the fit property
+            ),
+          ),
+          ListTile(
+            title: Text(listing['title']),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Description: ${listing['description']}'),
+                Text('Category: ${listing['category']}'),
+                Text('Posted By: ${listing['PostedBy']}'),
+                Text('Price: RM ${listing['price']}'),
+                Text('Posted Date: ${formatPostedDate(listing['postedDate'])}'),
+              ],
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // Close the dialog
+            },
+            child: Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String formatPostedDate(String postedDate) {
+    try {
+      DateTime postedDateTime =
+          DateTime.parse(postedDate).toUtc().add(Duration(hours: 8));
+      Duration difference = DateTime.now().difference(postedDateTime);
+      String differenceString = '';
+
+      if (difference.inDays > 0) {
+        differenceString = '${difference.inDays} days ago';
+      } else if (difference.inHours > 0) {
+        differenceString = '${difference.inHours} hours ago';
+      } else if (difference.inMinutes > 0) {
+        differenceString = '${difference.inMinutes} minutes ago';
+      } else {
+        differenceString = 'Just now';
+      }
+
+      return '${DateFormat('yyyy-MM-dd HH:mm:ss').format(postedDateTime)} ($differenceString)';
+    } catch (e) {
+      print('Error formatting posted date: $e');
+      return 'Invalid Date';
+    }
+  }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: ListingPage(),
+  ));
 }
