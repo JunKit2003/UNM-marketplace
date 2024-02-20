@@ -26,7 +26,7 @@ class _ListingPageState extends State<ListingPage> {
   void initState() {
     super.initState();
     fetchListings();
-    _timer = Timer.periodic(Duration(seconds: 30), (timer) {
+    _timer = Timer.periodic(Duration(seconds: 300), (timer) {
       fetchListings();
     });
   }
@@ -376,21 +376,29 @@ class ListingDetailDialog extends StatelessWidget {
 
   String formatPostedDate(String postedDate) {
     try {
+      // Parse the posted date and adjust to Malaysia time
       DateTime postedDateTime =
-          DateTime.parse(postedDate).toUtc().add(Duration(hours: 8));
-      Duration difference = DateTime.now().difference(postedDateTime);
+          DateTime.parse(postedDate).add(Duration(hours: 8));
+      DateTime now =
+          DateTime.now().add(Duration(hours: 8)); // Adjust for Malaysia time
+
+      Duration difference = now.difference(postedDateTime);
       String differenceString = '';
 
       if (difference.inDays > 0) {
-        differenceString = '${difference.inDays} days ago';
+        differenceString =
+            '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
       } else if (difference.inHours > 0) {
-        differenceString = '${difference.inHours} hours ago';
+        differenceString =
+            '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
       } else if (difference.inMinutes > 0) {
-        differenceString = '${difference.inMinutes} minutes ago';
+        differenceString =
+            '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
       } else {
         differenceString = 'Just now';
       }
 
+      // Format the posted date with the time difference
       return '${DateFormat('yyyy-MM-dd HH:mm:ss').format(postedDateTime)} ($differenceString)';
     } catch (e) {
       print('Error formatting posted date: $e');

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
+import 'package:unm_marketplace/EditListingPage.dart';
 import 'package:unm_marketplace/utils.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
 
@@ -74,6 +75,42 @@ class _ListedAdState extends State<ListedAd> {
     }
   }
 
+  Future<void> _deleteListing(dynamic listing) async {
+    var url =
+        'http://${getHost()}:5000/api/DeleteListing'; // Endpoint without ID
+
+    try {
+      var response = await dio.post(
+        url,
+        data: {'id': listing['id']}, // Include ID in the form data
+      );
+
+      if (response.statusCode == 200) {
+        // Refresh the listings after deletion
+        fetchListings();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Advertisement deleted successfully.'),
+          ),
+        );
+      } else {
+        print('Error: ${response.statusCode}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete advertisement.'),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Dio Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to delete advertisement.'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     List<dynamic> userAds = listings
@@ -131,12 +168,54 @@ class _ListedAdState extends State<ListedAd> {
                       ],
                     ),
                     onTap: () {
-                      // Handle tapping on the listing
+                      _showEditDeleteDialog(
+                          listing['id']); // Pass the listing ID to the dialog
                     },
                   ),
                 );
               },
             ),
+    );
+  }
+
+  void _showEditDeleteDialog(int listingId) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Listing Options"),
+          content: Text("Choose an option"),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        EditListingPage(id: listingId),
+                  ),
+                );
+              },
+              child: Text("Edit"),
+            ),
+            TextButton(
+              onPressed: () {
+                // Perform the delete operation
+                _deleteListing({'id': listingId});
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Delete"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text("Cancel"),
+            ),
+          ],
+        );
+      },
     );
   }
 }

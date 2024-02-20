@@ -1,4 +1,4 @@
-const db = require('../database/connection'); // Adjust path as needed
+const db = require('../database/connection.js'); // Adjust path as needed
 
 
 module.exports = async function getUsername(req, res) {

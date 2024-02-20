@@ -9,3 +9,4 @@ exports.UploadListingPhoto = require('./UploadListingPhoto');
 exports.RetrieveListing = require('./RetrieveListing');
 exports.DeleteListing = require('./DeleteListing');
 exports.UpdateProfilePhoto = require('./UpdateProfilePhoto');
+exports.EditListing = require('./EditListing');
