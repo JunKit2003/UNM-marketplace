@@ -10,3 +10,4 @@ exports.RetrieveListing = require('./RetrieveListing');
 exports.DeleteListing = require('./DeleteListing');
 exports.UpdateProfilePhoto = require('./UpdateProfilePhoto');
 exports.EditListing = require('./EditListing');
+exports.DeleteListingPhoto = require('./DeleteListingPhoto');

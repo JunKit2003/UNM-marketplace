@@ -8,6 +8,7 @@ module.exports = async function retrieveListing(req, res) {
     let listings;
     if (req.query.id) {
       // If ID is provided, retrieve details for that specific listing
+      console.log(`------------------------------------------------------------------Listing ID in backend: ${req.query.id}`)
       const selectQuery = 'SELECT * FROM marketplace.listing WHERE id = ?';
       listings = await db.query(selectQuery, [req.query.id]);
     } else {

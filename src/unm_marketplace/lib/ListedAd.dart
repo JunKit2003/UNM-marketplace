@@ -192,8 +192,10 @@ class _ListedAdState extends State<ListedAd> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) =>
-                        EditListingPage(id: listingId),
+                    builder: (context) => EditListingPage(
+                      listingId: listingId,
+                      onSubmitted: fetchListings, // Pass the callback function
+                    ),
                   ),
                 );
               },
