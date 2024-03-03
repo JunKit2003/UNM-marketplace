@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:html';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
@@ -24,6 +21,7 @@ class _ProfilePageState extends State<ProfilePage> {
   String email = '';
   String username = '';
   String profilePicture = ''; // Changed to camelCase for consistency
+  String phoneNumber = ''; // Added phone number
   Dio dio = DioSingleton.getInstance();
   bool isHovering = false;
 
@@ -54,6 +52,7 @@ class _ProfilePageState extends State<ProfilePage> {
           username = jsonResponse['username'];
           profilePicture =
               jsonResponse['ProfilePicture']; // Corrected variable name
+          phoneNumber = jsonResponse['phone_number']; // Retrieve phone number
         });
       } else {
         print('Failed to load profile');
@@ -67,10 +66,17 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       var response = await dio.get(imageUrl,
           options: Options(responseType: ResponseType.bytes));
-      return Uint8List.fromList(response.data);
+
+      if (response.statusCode == 200) {
+        return Uint8List.fromList(response.data);
+      } else {
+        // Handle other status codes if needed
+        print('Unexpected status code: ${response.statusCode}');
+        return Uint8List(0); // Return an empty Uint8List as a fallback
+      }
     } catch (e) {
       print('Error fetching image data: $e');
-      return Uint8List(0);
+      return Uint8List(0); // Return an empty Uint8List as a fallback
     }
   }
 
@@ -138,85 +144,84 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         title: Text('Profile'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Center(
-              child: Column(
-                children: [
-                  FutureBuilder<Uint8List>(
-                    future: fetchImageData(
-                      'http://${getHost()}:5000/images/$profilePicture',
+      body: Center(
+        child: SingleChildScrollView(
+          child: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ConstrainedBox(
+                constraints:
+                    BoxConstraints(maxWidth: 600), // Limit maximum width
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Column(
+                      children: [
+                        FutureBuilder<Uint8List>(
+                          future: fetchImageData(
+                            'http://${getHost()}:5000/images/$profilePicture',
+                          ),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return CircularProgressIndicator();
+                            } else if (snapshot.hasError) {
+                              return Icon(Icons.error);
+                            } else {
+                              return CircleAvatar(
+                                radius: 80,
+                                backgroundColor: Colors.grey[300],
+                                backgroundImage: snapshot.hasData
+                                    ? MemoryImage(snapshot.data!)
+                                    : const AssetImage('assets/DefaultProfilePicture.jpg')
+                                        as ImageProvider<Object>,
+                              );
+                            }
+                          },
+                        ),
+                        SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () async {
+                            await _pickProfilePhoto();
+                            await _updateProfilePicture();
+                          },
+                          child: Text('Change Profile Picture'),
+                        ),
+                      ],
                     ),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Icon(Icons.error);
-                      } else {
-                        return CircleAvatar(
-                          radius: 50,
-                          backgroundColor: Colors.grey[300],
-                          backgroundImage: snapshot.hasData
-                              ? MemoryImage(snapshot.data!)
-                              : AssetImage('assets/default_profile.jpg')
-                                  as ImageProvider<Object>,
-                        );
-                      }
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await _pickProfilePhoto(); // Wait for the user to pick a profile photo
-                      await _updateProfilePicture(); // Submit the picked profile photo
-                    },
-                    child: Text('Change Profile Picture'),
-                  ),
-                ],
+                    SizedBox(height: 20),
+                    _buildProfileItem('First Name', firstName),
+                    _buildProfileItem('Last Name', lastName),
+                    _buildProfileItem('Email', email),
+                    _buildProfileItem('Username', username),
+                    _buildProfileItem('Phone Number', phoneNumber),
+                  ],
+                ),
               ),
             ),
-            SizedBox(height: 20),
-            Text(
-              'First Name:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            Text(
-              firstName,
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Last Name:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            Text(
-              lastName,
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Email:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            Text(
-              email,
-              style: TextStyle(fontSize: 16),
-            ),
-            SizedBox(height: 10),
-            Text(
-              'Username:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
-            Text(
-              username,
-              style: TextStyle(fontSize: 16),
-            ),
-          ],
+          ),
         ),
       ),
+    );
+  }
+
+  Widget _buildProfileItem(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 10),
+        Text(
+          label,
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        ),
+        SizedBox(height: 5),
+        Text(
+          value,
+          style: TextStyle(fontSize: 14),
+        ),
+        Divider(), // Add divider for separation
+      ],
     );
   }
 }

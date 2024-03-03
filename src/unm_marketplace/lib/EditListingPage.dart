@@ -23,6 +23,7 @@ class _EditListingPageState extends State<EditListingPage> {
   TextEditingController title = TextEditingController();
   TextEditingController description = TextEditingController();
   TextEditingController price = TextEditingController();
+  TextEditingController ContactDescription = TextEditingController();
   TextEditingController category = TextEditingController();
   Dio dio = DioSingleton.getInstance();
 
@@ -71,6 +72,7 @@ class _EditListingPageState extends State<EditListingPage> {
             title.text = listing['title'];
             description.text = listing['description'];
             price.text = listing['price'].toString();
+            ContactDescription.text = listing['ContactDescription'];
             category.text = listing['category'];
           });
 
@@ -194,6 +196,7 @@ class _EditListingPageState extends State<EditListingPage> {
             'title': title.text,
             'description': description.text,
             'price': double.parse(price.text),
+            'ContactDescription': ContactDescription.text,
             'category': category.text,
             'PostedBy': await _getUsername(),
           },
@@ -290,6 +293,16 @@ class _EditListingPageState extends State<EditListingPage> {
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Please enter a price';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Contact Description'),
+                controller: ContactDescription,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a description on how the buyer will contact you';
                   }
                   return null;
                 },

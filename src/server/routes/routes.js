@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { ping, signup, login, logout, profile, getUsername, UploadListingDetails, UploadListingPhoto, RetrieveListing, DeleteListing, UpdateProfilePhoto, EditListing, DeleteListingPhoto } = require('../api-endpoints');
+const { ping, signup, login, logout, profile, getUsername, UploadListingDetails, UploadListingPhoto, RetrieveListing, DeleteListing, UpdateProfilePhoto, EditListing, DeleteListingPhoto, getProfilePhoto } = require('../api-endpoints');
 
 // All API Endpoints go here
 router.post('/ping', ping);
@@ -15,4 +15,5 @@ router.post('/DeleteListing', DeleteListing);
 router.post('/UpdateProfilePhoto', UpdateProfilePhoto);
 router.post('/EditListing', EditListing);
 router.post('/DeleteListingPhoto', DeleteListingPhoto);
+router.post('/getProfilePhoto', getProfilePhoto);
 module.exports = router;    

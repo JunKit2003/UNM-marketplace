@@ -20,6 +20,7 @@ class _UploadListingPageState extends State<UploadListingPage> {
   String description = '';
   String price = '';
   String category = ''; // Updated category field
+  String ContactDescription = '';
   String PostedBy = '';
   Dio dio = DioSingleton.getInstance();
 
@@ -78,6 +79,7 @@ class _UploadListingPageState extends State<UploadListingPage> {
       print('Description: $description');
       print('Price: $price');
       print('Category: $category');
+      print('ContactDescription : $ContactDescription');
       print('PostedBy : $PostedBy');
 
       // Send data
@@ -90,6 +92,7 @@ class _UploadListingPageState extends State<UploadListingPage> {
             'description': description,
             'price': price,
             'category': category,
+            'ContactDescription': ContactDescription,
             'PostedBy': await _getUsername(),
           },
           options: Options(
@@ -228,6 +231,20 @@ class _UploadListingPageState extends State<UploadListingPage> {
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Please enter a price';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                decoration: InputDecoration(labelText: 'Contact Description'),
+                onChanged: (value) {
+                  setState(() {
+                    ContactDescription = value;
+                  });
+                },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a description on how the buyer will contact you';
                   }
                   return null;
                 },

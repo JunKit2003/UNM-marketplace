@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:unm_marketplace/app_drawer.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
 import 'package:unm_marketplace/utils.dart';
+import 'package:unm_marketplace/ViewListingPage.dart';
 
 class ListingPage extends StatefulWidget {
   @override
@@ -259,11 +260,14 @@ class _ListingPageState extends State<ListingPage> {
                       var listing = filteredListings.reversed.toList()[index];
                       return GestureDetector(
                         onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return ListingDetailDialog(listing: listing);
-                            },
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ViewListingPage(
+                                listingId: listing[
+                                    'id'], // Pass the listing ID to ViewListingPage
+                              ),
+                            ),
                           );
                         },
                         child: Card(
@@ -327,82 +331,6 @@ class _ListingPageState extends State<ListingPage> {
     } catch (e) {
       print('Error fetching image data: $e');
       return Uint8List(0);
-    }
-  }
-}
-
-class ListingDetailDialog extends StatelessWidget {
-  final dynamic listing;
-
-  ListingDetailDialog({required this.listing});
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: 300, // Adjust width as needed
-            height: 200, // Adjust height as needed
-            child: Image.network(
-              'http://${getHost()}:5000/images/${listing['ImageID']}',
-              fit: BoxFit.contain, // Adjust the fit property
-            ),
-          ),
-          ListTile(
-            title: Text(listing['title']),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Description: ${listing['description']}'),
-                Text('Category: ${listing['category']}'),
-                Text('Posted By: ${listing['PostedBy']}'),
-                Text('Price: RM ${listing['price']}'),
-                Text('Posted Date: ${formatPostedDate(listing['postedDate'])}'),
-              ],
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context); // Close the dialog
-            },
-            child: Text('Close'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String formatPostedDate(String postedDate) {
-    try {
-      // Parse the posted date and adjust to Malaysia time
-      DateTime postedDateTime =
-          DateTime.parse(postedDate).add(Duration(hours: 8));
-      DateTime now =
-          DateTime.now().add(Duration(hours: 8)); // Adjust for Malaysia time
-
-      Duration difference = now.difference(postedDateTime);
-      String differenceString = '';
-
-      if (difference.inDays > 0) {
-        differenceString =
-            '${difference.inDays} day${difference.inDays > 1 ? 's' : ''} ago';
-      } else if (difference.inHours > 0) {
-        differenceString =
-            '${difference.inHours} hour${difference.inHours > 1 ? 's' : ''} ago';
-      } else if (difference.inMinutes > 0) {
-        differenceString =
-            '${difference.inMinutes} minute${difference.inMinutes > 1 ? 's' : ''} ago';
-      } else {
-        differenceString = 'Just now';
-      }
-
-      // Format the posted date with the time difference
-      return '${DateFormat('yyyy-MM-dd HH:mm:ss').format(postedDateTime)} ($differenceString)';
-    } catch (e) {
-      print('Error formatting posted date: $e');
-      return 'Invalid Date';
     }
   }
 }
