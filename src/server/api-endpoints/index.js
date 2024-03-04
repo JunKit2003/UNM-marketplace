@@ -12,3 +12,4 @@ exports.UpdateProfilePhoto = require('./UpdateProfilePhoto');
 exports.EditListing = require('./EditListing');
 exports.DeleteListingPhoto = require('./DeleteListingPhoto');
 exports.getProfilePhoto = require('./getProfilePhoto');
+exports.changePassword = require('./changePassword');

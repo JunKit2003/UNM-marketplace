@@ -45,16 +45,16 @@ class LoginSignupPage extends StatelessWidget {
                 SizedBox(height: 40), // Adds space between the text and buttons
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushAndRemoveUntil(
+                    Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => LoginPage()),
-                      (route) => false, // Clear the navigation stack
+                      //(route) => false, // Clear the navigation stack
                     );
                   },
                   child: Text('Login', style: TextStyle(fontSize: 16)),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.blue,
-                    onPrimary: Colors.white,
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.blue,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
@@ -64,16 +64,16 @@ class LoginSignupPage extends StatelessWidget {
                 SizedBox(height: 20), // Adds space between the buttons
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.pushAndRemoveUntil(
+                    Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => SignupPage()),
-                      (route) => false, // Clear the navigation stack
+                      //(route) => false, // Clear the navigation stack
                     );
                   },
                   child: Text('Signup', style: TextStyle(fontSize: 16)),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.green,
-                    onPrimary: Colors.white,
+                    foregroundColor: Colors.white,
+                    backgroundColor: Colors.green,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),

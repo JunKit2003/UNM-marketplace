@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
+import 'package:unm_marketplace/UpdatePassword.dart';
 import 'package:unm_marketplace/utils.dart';
 import 'dart:typed_data';
 import 'package:image_picker/image_picker.dart';
@@ -174,7 +175,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                 backgroundColor: Colors.grey[300],
                                 backgroundImage: snapshot.hasData
                                     ? MemoryImage(snapshot.data!)
-                                    : const AssetImage('assets/DefaultProfilePicture.jpg')
+                                    : const AssetImage(
+                                            'assets/DefaultProfilePicture.jpg')
                                         as ImageProvider<Object>,
                               );
                             }
@@ -187,6 +189,20 @@ class _ProfilePageState extends State<ProfilePage> {
                             await _updateProfilePicture();
                           },
                           child: Text('Change Profile Picture'),
+                        ),
+                        SizedBox(height: 20),
+                        ElevatedButton(
+                          onPressed: () {
+                            // Navigate to the page where the user can change their password
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    UpdatePasswordPage(username: username),
+                              ),
+                            );
+                          },
+                          child: Text('Change Password'),
                         ),
                       ],
                     ),

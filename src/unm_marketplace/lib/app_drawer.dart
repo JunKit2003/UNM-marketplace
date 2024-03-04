@@ -86,14 +86,15 @@ class _AppDrawerState extends State<AppDrawer> {
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Successful Logout')));
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => LoginSignupPage()),
+          (route) => false, // Clear the navigation stack
         );
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Error logging out')));
+          .showSnackBar(const SnackBar(content: Text('Error logging out')));
     }
   }
 
@@ -111,7 +112,7 @@ class _AppDrawerState extends State<AppDrawer> {
               ),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return Container();
                 } else if (snapshot.hasError) {
                   return Icon(Icons.error);
                 } else {
@@ -124,7 +125,8 @@ class _AppDrawerState extends State<AppDrawer> {
                         backgroundColor: Colors.grey[300],
                         backgroundImage: snapshot.hasData
                             ? MemoryImage(snapshot.data!)
-                            : const AssetImage('DefaultProfilePicture.jpg')
+                            : const AssetImage(
+                                    'assets/DefaultProfilePicture.jpg')
                                 as ImageProvider<Object>,
                       ),
                       SizedBox(height: 10),
