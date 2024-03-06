@@ -6,7 +6,7 @@ module.exports = async function retrieveListing(req, res) {
 
   try {
     // Retrieve listings from the database
-    const selectQuery = 'SELECT * FROM marketplace.listing';
+    const selectQuery = 'SELECT * FROM marketplace1234.listing';
     const listings = await db.query(selectQuery);
 
     // Convert local file paths to HTTP URLs for images

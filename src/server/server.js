@@ -10,13 +10,20 @@ const app = express();
 // Parsing JSON bodies (as sent by API clients)
 app.use(express.json());
 
-
 app.use(cors({
-    origin: 'http://localhost:8000',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
-  }));
+  origin: function (origin, callback) {
+    if (!origin) {
+        // Allow requests with no origin, like mobile apps or curl requests
+        callback(null, true);
+    } else {
+        // Allow other origins
+        callback(null, origin);
+    }
+  },
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
 // Session configuration
 app.use(session({

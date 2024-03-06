@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  carousel_slider: ^4.0.0
   dio: ^5.2.0
   dio_cookie_manager: ^3.1.1
   cookie_jar: ^4.0.8
@@ -68,7 +69,21 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  # assets:
+  assets:
+  - assets/images.png
+  - assets/all_image.png
+  - assets/SEimage.png
+  - assets/books_image.png
+  - assets/vehicles_image.png
+  - assets/property_rentals_image.png
+  - assets/home_garden_image.png
+  - assets/electronics_image.png
+  - assets/hobbies_image.png
+  - assets/clothing_accessories_image.png
+  - assets/family_image.png
+  - assets/entertainment_image.png
+  - assets/other_image.png
+  - assets/close_image.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

@@ -3,9 +3,12 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
+import 'package:carousel_slider/carousel_slider.dart'; // Import CarouselSlider
 import 'package:unm_marketplace/app_drawer.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
+import 'package:unm_marketplace/profile_page.dart';
 import 'package:unm_marketplace/utils.dart';
+import 'upload_listing.dart';
 
 class ListingPage extends StatefulWidget {
   @override
@@ -99,225 +102,440 @@ class _ListingPageState extends State<ListingPage> {
         ],
       ),
       drawer: AppDrawer(),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: searchController,
-                    decoration: InputDecoration(
-                      labelText: 'Search Listings',
-                      prefixIcon: Icon(Icons.search),
-                      border: OutlineInputBorder(),
+      body: Center(
+        child: Container(
+          width: 1400,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 900,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(24.0),
+                      border: Border.all(color: Colors.black, width: 1.0),
                     ),
-                    onChanged: searchListings,
-                  ),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('Filters'),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              DropdownButtonFormField<String>(
-                                value: selectedCategory,
-                                items: [
-                                  DropdownMenuItem(
-                                    value: 'All',
-                                    child: Text('All'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Books',
-                                    child: Text('Books'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Vehicles',
-                                    child: Text('Vehicles'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Property Rentals',
-                                    child: Text('Property Rentals'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Home & Garden',
-                                    child: Text('Home & Garden'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Electronics',
-                                    child: Text('Electronics'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Hobbies',
-                                    child: Text('Hobbies'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Clothing & Accessories',
-                                    child: Text('Clothing & Accessories'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Family',
-                                    child: Text('Family'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Entertainment',
-                                    child: Text('Entertainment'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Sports equipment',
-                                    child: Text('Sports equipment'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Other',
-                                    child: Text('Other'),
-                                  ),
-                                ],
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedCategory = value;
-                                  });
-                                },
-                                decoration: InputDecoration(
-                                  labelText: 'Category',
-                                ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Row(
+                        children: [
+                          Icon(Icons.search),
+                          SizedBox(width: 4.0),
+                          Expanded(
+                            child: TextField(
+                              controller: searchController,
+                              decoration: InputDecoration(
+                                hintText: 'Search...',
+                                border: InputBorder.none,
                               ),
-                              TextFormField(
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  labelText: 'Min Price',
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    minPrice = double.tryParse(value);
-                                  });
-                                },
-                              ),
-                              TextFormField(
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  labelText: 'Max Price',
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    maxPrice = double.tryParse(value);
-                                  });
-                                },
-                              ),
-                            ],
+                              onChanged: searchListings,
+                            ),
                           ),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                applyFilters();
-                                Navigator.pop(context);
-                              },
-                              child: Text('Apply'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                setState(() {
-                                  selectedCategory = 'All';
-                                  minPrice = null;
-                                  maxPrice = null;
-                                });
-                                applyFilters();
-                                Navigator.pop(context);
-                              },
-                              child: Text('Clear Filters'),
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  },
-                  child: Text('Filter'),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            child: filteredListings.isEmpty
-                ? Center(child: Text('No listings available'))
-                : GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount:
-                          MediaQuery.of(context).size.width > 600 ? 4 : 2,
-                      crossAxisSpacing: 8.0,
-                      mainAxisSpacing: 8.0,
-                      childAspectRatio:
-                          MediaQuery.of(context).size.width > 600 ? 0.75 : 1.0,
+                        ],
+                      ),
                     ),
-                    itemCount: filteredListings.length,
-                    itemBuilder: (context, index) {
-                      var listing = filteredListings.reversed.toList()[index];
-                      return GestureDetector(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return ListingDetailDialog(listing: listing);
-                            },
-                          );
-                        },
-                        child: Card(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: FutureBuilder<Uint8List>(
-                                  future: fetchImageData(
-                                      'http://${getHost()}:5000/images/${listing['ImageID']}'),
-                                  builder: (context, snapshot) {
-                                    if (snapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return Center(
-                                          child: CircularProgressIndicator());
-                                    }
-                                    if (snapshot.hasError ||
-                                        !snapshot.hasData) {
-                                      return Icon(Icons.error);
-                                    }
-                                    return Image.memory(
-                                      snapshot.data!,
-                                      fit: BoxFit
-                                          .contain, // Adjust the fit property
-                                      width: double.infinity,
-                                    );
+                  ),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('Filters'),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                DropdownButtonFormField<String>(
+                                  value: selectedCategory,
+                                  items: [
+                                    DropdownMenuItem(
+                                      value: 'All',
+                                      child: Text('All'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Books',
+                                      child: Text('Books'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Vehicles',
+                                      child: Text('Vehicles'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Property Rentals',
+                                      child: Text('Property Rentals'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Home & Garden',
+                                      child: Text('Home & Garden'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Electronics',
+                                      child: Text('Electronics'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Hobbies',
+                                      child: Text('Hobbies'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Clothing & Accessories',
+                                      child:
+                                          Text('Clothing & Accessories'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Family',
+                                      child: Text('Family'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Entertainment',
+                                      child: Text('Entertainment'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Sports equipment',
+                                      child: Text('Sports equipment'),
+                                    ),
+                                    DropdownMenuItem(
+                                      value: 'Other',
+                                      child: Text('Other'),
+                                    ),
+                                  ],
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedCategory = value;
+                                    });
+                                  },
+                                  decoration: InputDecoration(
+                                    labelText: 'Category',
+                                  ),
+                                ),
+                                TextFormField(
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    labelText: 'Min Price',
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      minPrice = double.tryParse(value);
+                                    });
                                   },
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      listing['title'],
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text('Price: RM ${listing['price']}'),
-                                  ],
+                                TextFormField(
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    labelText: 'Max Price',
+                                  ),
+                                  onChanged: (value) {
+                                    setState(() {
+                                      maxPrice = double.tryParse(value);
+                                    });
+                                  },
                                 ),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  applyFilters();
+                                  Navigator.pop(context);
+                                },
+                                child: Text('Apply'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    selectedCategory = 'All';
+                                    minPrice = null;
+                                    maxPrice = null;
+                                  });
+                                  applyFilters();
+                                  Navigator.pop(context);
+                                },
+                                child: Text('Clear Filters'),
                               ),
                             ],
-                          ),
+                          );
+                        },
+                      );
+                    },
+                    child: Text('Filter'),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              CarouselSlider(
+                options: CarouselOptions(
+                  height: 300,
+                  enlargeCenterPage: true,
+                  autoPlay: true,
+                  aspectRatio: 16 / 9,
+                  autoPlayInterval: Duration(seconds: 3),
+                  autoPlayAnimationDuration: Duration(milliseconds: 800),
+                  autoPlayCurve: Curves.fastOutSlowIn,
+                  pauseAutoPlayOnTouch: true,
+                  enableInfiniteScroll: true,
+                  viewportFraction: 0.8,
+                ),
+                items: [
+                  'assets/images.png', // Path to your poster image
+                ].map((image) {
+                  return Builder(
+                    builder: (BuildContext context) {
+                      return Container(
+                        width: MediaQuery.of(context).size.width,
+                        margin: EdgeInsets.symmetric(horizontal: 5.0),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14.0),
+                          border: Border.all(color: Colors.black, width: 5.0),
+                        ),
+                        child: Image.asset(
+                          image,
+                          fit: BoxFit.cover,
                         ),
                       );
                     },
+                  );
+                }).toList(),
+              ),
+              SizedBox(height: 20),
+              // Buttons for each category
+             SizedBox(
+                height: 95, // Adjust the height as needed
+                child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildCategoryButton(
+                    category: 'All',
+                    imagePath: 'assets/all_image.png', // Change the image path as needed
                   ),
+                  _buildCategoryButton(
+                    category: 'Sports equipment',
+                    imagePath: 'assets/SEimage.png',
+                  ),
+                    _buildCategoryButton(
+                      category: 'Books',
+                      imagePath: 'assets/books_image.png',
+                    ),
+                    _buildCategoryButton(
+                      category: 'Vehicles',
+                      imagePath: 'assets/vehicles_image.png',
+                    ),
+                    _buildCategoryButton(
+                      category: 'Property Rentals',
+                      imagePath: 'assets/property_rentals_image.png',
+                    ),
+                    _buildCategoryButton(
+                      category: 'Home & Garden',
+                      imagePath: 'assets/home_garden_image.png',
+                    ),
+                    _buildCategoryButton(
+                      category: 'Electronics',
+                      imagePath: 'assets/electronics_image.png',
+                    ),
+                    _buildCategoryButton(
+                      category: 'Hobbies',
+                      imagePath: 'assets/hobbies_image.png',
+                    ),
+                    _buildCategoryButton(
+                      category: 'Clothing & Accessories',
+                      imagePath: 'assets/clothing_accessories_image.png',
+                    ),
+                    _buildCategoryButton(
+                      category: 'Family',
+                      imagePath: 'assets/family_image.png',
+                    ),
+                    _buildCategoryButton(
+                      category: 'Entertainment',
+                      imagePath: 'assets/entertainment_image.png',
+                    ),
+                    _buildCategoryButton(
+                      category: 'Other',
+                      imagePath: 'assets/other_image.png',
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black, width: 1.0),
+                    borderRadius: BorderRadius.circular(24.0),
+                  ),
+                  child: filteredListings.isEmpty
+                      ? Center(child: Text('No listings available'))
+                      : GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount:
+                                MediaQuery.of(context).size.width > 600 ? 4 : 2,
+                            crossAxisSpacing: 8.0,
+                            mainAxisSpacing: 8.0,
+                            childAspectRatio:
+                                MediaQuery.of(context).size.width > 600
+                                    ? 0.75
+                                    : 1.0,
+                          ),
+                          itemCount: filteredListings.length,
+                          itemBuilder: (context, index) {
+                            var listing =
+                                filteredListings.reversed.toList()[index];
+                            return GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return ListingDetailDialog(
+                                        listing: listing);
+                                  },
+                                );
+                              },
+                              child: Card(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      child: FutureBuilder<Uint8List>(
+                                        future: fetchImageData(
+                                            'http://${getHost()}:5000/images/${listing['ImageID']}'),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Center(
+                                                child:
+                                                    CircularProgressIndicator());
+                                          }
+                                          if (snapshot.hasError ||
+                                              !snapshot.hasData) {
+                                            return Icon(Icons.error);
+                                          }
+                                          return Image.memory(
+                                            snapshot.data!,
+                                            fit: BoxFit.contain,
+                                            width: double.infinity,
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            listing['title'],
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Text('Price: RM ${listing['price']}'),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
+      ),
+      bottomNavigationBar: _buildBottomBar(),
+    );
+  }
+
+  Widget _buildBottomBar() {
+    return BottomAppBar(
+      shape: CircularNotchedRectangle(),
+      child: Container(
+        height: 60.0,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: <Widget>[
+            IconButton(
+              icon: Icon(Icons.home),
+              onPressed: () {
+                // Handle home button press
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => UploadListingPage()),
+                );
+              },
+            ),
+            IconButton(
+              icon: Icon(Icons.person),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProfilePage(username: '',)),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
+Widget _buildCategoryButton({required String category, required String imagePath}) {
+  // Split the category name at the first space
+  List<String> categoryNameParts = category.split(' ');
+  
+  return Expanded(
+    child: Container(
+      alignment: Alignment.topCenter,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                selectedCategory = category;
+              });
+              applyFilters();
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(14.0),
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
+                width: double.infinity,
+              ),
+            ),
+          ),
+          SizedBox(height: 5), // Add some space between the button and the label
+          Column(
+            children: [
+              Text(
+                categoryNameParts[0], // Display the first part of the category name
+                textAlign: TextAlign.center, // Align the text to center
+                style: TextStyle(fontSize: 12), // Adjust the font size as needed
+              ),
+              Text(
+                categoryNameParts.sublist(1).join(' '), // Display the remaining parts of the category name
+                textAlign: TextAlign.center, // Align the text to center
+                style: TextStyle(fontSize: 12), // Adjust the font size as needed
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
 
   Future<Uint8List> fetchImageData(String imageUrl) async {
     try {
@@ -335,44 +553,111 @@ class ListingDetailDialog extends StatelessWidget {
   final dynamic listing;
 
   ListingDetailDialog({required this.listing});
-
-  @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          SizedBox(
-            width: 300, // Adjust width as needed
-            height: 200, // Adjust height as needed
-            child: Image.network(
-              'http://${getHost()}:5000/images/${listing['ImageID']}',
-              fit: BoxFit.contain, // Adjust the fit property
+  
+@override
+Widget build(BuildContext context) {
+  return Dialog(
+    child: Container(
+      width: MediaQuery.of(context).size.width * 0.3, // Adjust the width as needed
+      height: MediaQuery.of(context).size.height * 0.6, // Adjust the height as needed
+      child: SingleChildScrollView( // Wrap the content in SingleChildScrollView
+        physics: AlwaysScrollableScrollPhysics(), // Set physics to AlwaysScrollableScrollPhysics
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height * 0.3, // Adjust the height of the image box
+              child: Image.network(
+                'http://${getHost()}:5000/images/${listing['ImageID']}',
+                fit: BoxFit.contain,
+              ),
             ),
-          ),
-          ListTile(
-            title: Text(listing['title']),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Description: ${listing['description']}'),
-                Text('Category: ${listing['category']}'),
-                Text('Posted By: ${listing['PostedBy']}'),
-                Text('Price: RM ${listing['price']}'),
-                Text('Posted Date: ${formatPostedDate(listing['postedDate'])}'),
-              ],
+            ListTile(
+              title: Text(
+                listing['title'],
+                style: TextStyle(
+                  fontSize: 32, // Adjust the font size as needed
+                  fontWeight: FontWeight.bold, // Make the text bold
+                ),
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Description: ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, // Make the text bold
+                    ),
+                  ),
+                  Text('${listing['description']}'),
+                  Text(
+                    'Category: ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, // Make the text bold
+                    ),
+                  ),
+                  Text('${listing['category']}'),
+                  Text(
+                    'Posted By: ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, // Make the text bold
+                    ),
+                  ),
+                  Text('${listing['PostedBy']}'),
+                  Text(
+                    'Price: ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, // Make the text bold
+                    ),
+                  ),
+                  Text('RM ${listing['price']}'),
+                  Text(
+                    'Posted Date: ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold, // Make the text bold
+                    ),
+                  ),
+                  Text(
+                    '${formatPostedDate(listing['postedDate'])}',
+                  ),
+                ],
+              ),
             ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context); // Close the dialog
-            },
-            child: Text('Close'),
-          ),
-        ],
+ Container(
+  alignment: Alignment.center,
+  child: FloatingActionButton(
+    onPressed: () {
+      Navigator.pop(context);
+    },
+    child: Container(
+      width: 50, // Adjust width as needed to match the image size
+      height: 50, // Adjust height as needed to match the image size
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8.0), // Set border radius
       ),
-    );
-  }
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14.0), // Clip rounded corners
+        child: Image.asset(
+          'assets/close_image.png', // Replace with the path to your close button image
+          fit: BoxFit.fill, // Make the image fill the button
+        ),
+      ),
+    ),
+    backgroundColor: Colors.transparent, // Set background color to transparent
+    elevation: 0, // Remove elevation
+    highlightElevation: 0, // Remove elevation when button is pressed
+  ),
+),
+
+
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
 
   String formatPostedDate(String postedDate) {
     try {
