@@ -125,6 +125,9 @@ class _ViewListingPageState extends State<ViewListingPage> {
               SizedBox(height: 8.0),
               Text('Description: ${_listingDetails!['description']}'),
               SizedBox(height: 8.0),
+              Text(
+                  'Condition: ${_listingDetails!['condition']}'), // Display the condition
+              SizedBox(height: 8.0),
               Text('Price: RM ${_listingDetails!['price']}'),
               SizedBox(height: 8.0),
               Text(

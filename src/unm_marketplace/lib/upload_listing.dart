@@ -19,13 +19,22 @@ class _UploadListingPageState extends State<UploadListingPage> {
   String category = ''; // Updated category field
   String ContactDescription = '';
   String PostedBy = '';
+  String condition = ''; // New field for item condition
   Dio dio = DioSingleton.getInstance();
   List<String> categories = [];
+  List<String> conditions = [
+    'Brand new',
+    'Like new',
+    'Lightly used',
+    'Well used',
+    'Heavily used'
+  ];
 
   @override
   void initState() {
     super.initState();
     _fetchCategories();
+    condition = 'Brand new';
   }
 
   Future<void> _fetchCategories() async {
@@ -81,9 +90,10 @@ class _UploadListingPageState extends State<UploadListingPage> {
           data: {
             'title': title,
             'description': description,
+            'condition': condition, // Include condition in data payload
             'price': price,
-            'category': category,
             'ContactDescription': ContactDescription,
+            'category': category,
             'PostedBy': await _getUsername(),
           },
           options: Options(
@@ -212,6 +222,41 @@ class _UploadListingPageState extends State<UploadListingPage> {
                   return null;
                 },
               ),
+              FormField<String>(
+                builder: (FormFieldState<String> state) {
+                  return InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'Condition',
+                      errorText: state.errorText,
+                    ),
+                    isEmpty: condition == '',
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: condition,
+                        isDense: true,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            condition = newValue!;
+                            state.didChange(newValue);
+                          });
+                        },
+                        items: conditions.map((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  );
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please choose the condition';
+                  }
+                  return null;
+                },
+              ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Price'),
                 onChanged: (value) {
@@ -235,11 +280,12 @@ class _UploadListingPageState extends State<UploadListingPage> {
                 },
                 validator: (value) {
                   if (value!.isEmpty) {
-                    return 'Please enter a description on how the buyer will contact you';
+                    return 'Please enter a contact description';
                   }
                   return null;
                 },
               ),
+
               // DropdownButtonFormField for category selection
               FormField<String>(
                 builder: (FormFieldState<String> state) {
@@ -276,6 +322,8 @@ class _UploadListingPageState extends State<UploadListingPage> {
                   return null;
                 },
               ),
+              // DropdownButtonFormField for condition selection
+
               ElevatedButton(
                 onPressed: () async {
                   // Inside an asynchronous function or method

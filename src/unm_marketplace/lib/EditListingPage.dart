@@ -21,17 +21,26 @@ class _EditListingPageState extends State<EditListingPage> {
   TextEditingController title = TextEditingController();
   TextEditingController description = TextEditingController();
   TextEditingController price = TextEditingController();
-  TextEditingController ContactDescription = TextEditingController();
+  TextEditingController contactDescription = TextEditingController();
   TextEditingController category = TextEditingController();
+  TextEditingController condition = TextEditingController();
   Dio dio = DioSingleton.getInstance();
   List<String> categories = [];
+  List<String> conditions = [
+    'Brand new',
+    'Like new',
+    'Lightly used',
+    'Well used',
+    'Heavily used'
+  ];
 
   @override
   void initState() {
     super.initState();
+    _fetchCategories();
     print('Listing ID: ${widget.listingId}');
     _fetchListingDetails(widget.listingId);
-    _fetchCategories();
+    _initializeCondition(); // Initialize condition
     print('Categories : $categories');
   }
 
@@ -70,8 +79,9 @@ class _EditListingPageState extends State<EditListingPage> {
             title.text = listing['title'];
             description.text = listing['description'];
             price.text = listing['price'].toString();
-            ContactDescription.text = listing['ContactDescription'];
+            contactDescription.text = listing['ContactDescription'];
             category.text = listing['category'];
+            condition.text = listing['condition'];
           });
 
           var imageDataResponse = await dio.get(
@@ -95,6 +105,10 @@ class _EditListingPageState extends State<EditListingPage> {
     } catch (e) {
       print('Error fetching listing details: $e');
     }
+  }
+
+  void _initializeCondition() {
+    condition.text = conditions.isNotEmpty ? conditions[0] : '';
   }
 
   Future<void> _pickListingPhoto() async {
@@ -184,8 +198,9 @@ class _EditListingPageState extends State<EditListingPage> {
             'title': title.text,
             'description': description.text,
             'price': double.parse(price.text),
-            'ContactDescription': ContactDescription.text,
+            'ContactDescription': contactDescription.text,
             'category': category.text,
+            'condition': condition.text,
             'PostedBy': await _getUsername(),
           },
           options: Options(
@@ -267,6 +282,27 @@ class _EditListingPageState extends State<EditListingPage> {
                   return null;
                 },
               ),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(labelText: 'Condition'),
+                value: condition.text,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    condition.text = newValue!;
+                  });
+                },
+                items: conditions.map((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please choose a condition';
+                  }
+                  return null;
+                },
+              ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Price'),
                 controller: price,
@@ -279,7 +315,7 @@ class _EditListingPageState extends State<EditListingPage> {
               ),
               TextFormField(
                 decoration: InputDecoration(labelText: 'Contact Description'),
-                controller: ContactDescription,
+                controller: contactDescription,
                 validator: (value) {
                   if (value!.isEmpty) {
                     return 'Please enter a description on how the buyer will contact you';
