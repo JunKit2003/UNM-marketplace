@@ -20,27 +20,30 @@ class _UploadListingPageState extends State<UploadListingPage> {
   String ContactDescription = '';
   String PostedBy = '';
   Dio dio = DioSingleton.getInstance();
-
-  // Define a list of categories
-  List<String> categories = [
-    'Books',
-    'Vehicles',
-    'Property Rentals',
-    'Home & Garden',
-    'Electronics',
-    'Hobbies',
-    'Clothing & Accessories',
-    'Family',
-    'Entertainment',
-    'Sports equipment',
-    'Other'
-  ];
+  List<String> categories = [];
 
   @override
   void initState() {
     super.initState();
-    // Set the initial value of category to the first item in the categories list
-    category = categories.isNotEmpty ? categories[0] : '';
+    _fetchCategories();
+  }
+
+  Future<void> _fetchCategories() async {
+    try {
+      var response =
+          await dio.post('http://${getHost()}:5000/api/getCategories');
+
+      if (response.statusCode == 200) {
+        setState(() {
+          categories = List<String>.from(response.data['categories']);
+          category = categories.isNotEmpty ? categories[0] : '';
+        });
+      } else {
+        print('Failed to fetch categories');
+      }
+    } catch (e) {
+      print('Error fetching categories: $e');
+    }
   }
 
   Future<String> _getUsername() async {
@@ -70,15 +73,6 @@ class _UploadListingPageState extends State<UploadListingPage> {
 
   Future<int> _submitListingDetails() async {
     if (_formKey.currentState!.validate()) {
-      // Print out the values before sending
-      print('Submitting Listing Details:');
-      print('Title: $title');
-      print('Description: $description');
-      print('Price: $price');
-      print('Category: $category');
-      print('ContactDescription : $ContactDescription');
-      print('PostedBy : $PostedBy');
-
       // Send data
       var url = 'http://${getHost()}:5000/api/UploadListingDetails';
       try {

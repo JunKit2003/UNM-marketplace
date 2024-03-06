@@ -21,11 +21,13 @@ class _ListingPageState extends State<ListingPage> {
   double? maxPrice;
   Dio dio = DioSingleton.getInstance();
   late Timer _timer;
+  List<String> categories = [];
 
   @override
   void initState() {
     super.initState();
     fetchListings();
+    fetchCategories();
     _timer = Timer.periodic(Duration(seconds: 300), (timer) {
       fetchListings();
     });
@@ -55,6 +57,23 @@ class _ListingPageState extends State<ListingPage> {
     }
   }
 
+  Future<void> fetchCategories() async {
+    var url = 'http://${getHost()}:5000/api/getCategories';
+
+    try {
+      var response = await dio.post(url);
+      if (response.statusCode == 200) {
+        setState(() {
+          categories = List<String>.from(response.data['categories']);
+        });
+      } else {
+        print('Error fetching categories: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Dio Error fetching categories: $e');
+    }
+  }
+
   void searchListings(String query) {
     setState(() {
       filteredListings = listings
@@ -62,6 +81,17 @@ class _ListingPageState extends State<ListingPage> {
               listing['title'].toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
+  }
+
+  Future<Uint8List> fetchImageData(String imageUrl) async {
+    try {
+      var response = await dio.get(imageUrl,
+          options: Options(responseType: ResponseType.bytes));
+      return Uint8List.fromList(response.data);
+    } catch (e) {
+      print('Error fetching image data: $e');
+      return Uint8List(0);
+    }
   }
 
   void applyFilters() {
@@ -134,50 +164,11 @@ class _ListingPageState extends State<ListingPage> {
                                     value: 'All',
                                     child: Text('All'),
                                   ),
-                                  DropdownMenuItem(
-                                    value: 'Books',
-                                    child: Text('Books'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Vehicles',
-                                    child: Text('Vehicles'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Property Rentals',
-                                    child: Text('Property Rentals'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Home & Garden',
-                                    child: Text('Home & Garden'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Electronics',
-                                    child: Text('Electronics'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Hobbies',
-                                    child: Text('Hobbies'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Clothing & Accessories',
-                                    child: Text('Clothing & Accessories'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Family',
-                                    child: Text('Family'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Entertainment',
-                                    child: Text('Entertainment'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Sports equipment',
-                                    child: Text('Sports equipment'),
-                                  ),
-                                  DropdownMenuItem(
-                                    value: 'Other',
-                                    child: Text('Other'),
-                                  ),
+                                  for (var category in categories)
+                                    DropdownMenuItem(
+                                      value: category,
+                                      child: Text(category),
+                                    ),
                                 ],
                                 onChanged: (value) {
                                   setState(() {
@@ -321,21 +312,4 @@ class _ListingPageState extends State<ListingPage> {
       ),
     );
   }
-
-  Future<Uint8List> fetchImageData(String imageUrl) async {
-    try {
-      var response = await dio.get(imageUrl,
-          options: Options(responseType: ResponseType.bytes));
-      return Uint8List.fromList(response.data);
-    } catch (e) {
-      print('Error fetching image data: $e');
-      return Uint8List(0);
-    }
-  }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: ListingPage(),
-  ));
 }

@@ -24,34 +24,37 @@ class _EditListingPageState extends State<EditListingPage> {
   TextEditingController ContactDescription = TextEditingController();
   TextEditingController category = TextEditingController();
   Dio dio = DioSingleton.getInstance();
-
-  // Define a list of categories
-  List<String> categories = [
-    'Books',
-    'Vehicles',
-    'Property Rentals',
-    'Home & Garden',
-    'Electronics',
-    'Hobbies',
-    'Clothing & Accessories',
-    'Family',
-    'Entertainment',
-    'Sports equipment',
-    'Other'
-  ];
+  List<String> categories = [];
 
   @override
   void initState() {
     super.initState();
     print('Listing ID: ${widget.listingId}');
-    // Fetch listing details
-    category.text = categories.isNotEmpty ? categories[0] : '';
     _fetchListingDetails(widget.listingId);
+    _fetchCategories();
+    print('Categories : $categories');
+  }
+
+  Future<void> _fetchCategories() async {
+    try {
+      var response =
+          await dio.post('http://${getHost()}:5000/api/getCategories');
+
+      if (response.statusCode == 200) {
+        setState(() {
+          categories = List<String>.from(response.data['categories']);
+          category.text = categories.isNotEmpty ? categories[0] : '';
+        });
+      } else {
+        print('Failed to fetch categories');
+      }
+    } catch (e) {
+      print('Error fetching categories: $e');
+    }
   }
 
   Future<void> _fetchListingDetails(int listingId) async {
     try {
-      // Fetch listing details using the provided listingId
       var response = await dio.post(
         'http://${getHost()}:5000/api/RetrieveListing',
         queryParameters: {'id': listingId},
@@ -60,12 +63,9 @@ class _EditListingPageState extends State<EditListingPage> {
       print(response.data);
 
       if (response.statusCode == 200) {
-        // Check if listings array is not empty
         if (response.data['listings'] != null &&
             response.data['listings'].isNotEmpty) {
-          // Access the first listing in the array
           var listing = response.data['listings'][0];
-          // Update state with fetched listing details
           setState(() {
             title.text = listing['title'];
             description.text = listing['description'];
@@ -74,7 +74,6 @@ class _EditListingPageState extends State<EditListingPage> {
             category.text = listing['category'];
           });
 
-          // Fetch image data using ImageID
           var imageDataResponse = await dio.get(
             'http://${getHost()}:5000/images/${listing['ImageID']}',
             options: Options(responseType: ResponseType.bytes),
@@ -88,11 +87,9 @@ class _EditListingPageState extends State<EditListingPage> {
             print('Failed to fetch image data');
           }
         } else {
-          // Handle empty or null listings array
           print('No listing found');
         }
       } else {
-        // Handle error response
         print('Failed to fetch listing details');
       }
     } catch (e) {
@@ -138,13 +135,11 @@ class _EditListingPageState extends State<EditListingPage> {
         );
 
         if (response.statusCode == 200) {
-          // Handle success
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Listing photo uploaded successfully')),
           );
-          Navigator.pop(context); // Navigate back to the previous screen
+          Navigator.pop(context);
         } else {
-          // Handle failure
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Listing photo upload failed')),
           );
@@ -159,7 +154,6 @@ class _EditListingPageState extends State<EditListingPage> {
 
   Future<void> _deleteOldPhoto(int listingId) async {
     try {
-      // Send a request to delete the old photo using the listing ID
       final response = await dio.post(
         'http://${getHost()}:5000/api/DeleteListingPhoto',
         data: {'id': listingId},
@@ -178,15 +172,11 @@ class _EditListingPageState extends State<EditListingPage> {
   Future<void> _submitEditedListing() async {
     if (_formKey.currentState!.validate()) {
       try {
-        // Check if there's a new image to upload
         if (_imageBytes != null) {
-          // Delete the old photo from the server before uploading the new one
           await _deleteOldPhoto(widget.listingId);
-          // Upload the new photo
           await _submitListingPhoto(widget.listingId);
         }
 
-        // Send edited listing details
         final response = await dio.post(
           'http://${getHost()}:5000/api/EditListing',
           data: {
@@ -206,21 +196,13 @@ class _EditListingPageState extends State<EditListingPage> {
         );
 
         if (response.statusCode == 200) {
-          // Handle success
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Listing details updated successfully')));
-            // Call the callback function to refresh the ListedAd page
-            widget.onSubmitted();
-            // Navigate back to the previous screen (ListedAd page)
-            Navigator.pop(context);
-          }
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Listing details updated successfully')));
+          widget.onSubmitted();
+          Navigator.pop(context);
         } else {
-          // Error response
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text('Failed to update listing details')));
-          }
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text('Failed to update listing details')));
         }
       } catch (e) {
         print('Error submitting edited listing: $e');
@@ -305,7 +287,6 @@ class _EditListingPageState extends State<EditListingPage> {
                   return null;
                 },
               ),
-              // DropdownButtonFormField for category selection
               DropdownButtonFormField<String>(
                 decoration: InputDecoration(labelText: 'Category'),
                 value: category.text,
