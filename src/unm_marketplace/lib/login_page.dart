@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import './listing_page.dart';
+import 'package:unm_marketplace/DioSingleton.dart';
+import 'package:unm_marketplace/utils.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -13,9 +16,9 @@ class _LoginPageState extends State<LoginPage> {
 
   Future<void> loginUser(
       String email, String password, BuildContext context) async {
-    var dio = Dio();
+    Dio dio = DioSingleton.getInstance();
     var url =
-        'http://localhost:5000/api/login'; // Adjust the URL as per your server setup
+        'http://${getHost()}:5000/api/login'; // Adjust the URL as per your server setup
 
     try {
       var response = await dio.post(url, data: {
@@ -24,9 +27,16 @@ class _LoginPageState extends State<LoginPage> {
       });
 
       // Handle successful response
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Login Successful')));
-      // Navigate to home or dashboard page
+      if (response.statusCode == 200) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => ListingPage()),
+        );
+      } else {
+        // Handle unsuccessful login
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Invalid credentials')));
+      }
     } on DioError catch (e) {
       if (e.response != null && e.response!.statusCode == 401) {
         // Unauthorized or login failed
@@ -54,32 +64,42 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("Login")),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: <Widget>[
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) => value!.isEmpty || !value.contains('@')
-                    ? 'Enter a valid email'
-                    : null,
-                onSaved: (value) => email = value!,
+      body: Center(
+        child: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            constraints: BoxConstraints(
+                maxWidth: 400), // Limit width for better readability
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  TextFormField(
+                    decoration: InputDecoration(labelText: 'Email'),
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (value) => value!.isEmpty || !value.contains('@')
+                        ? 'Enter a valid email'
+                        : null,
+                    onSaved: (value) => email = value!,
+                  ),
+                  SizedBox(height: 20), // Add space between fields
+                  TextFormField(
+                    decoration: InputDecoration(labelText: 'Password'),
+                    obscureText: true,
+                    validator: (value) =>
+                        value!.isEmpty ? 'Enter your password' : null,
+                    onSaved: (value) => password = value!,
+                  ),
+                  SizedBox(height: 20), // Add space between fields and button
+                  ElevatedButton(
+                    onPressed: _submitForm,
+                    child: Text('Login'),
+                  ),
+                ],
               ),
-              TextFormField(
-                decoration: InputDecoration(labelText: 'Password'),
-                obscureText: true,
-                validator: (value) =>
-                    value!.isEmpty ? 'Enter your password' : null,
-                onSaved: (value) => password = value!,
-              ),
-              ElevatedButton(
-                onPressed: _submitForm,
-                child: Text('Login'),
-              ),
-            ],
+            ),
           ),
         ),
       ),
