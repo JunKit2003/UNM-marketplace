@@ -68,12 +68,22 @@ class _SignupPageState extends State<SignupPage> {
     }
   }
 
-  void _submitForm() {
-    if (_formKey.currentState!.validate()) {
-      _formKey.currentState!.save();
-      registerUser(firstName, lastName, email, phone_number, password, context);
+  void _submitForm() async {
+  if (_formKey.currentState!.validate()) {
+    _formKey.currentState!.save();
+
+    try {
+      // Call your signup endpoint
+      await registerUser(firstName, lastName, email, phone_number, password, context);
+
+      // After successful signup, call the Stream user creation and token generation endpoint
+      await createStreamUserToken(username); // Replace with your actual username
+    } catch (error) {
+      print('Error during signup or token generation: $error');
+      // Handle error as needed
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +93,7 @@ class _SignupPageState extends State<SignupPage> {
         child: SingleChildScrollView(
           child: Container(
             padding: EdgeInsets.all(16.0),
-            constraints: BoxConstraints(
+            constraints: const BoxConstraints(
                 maxWidth: 400), // Limit width for better readability
             child: Form(
               key: _formKey,
@@ -147,5 +157,32 @@ class _SignupPageState extends State<SignupPage> {
         ),
       ),
     );
+  }
+}
+
+Future<void> createStreamUserToken(String username) async {
+  try {
+    var dio = Dio();
+    var response = await dio.post(
+      'http://${getHost()}:5000/api/CreateStreamUserandToken',
+      data: {'username': username},
+      options: Options(headers: {"Content-Type": "application/json"}),
+    );
+
+    if (response.statusCode == 200) {
+      // Success response
+      print('Stream user and token generated successfully');
+      // Extract user and token information from the response if needed
+      // var user = response.data['user'];
+      // var token = response.data['token'];
+    } else {
+      // Error response
+      print('Failed to generate Stream user and token');
+      // Handle error as needed
+    }
+  } catch (e) {
+    // Handle DioError or other exceptions
+    print('Error during Stream user and token generation: $e');
+    // Handle error as needed
   }
 }
