@@ -4,10 +4,12 @@ import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
 import 'package:unm_marketplace/utils.dart';
+import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
+// import 'Chat/UI/chat_screens.dart';
 
 class ViewListingPage extends StatefulWidget {
   final int listingId;
-
+  
   ViewListingPage({required this.listingId});
 
   @override
@@ -15,6 +17,12 @@ class ViewListingPage extends StatefulWidget {
 }
 
 class _ViewListingPageState extends State<ViewListingPage> {
+  // late final userListController = StreamUserListController(
+  //   client: StreamChatCore.of(context).client,
+  //   limit: 20,
+  //   filter: Filter.notEqual('id', StreamChatCore.of(context).currentUser!.id),
+  // );
+  //late final User seller; // Add this line
   late Dio dio;
   Uint8List? _imageBytes;
   Map<String, dynamic>? _listingDetails;
@@ -39,6 +47,11 @@ class _ViewListingPageState extends State<ViewListingPage> {
           var listing = response.data['listings'][0];
           setState(() {
             _listingDetails = listing;
+            // seller = User(
+            //   id: listing['sellerId'],
+            //   name: listing['sellerName'], // Replace with actual key in your data
+            //   image: listing['sellerImage'], // Replace with actual key in your data
+            // );
           });
 
           var imageDataResponse = await dio.get(
@@ -96,14 +109,39 @@ class _ViewListingPageState extends State<ViewListingPage> {
     }
   }
 
+  // Future<void> _createChannel() async {
+  //   try {
+  //     final core = StreamChatCore.of(context);
+  //     final nav = Navigator.of(context);
+
+  //     // Create a chat channel with the seller
+  //     final channel = core.client.channel('messaging', extraData: {
+  //       'members': [
+  //         core.currentUser!.id,
+  //         seller.id,
+  //       ]
+  //     });
+
+  //     // Watch the channel
+  //     await channel.watch();
+
+  //     // Navigate to the chat screen with the created channel
+  //     nav.push(
+  //       ChatScreens.routeWithChannel(channel),
+  //     );
+  //   } catch (e) {
+  //     print('Error creating channel: $e');
+  //   }
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('View Listing'),
+        title: const Text('View Listing'),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -116,29 +154,30 @@ class _ViewListingPageState extends State<ViewListingPage> {
                   fit: BoxFit.contain, // Set fit property to contain
                 ),
               ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             if (_listingDetails != null) ...[
               Text(
                 'Title: ${_listingDetails!['title']}',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text('Description: ${_listingDetails!['description']}'),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text('Price: RM ${_listingDetails!['price']}'),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text(
                   'Contact Description: ${_listingDetails!['ContactDescription']}'),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text('Category: ${_listingDetails!['category']}'),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text(
                   'Posted Time: ${formatPostedDate(_listingDetails!['postedDate'])}'),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               ElevatedButton(
                   onPressed: () {
+                    // _createChannel();
                 },
-                child: Text('Chat with the seller'),
+                child: const Text('Chat with the seller'),
               ),
             ],
           ],
@@ -146,4 +185,7 @@ class _ViewListingPageState extends State<ViewListingPage> {
       ),
     );
   }
+
 }
+
+
