@@ -16,9 +16,10 @@ class _SignupPageState extends State<SignupPage> {
   String email = '';
   String phone_number = '';
   String password = '';
+  String token = '';
 
   Future<void> registerUser(String firstName, String lastName, String email,
-      String phone_number, String password, BuildContext context) async {
+      String phone_number, String password, String token, BuildContext context) async {
     var url = 'http://${getHost()}:5000/api/signup'; // URL for local server
     Dio dio = DioSingleton.getInstance();
 
@@ -28,6 +29,7 @@ class _SignupPageState extends State<SignupPage> {
       print(email);
       print(phone_number);
       print(password);
+      print(token);
 
       var response = await dio.post(url,
           data: {
@@ -37,6 +39,7 @@ class _SignupPageState extends State<SignupPage> {
             'email': email,
             'phone_number': phone_number,
             'password': password,
+            'token': token,
           },
           options: Options(headers: {"Content-Type": "application/json"}));
 
@@ -60,7 +63,7 @@ class _SignupPageState extends State<SignupPage> {
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('An Unknown Error has occurred')));
+            SnackBar(content: Text('An Unknown Error has occurred,haha')));
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -74,10 +77,8 @@ class _SignupPageState extends State<SignupPage> {
 
     try {
       // Call your signup endpoint
-      await registerUser(firstName, lastName, email, phone_number, password, context);
+      await registerUser(firstName, lastName, email, phone_number, password, token, context);
 
-      // After successful signup, call the Stream user creation and token generation endpoint
-      await createStreamUserToken(username); // Replace with your actual username
     } catch (error) {
       print('Error during signup or token generation: $error');
       // Handle error as needed
@@ -160,29 +161,3 @@ class _SignupPageState extends State<SignupPage> {
   }
 }
 
-Future<void> createStreamUserToken(String username) async {
-  try {
-    var dio = Dio();
-    var response = await dio.post(
-      'http://${getHost()}:5000/api/CreateStreamUserandToken',
-      data: {'username': username},
-      options: Options(headers: {"Content-Type": "application/json"}),
-    );
-
-    if (response.statusCode == 200) {
-      // Success response
-      print('Stream user and token generated successfully');
-      // Extract user and token information from the response if needed
-      // var user = response.data['user'];
-      // var token = response.data['token'];
-    } else {
-      // Error response
-      print('Failed to generate Stream user and token');
-      // Handle error as needed
-    }
-  } catch (e) {
-    // Handle DioError or other exceptions
-    print('Error during Stream user and token generation: $e');
-    // Handle error as needed
-  }
-}

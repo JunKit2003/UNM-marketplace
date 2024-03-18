@@ -5,14 +5,14 @@ const bcrypt = require('bcrypt');
 const saltRounds = 10; 
 
 router.post('/register', async (req, res) => {
-    const { first_name, last_name, email, password } = req.body;
+    const { first_name, last_name, email, password, token } = req.body;
 
     try {
         // Hash the password before storing it
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-        const query = 'INSERT INTO accounts (first_name, last_name, email, password) VALUES (?, ?, ?, ?)';
-        db.query(query, [first_name, last_name, email, hashedPassword], (err, result) => {
+        const query = 'INSERT INTO accounts (first_name, last_name, email, password, token) VALUES (?, ?, ?, ?, ?)';
+        db.query(query, [first_name, last_name, email, hashedPassword, token], (err, result) => {
             if (err) {
                 res.status(500).send({ message: 'Error in database operation', error: err });
             } else {
