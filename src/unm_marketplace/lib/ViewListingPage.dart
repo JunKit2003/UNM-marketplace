@@ -42,7 +42,7 @@ class _ViewListingPageState extends State<ViewListingPage> {
           });
 
           var imageDataResponse = await dio.get(
-            'http://${getHost()}:5000/images/${listing['ImageID']}',
+            'http://${getHost()}:5000/images/Listing/${listing['ImageID']}',
             options: Options(responseType: ResponseType.bytes),
           );
 

@@ -161,7 +161,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         FutureBuilder<Uint8List>(
                           future: fetchImageData(
-                            'http://${getHost()}:5000/images/$profilePicture',
+                            'http://${getHost()}:5000/images/ProfilePhoto/$profilePicture',
                           ),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==

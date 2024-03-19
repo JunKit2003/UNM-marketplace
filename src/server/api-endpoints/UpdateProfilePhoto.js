@@ -1,15 +1,32 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const images = require('../multer-config.js');
 const db = require('../database/connection.js');
+const images = require('../multer-config.js');
 const fs = require('fs');
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const destinationDir = path.join(__dirname, '..', 'images', 'ProfilePhoto');
+    cb(null, destinationDir);
+  },
+  filename: (req, file, cb) => {
+    // Preserve the original file extension
+    const fileExtension = path.extname(file.originalname);
+    // Generate a unique filename for the uploaded image
+    const uniqueFilename = `${Date.now()}${fileExtension}`;
+    cb(null, uniqueFilename);
+  },
+});
+
+const upload = multer({ storage: storage });
 
 module.exports = async function uploadProfilePhoto(req, res) {
   console.log("IN uploadProfilePhoto backend");
 
   // Use multer to handle file upload using the configured images middleware
-  images.single('profilePhoto')(req, res, async (err) => {
+  upload.single('profilePhoto')(req, res, async (err) => {
     if (err) {
       console.error('Error uploading file:', err);
       return res.status(500).send({ message: 'Error uploading file', error: err });
@@ -17,8 +34,8 @@ module.exports = async function uploadProfilePhoto(req, res) {
 
     console.log('File uploaded successfully:', req.file);
 
-    const profilePhotoPath = req.file.filename; // Assuming the Multer configuration returns the filename
-    const username = req.body.username; // Assuming username is sent in the request body
+    const profilePhotoPath = req.file.filename; // Get the filename of the uploaded file
+    const username = req.body.username; // Get the username from the request body
 
     // Query to fetch the current profile picture of the user
     const selectQuery = 'SELECT ProfilePicture FROM accounts WHERE username = ?';
@@ -30,7 +47,7 @@ module.exports = async function uploadProfilePhoto(req, res) {
 
       // If there is a profile picture associated with the user, delete it
       if (selectResult && selectResult.length > 0 && selectResult[0].ProfilePicture) {
-        const existingProfilePicturePath = path.join(__dirname, '..', 'images', selectResult[0].ProfilePicture);
+        const existingProfilePicturePath = path.join(__dirname, '..', 'images', 'ProfilePhoto', selectResult[0].ProfilePicture);
         // Delete the existing profile picture
         try {
           fs.unlinkSync(existingProfilePicturePath);
@@ -52,4 +69,4 @@ module.exports = async function uploadProfilePhoto(req, res) {
       });
     });
   });
-}
+};

@@ -20,12 +20,11 @@ module.exports = async function deleteListingPhoto(req, res) {
     // Check if there is a photo associated with the listing
     if (selectResult && selectResult.length > 0 && selectResult[0].ImageID) {
       const imageID = selectResult[0].ImageID;
-      const imagePath = path.join(__dirname, '..', 'images', imageID);
+      const imagePath = path.join(__dirname, '..', 'images', 'Listing', imageID);
 
       // Delete the photo file
       fs.unlink(imagePath, (unlinkErr) => {
-        if (unlinkErr) {
-          console.error('Error deleting photo:', unlinkErr);
+        if (unlinkErr) {          console.error('Error deleting photo:', unlinkErr);
           return res.status(500).send({ message: 'Error deleting photo', error: unlinkErr });
         }
         console.log('Listing photo deleted successfully');
