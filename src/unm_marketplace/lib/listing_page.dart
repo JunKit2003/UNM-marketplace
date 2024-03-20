@@ -269,21 +269,31 @@ class _ListingPageState extends State<ListingPage> {
                                   future: fetchImageData(
                                       'http://${getHost()}:5000/images/Listing/${listing['ImageID']}'),
                                   builder: (context, snapshot) {
+                                    print(
+                                        "---------------------------------------------------------------------------------------------");
+                                    print(snapshot.data);
                                     if (snapshot.connectionState ==
                                         ConnectionState.waiting) {
                                       return Center(
                                           child: CircularProgressIndicator());
                                     }
                                     if (snapshot.hasError ||
-                                        !snapshot.hasData) {
+                                        !snapshot.hasData ||
+                                        snapshot.data == []) {
                                       return Icon(Icons.error);
                                     }
-                                    return Image.memory(
-                                      snapshot.data!,
-                                      fit: BoxFit
-                                          .contain, // Adjust the fit property
-                                      width: double.infinity,
-                                    );
+
+                                    if (!snapshot.data!.isEmpty) {
+                                      return Image.memory(
+                                        snapshot.data!,
+                                        fit: BoxFit
+                                            .contain, // Adjust the fit property
+                                        width: double.infinity,
+                                      );
+                                    } else {
+                                      return Image.asset(
+                                          'assets/DefaultProfilePicture.jpg');
+                                    }
                                   },
                                 ),
                               ),
