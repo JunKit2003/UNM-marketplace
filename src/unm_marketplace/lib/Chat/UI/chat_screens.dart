@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:unm_marketplace/Chat/app.dart';
 import 'package:unm_marketplace/Chat/helpers.dart';
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:unm_marketplace/Chat/theme.dart';
@@ -7,7 +8,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
-import 'package:unm_marketplace/Chat/app.dart';
 
 class ChatScreens extends StatefulWidget {
   static Route routeWithChannel(Channel channel) => MaterialPageRoute(

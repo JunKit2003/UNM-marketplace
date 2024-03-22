@@ -1,11 +1,11 @@
 import 'package:unm_marketplace/Chat/UI/screens.dart';
+import 'package:unm_marketplace/Chat/app.dart';
 import 'package:unm_marketplace/Chat/helpers.dart';
 import 'package:unm_marketplace/Chat/Theme.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 import '../widgets/widgets.dart';
-import 'package:unm_marketplace/Chat/app.dart';
 
 class MessagesPage extends StatefulWidget {
   const MessagesPage({Key? key}) : super(key: key);

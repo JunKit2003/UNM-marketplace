@@ -7,7 +7,14 @@ import 'package:unm_marketplace/DioSingleton.dart';
 import 'package:unm_marketplace/upload_listing.dart';
 import 'package:unm_marketplace/utils.dart';
 import 'dart:typed_data';
-import 'package:unm_marketplace/ListedAd.dart'; // Import the ListedAd.dart file
+import 'package:unm_marketplace/ListedAd.dart';
+import 'package:unm_marketplace/Chat/UI/home_screen.dart';
+import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
+import 'package:logger/logger.dart' as log;
+import 'package:unm_marketplace/main.dart';
+
+const apiKey = 'adqmr32mfsg4';
+var logger = log.Logger();
 
 class AppDrawer extends StatefulWidget {
   @override
@@ -31,6 +38,12 @@ class _AppDrawerState extends State<AppDrawer> {
     return response.data['username'];
   }
 
+  Future<String> getStreamToken() async {
+    final response = await dio.post('http://${getHost()}:5000/api/getStreamToken');
+    print(response.data['token']);
+    return response.data['token'];
+  }
+
   Future<void> fetchData() async {
     // Fetch the username
     username = await getUsername();
@@ -38,9 +51,54 @@ class _AppDrawerState extends State<AppDrawer> {
     // Fetch the profile photo and store the directory
     photoDirectory = await fetchProfilePhoto(username);
     print('---------------------PhotoDirectory: $photoDirectory');
+    // Fetch the image URL from the directory
 
     setState(() {});
   }
+
+bool _loading = false;
+
+Future<void> connectUserToStream(String token) async {
+  final client = globalStreamChatClient; // Access the global StreamChatClient instance
+  if (client == null) {
+    logger.e('StreamChatClient instance is null.');
+    return;
+  }
+
+  setState(() {
+    _loading = true;
+  });
+
+  try {
+    String imageUrl = await fetchProfilePhoto(username);
+    // Set the token for the client
+    await client.connectUser(
+      User(
+        id: 'username',
+        extraData: {
+          'name': username,
+          'image': imageUrl,
+        },
+      ),
+      token,
+    );
+
+    // Navigate to the home screen after successful connection
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => HomeScreen()),
+    );
+  } on Exception catch (e, st) {
+    logger.e('Could not connect user', error: e, stackTrace: st);
+  } finally {
+    // Set the loading state to false regardless of success or failure
+    setState(() {
+      _loading = false;
+    });
+  }
+}
+
+
 
   Future<String> fetchProfilePhoto(String username) async {
     try {
@@ -92,7 +150,7 @@ class _AppDrawerState extends State<AppDrawer> {
           (route) => false, // Clear the navigation stack
         );
       }
-    } on DioException catch (e) {
+    } on DioException {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Error logging out')));
     }
@@ -208,8 +266,18 @@ class _AppDrawerState extends State<AppDrawer> {
                             username)), // Provide the username to ListedAd
               );
             },
+          ),       
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: Text('Chat'),
+            onTap: () async {
+              // Ensure that the loading state is not set to true again if it's already loading
+              if (!_loading) {
+                String token = await getStreamToken();
+                await connectUserToStream(token);
+              }
+            },
           ),
-
           ListTile(
             leading: Icon(Icons.logout),
             title: Text('Log out'),

@@ -1,13 +1,20 @@
-import 'package:unm_marketplace/Chat/UI/screens.dart';
+import 'package:dio/dio.dart';
+import 'package:unm_marketplace/Chat/app.dart';
 import 'package:unm_marketplace/Chat/pages/contacts_page.dart';
 import 'package:unm_marketplace/Chat/pages/notification_page.dart';
 import 'package:unm_marketplace/Chat/pages/messages_page.dart';
 import 'package:unm_marketplace/Chat/theme.dart';
 import 'package:unm_marketplace/Chat/widgets/widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:unm_marketplace/Chat/app.dart';
+import 'package:unm_marketplace/DioSingleton.dart';
+import 'package:unm_marketplace/profile_page.dart';
+import 'package:unm_marketplace/utils.dart';
+
 
 class HomeScreen extends StatelessWidget {
+  static Route get route => MaterialPageRoute(
+        builder: (context) => HomeScreen(),
+  );
   HomeScreen({Key? key}) : super(key: key);
 
   final ValueNotifier<int> pageIndex = ValueNotifier(0);
@@ -24,6 +31,14 @@ class HomeScreen extends StatelessWidget {
     'Notifications',
     'Contacts'
   ];
+
+  final Dio dio = DioSingleton.getInstance();
+
+  Future<String> getUsername() async {
+    final response = await dio.post('http://${getHost()}:5000/api/getUsername');
+    print(response.data['username']);
+    return response.data['username'];
+  }
   
   @override
   Widget build(BuildContext context) {
@@ -56,19 +71,26 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
       actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: 24.0),
-          child: Hero(
-            tag: 'hero-profile-picture',
-            child: Avatar.small(
-              url: context.currentUserImage,
-              onTap: () {
-              Navigator.of(context).push(ProfileScreen.route);
-            }
+          Padding(
+            padding: const EdgeInsets.only(right: 24.0),
+            child: Hero(
+              tag: 'hero-profile-picture',
+              child: Avatar.small(
+                url: context.currentUserImage != null ? 'http://localhost:5000/images/${context.currentUserImage}' : null,
+                onTap: () async {
+                  String username = await getUsername();
+                  Navigator.push(
+                            context,             
+                            MaterialPageRoute(
+                                builder: (context) => ProfilePage(username: username)),
+                          );
+
+                },
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      
     ),
       body: ValueListenableBuilder(
         valueListenable: pageIndex,

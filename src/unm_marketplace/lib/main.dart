@@ -4,12 +4,14 @@ import 'login_signup_page.dart';
 import 'package:unm_marketplace/Chat/app.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
 
+StreamChatClient? globalStreamChatClient; // Global variable to hold the StreamChatClient instance
 void main() async {
   // Initialize date formatting with the desired timezone (GMT+8)
   await initializeDateFormatting('en_US', null);
 
   // Initialize StreamChatClient
   final client = StreamChatClient(streamKey);
+  globalStreamChatClient = client; // Assign the client to the global variable
 
   runApp(
     MultiApp(client: client),

@@ -19,7 +19,8 @@ module.exports = async function login (req, res){
                         firstName: result[0].first_name,
                         lastName: result[0].last_name,
                         username: result[0].username,
-                        email: result[0].email
+                        email: result[0].email,
+                        token: result[0].token
                     };
                     console.log(req.session);
                     res.status(200).send({ message: 'Login successful' });

@@ -4,6 +4,7 @@ exports.signup = require('./signup');
 exports.ping = require('./ping');
 exports.profile = require('./profile');
 exports.getUsername = require('./getUsername');
+exports.getStreamToken = require('./getStreamToken');
 exports.UploadListingDetails = require('./UploadListingDetails');
 exports.UploadListingPhoto = require('./UploadListingPhoto');
 exports.RetrieveListing = require('./RetrieveListing');
