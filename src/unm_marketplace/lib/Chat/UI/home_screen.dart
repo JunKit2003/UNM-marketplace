@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:unm_marketplace/Chat/app.dart';
 import 'package:unm_marketplace/Chat/pages/contacts_page.dart';
-import 'package:unm_marketplace/Chat/pages/notification_page.dart';
 import 'package:unm_marketplace/Chat/pages/messages_page.dart';
 import 'package:unm_marketplace/Chat/theme.dart';
 import 'package:unm_marketplace/Chat/widgets/widgets.dart';
@@ -9,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
 import 'package:unm_marketplace/profile_page.dart';
 import 'package:unm_marketplace/utils.dart';
-
+import 'package:flutter/cupertino.dart';
 
 class HomeScreen extends StatelessWidget {
   static Route get route => MaterialPageRoute(
@@ -22,13 +21,11 @@ class HomeScreen extends StatelessWidget {
 
   final pages = const [
     MessagesPage(),
-    NotificationsPage(),
     ContactsPage(),
   ];
 
   final pageTitles = const [
     'Messages',
-    'Notifications',
     'Contacts'
   ];
 
@@ -64,9 +61,9 @@ class HomeScreen extends StatelessWidget {
       leading: Align(
         alignment: Alignment.centerRight,
         child: IconBackground(
-          icon: Icons.search,
+          icon: CupertinoIcons.back,
           onTap: () {
-          print('TODO search');
+            Navigator.of(context).pop();
           },
         ),
       ),
@@ -157,13 +154,6 @@ class _BottomNavigationBarState extends State<_BottomNavigationBar> {
                 ),
               _NavigationBarItem(
                 index: 1,
-                label: 'Notifications', 
-                icon: Icons.notifications,
-                isSelected: (selectedIndex == 1),
-                onTap: handleSelectedItem,
-              ),
-              _NavigationBarItem(
-                index: 2,
                 label: 'Contacts', 
                 icon: Icons.contact_mail,
                 isSelected: (selectedIndex == 2),

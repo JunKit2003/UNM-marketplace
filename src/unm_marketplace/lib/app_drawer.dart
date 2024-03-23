@@ -71,7 +71,18 @@ Future<void> connectUserToStream(String token) async {
 
   try {
     String imageUrl = await fetchProfilePhoto(username);
-    // Set the token for the client
+    // Check if the user is already connected
+    if (client.state.currentUser != null) {
+      // User is already connected, no need to connect again
+      // ignore: use_build_context_synchronously
+        Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
+      return;
+    }
+
+    // User is not connected, proceed with connection
     await client.connectUser(
       User(
         id: 'username',
@@ -84,12 +95,15 @@ Future<void> connectUserToStream(String token) async {
     );
 
     // Navigate to the home screen after successful connection
+    // ignore: use_build_context_synchronously
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => HomeScreen()),
     );
   } on Exception catch (e, st) {
     logger.e('Could not connect user', error: e, stackTrace: st);
+    // Log error when navigation fails
+    logger.e('Navigation to HomeScreen failed');
   } finally {
     // Set the loading state to false regardless of success or failure
     setState(() {
@@ -136,6 +150,8 @@ Future<void> connectUserToStream(String token) async {
   }
 
   Future<void> logoutUser(BuildContext context) async {
+    // Disconnect the user from Stream Chat service
+    await globalStreamChatClient!.disconnectUser();
     var url = 'http://${getHost()}:5000/api/logout'; // Adjust as needed
 
     try {
@@ -143,7 +159,7 @@ Future<void> connectUserToStream(String token) async {
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Successful Logout')));
+            .showSnackBar(const SnackBar(content: Text('Successful Logout')));
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => LoginSignupPage()),
@@ -172,7 +188,7 @@ Future<void> connectUserToStream(String token) async {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Container();
                 } else if (snapshot.hasError) {
-                  return Icon(Icons.error);
+                  return const Icon(Icons.error);
                 } else {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,20 +203,20 @@ Future<void> connectUserToStream(String token) async {
                                     'assets/DefaultProfilePicture.jpg')
                                 as ImageProvider<Object>,
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       FutureBuilder<String>(
                         future: getUsername(),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             return Text(
                               'Welcome ${snapshot.data}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                               ),
                             );
                           } else {
-                            return Text(
+                            return const Text(
                               'Welcome User',
                               style: TextStyle(
                                 color: Colors.white,

@@ -10,7 +10,7 @@ void main() async {
   await initializeDateFormatting('en_US', null);
 
   // Initialize StreamChatClient
-  final client = StreamChatClient(streamKey);
+  final client = StreamChatClient(streamKey, logLevel: Level.INFO);// Set log level as needed);
   globalStreamChatClient = client; // Assign the client to the global variable
 
   runApp(

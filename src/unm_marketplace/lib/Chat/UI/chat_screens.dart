@@ -349,7 +349,7 @@ class _AppBarTitle extends StatelessWidget {
               Text(
                 Helpers.getChannelName(channel, context.currentUser!),
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 14),
+                style: const TextStyle(fontSize: 14, color: Colors.black),
               ),
               const SizedBox(height: 2),
               BetterStreamBuilder<List<Member>>(
