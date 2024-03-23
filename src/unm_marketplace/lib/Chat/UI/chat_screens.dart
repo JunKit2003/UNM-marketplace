@@ -424,10 +424,10 @@ class _AppBarTitle extends StatelessWidget {
             ),
           );
         } else {
-          alternativeWidget = Text(
+          alternativeWidget = const Text(
             'Offline',
             // '${Jiffy.parseFromDateTime(otherMember.user?.lastActive).fromNow()}',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 10,
               fontWeight: FontWeight.bold,
               color: Colors.red,

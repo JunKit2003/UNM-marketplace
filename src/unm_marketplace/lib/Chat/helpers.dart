@@ -36,7 +36,7 @@ abstract class Helpers {
 
   static String? getChannelImage(Channel channel, User currentUser) {
     if (channel.image != null) {
-      return channel.image!;
+      return 'http://localhost:5000/images/${channel.image}'; // Add URL prefix
     } else if (channel.state?.members.isNotEmpty ?? false) {
       final otherMembers = channel.state?.members
           .where(
@@ -44,7 +44,7 @@ abstract class Helpers {
           )
           .toList();
       if (otherMembers?.length == 1) {
-        return otherMembers!.first.user?.image;
+        return 'http://localhost:5000/images/${otherMembers!.first.user?.image}'; // Add URL prefix
       }
     }
     return null;
