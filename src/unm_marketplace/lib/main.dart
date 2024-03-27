@@ -43,7 +43,7 @@ class _MyAppState extends State<MyApp> {
       } else {
         return false;
       }
-    } on DioError catch (e) {
+    } on DioException {
       return false;
     }
   }

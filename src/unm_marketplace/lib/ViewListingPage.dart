@@ -137,6 +137,8 @@ class _ViewListingPageState extends State<ViewListingPage> {
               SizedBox(height: 8.0),
               Text(
                   'Posted Time: ${formatPostedDate(_listingDetails!['postedDate'])}'),
+              SizedBox(height: 8.0),
+              Text('Posted By: ${_listingDetails!['PostedBy']}'),
             ],
           ],
         ),

@@ -193,7 +193,6 @@ class _AppDrawerState extends State<AppDrawer> {
             },
           ),
 
-          // In the AppDrawer, where you navigate to the ListedAd page, provide the username parameter
 
           ListTile(
             leading: Icon(Icons.list_alt), // Icon for the new option
