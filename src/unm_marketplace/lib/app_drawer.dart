@@ -182,7 +182,7 @@ Future<void> connectUserToStream(String token) async {
             decoration: BoxDecoration(color: Colors.blue),
             child: FutureBuilder<Uint8List?>(
               future: fetchImageData(
-                'http://${getHost()}:5000/images/$photoDirectory',
+                'http://${getHost()}:5000/images/ProfilePhoto/$photoDirectory',
               ),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {

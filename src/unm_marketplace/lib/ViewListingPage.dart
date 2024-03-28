@@ -2,14 +2,16 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
-import 'package:unm_marketplace/DioSingleton.dart';
-import 'package:unm_marketplace/utils.dart';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
-// import 'Chat/UI/chat_screens.dart';
+import 'package:unm_marketplace/Chat/UI/chat_screens.dart';
+import 'package:unm_marketplace/DioSingleton.dart';
+import 'package:unm_marketplace/main.dart';
+import 'package:unm_marketplace/utils.dart';
+import 'package:unm_marketplace/Chat/app.dart';
 
 class ViewListingPage extends StatefulWidget {
   final int listingId;
-  
+
   ViewListingPage({required this.listingId});
 
   @override
@@ -17,15 +19,13 @@ class ViewListingPage extends StatefulWidget {
 }
 
 class _ViewListingPageState extends State<ViewListingPage> {
-  // late final userListController = StreamUserListController(
-  //   client: StreamChatCore.of(context).client,
-  //   limit: 20,
-  //   filter: Filter.notEqual('id', StreamChatCore.of(context).currentUser!.id),
-  // );
-  //late final User seller; // Add this line
   late Dio dio;
   Uint8List? _imageBytes;
   Map<String, dynamic>? _listingDetails;
+  String username = '';
+  Uint8List? profilePhoto;
+  Dio dioSingleton = DioSingleton.getInstance(); // Ensure you have this line
+  String photoDirectory = '';
 
   @override
   void initState() {
@@ -36,7 +36,7 @@ class _ViewListingPageState extends State<ViewListingPage> {
 
   Future<void> _fetchListingDetails(int listingId) async {
     try {
-      var response = await dio.post(
+      var response = await dioSingleton.post(
         'http://${getHost()}:5000/api/RetrieveListing',
         queryParameters: {'id': listingId},
       );
@@ -47,15 +47,10 @@ class _ViewListingPageState extends State<ViewListingPage> {
           var listing = response.data['listings'][0];
           setState(() {
             _listingDetails = listing;
-            // seller = User(
-            //   id: listing['sellerId'],
-            //   name: listing['sellerName'], // Replace with actual key in your data
-            //   image: listing['sellerImage'], // Replace with actual key in your data
-            // );
           });
 
-          var imageDataResponse = await dio.get(
-            'http://${getHost()}:5000/images/${listing['ImageID']}',
+          var imageDataResponse = await dioSingleton.get(
+            'http://${getHost()}:5000/images/Listing/${listing['ImageID']}',
             options: Options(responseType: ResponseType.bytes),
           );
 
@@ -75,6 +70,104 @@ class _ViewListingPageState extends State<ViewListingPage> {
     } catch (e) {
       print('Error fetching listing details: $e');
     }
+  }
+
+  Future<String> fetchProfilePhoto(String username) async {
+    try {
+      final profileResponse = await dioSingleton.post(
+        'http://${getHost()}:5000/api/getProfilePhoto',
+        data: {'username': username},
+      );
+      String profilePhotoUrl = profileResponse.data['profilePhotoUrl'];
+      print('This is your profile photo URL: $profilePhotoUrl');
+      return profilePhotoUrl;
+    } catch (e) {
+      print('Error fetching profile photo: $e');
+      return ''; // Return an empty string if there's an error
+    }
+  }
+
+  Future<String> getUsername() async {
+    final response = await dioSingleton.post('http://${getHost()}:5000/api/getUsername');
+    print(response.data['username']);
+    return response.data['username'];
+  }
+
+  Future<String> getStreamToken() async {
+    final response = await dio.post('http://${getHost()}:5000/api/getStreamToken');
+    print(response.data['token']);
+    return response.data['token'];
+  }
+
+  Future<void> fetchData() async {
+    // Fetch the username
+    username = await getUsername();
+
+    // Fetch the profile photo and store the directory
+    photoDirectory = await fetchProfilePhoto(username);
+    print('---------------------PhotoDirectory: $photoDirectory');
+    // Fetch the image URL from the directory
+
+    setState(() {});
+  }
+
+  bool _loading = false;
+
+  Future<void> connectUserToStream(String token) async {
+  final client = globalStreamChatClient; // Access the global StreamChatClient instance
+  if (client == null) {
+    logger.e('StreamChatClient instance is null.');
+    return;
+  }
+
+  setState(() {
+    _loading = true;
+  });
+  try {
+    String imageUrl = await fetchProfilePhoto(username);
+    // Check if the user is already connected
+    if (client.state.currentUser != null) {
+      return;
+    }
+    // User is not connected, proceed with connection
+    await client.connectUser(
+      User(
+        id: 'username',
+        extraData: {
+          'name': username,
+          'image': imageUrl,
+        },
+      ),
+      token,
+    );
+
+  } on Exception catch (e, st) {
+    logger.e('Could not connect user', error: e, stackTrace: st);
+    // Log error when navigation fails
+    logger.e('Navigation to ChatScreen failed');
+  } finally {
+    // Set the loading state to false regardless of success or failure
+    setState(() {
+      _loading = false;
+    });
+  }
+}
+
+
+Future<void> createChannel(BuildContext context, sellerUsername) async {
+    final core = StreamChatCore.of(context);
+    final nav = Navigator.of(context);
+    final channel = core.client.channel('messaging', extraData: {
+        'members': [
+          core.currentUser!.id,
+          sellerUsername,
+        ]
+      });
+    await channel.watch();
+
+    nav.push(
+      ChatScreens.routeWithChannel(channel),
+    );
   }
 
   String formatPostedDate(String postedDate) {
@@ -109,39 +202,18 @@ class _ViewListingPageState extends State<ViewListingPage> {
     }
   }
 
-  // Future<void> _createChannel() async {
-  //   try {
-  //     final core = StreamChatCore.of(context);
-  //     final nav = Navigator.of(context);
-
-  //     // Create a chat channel with the seller
-  //     final channel = core.client.channel('messaging', extraData: {
-  //       'members': [
-  //         core.currentUser!.id,
-  //         seller.id,
-  //       ]
-  //     });
-
-  //     // Watch the channel
-  //     await channel.watch();
-
-  //     // Navigate to the chat screen with the created channel
-  //     nav.push(
-  //       ChatScreens.routeWithChannel(channel),
-  //     );
-  //   } catch (e) {
-  //     print('Error creating channel: $e');
-  //   }
-  // }
+  
 
   @override
   Widget build(BuildContext context) {
+    // Add this line to print debug information
+    logger.d('Username: $username, Posted By: ${_listingDetails!['PostedBy']}');
     return Scaffold(
       appBar: AppBar(
-        title: const Text('View Listing'),
+        title: Text('View Listing'),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -154,29 +226,39 @@ class _ViewListingPageState extends State<ViewListingPage> {
                   fit: BoxFit.contain, // Set fit property to contain
                 ),
               ),
-            const SizedBox(height: 16.0),
+            SizedBox(height: 16.0),
             if (_listingDetails != null) ...[
               Text(
                 'Title: ${_listingDetails!['title']}',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              const SizedBox(height: 8.0),
+              SizedBox(height: 8.0),
               Text('Description: ${_listingDetails!['description']}'),
-              const SizedBox(height: 8.0),
+              SizedBox(height: 8.0),
               Text('Price: RM ${_listingDetails!['price']}'),
-              const SizedBox(height: 8.0),
+              SizedBox(height: 8.0),
               Text(
                   'Contact Description: ${_listingDetails!['ContactDescription']}'),
-              const SizedBox(height: 8.0),
+              SizedBox(height: 8.0),
               Text('Category: ${_listingDetails!['category']}'),
-              const SizedBox(height: 8.0),
+              SizedBox(height: 8.0),
               Text(
                   'Posted Time: ${formatPostedDate(_listingDetails!['postedDate'])}'),
-              const SizedBox(height: 8.0),
-              ElevatedButton(
-                  onPressed: () {
-                    // _createChannel();
-                },
+              SizedBox(height: 8.0),
+              Text('Posted By: ${_listingDetails!['PostedBy']}'),
+              SizedBox(height: 8.0),
+              // Show the button only if the seller is not the current user
+              if (_listingDetails!['PostedBy'] != username)
+                ElevatedButton(
+                  onPressed: () async{
+                    if (!_loading) {
+                      // _createChannel();
+                      String token = await getStreamToken();
+                      await connectUserToStream(token);
+                      String sellerUsername = _listingDetails!['PostedBy'];
+                      await createChannel(context, sellerUsername);
+                    }
+                  },
                 child: const Text('Chat with the seller'),
               ),
             ],
@@ -185,7 +267,4 @@ class _ViewListingPageState extends State<ViewListingPage> {
       ),
     );
   }
-
 }
-
-

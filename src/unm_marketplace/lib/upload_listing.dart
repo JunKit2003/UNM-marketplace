@@ -1,7 +1,10 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
+import 'package:unm_marketplace/Chat/app.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
+import 'package:unm_marketplace/main.dart';
 import 'package:unm_marketplace/utils.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -19,6 +22,8 @@ class _UploadListingPageState extends State<UploadListingPage> {
   String category = ''; // Updated category field
   String ContactDescription = '';
   String PostedBy = '';
+  String username = '';
+  String photoDirectory = '';
   Dio dio = DioSingleton.getInstance();
 
   // Define a list of categories
@@ -164,6 +169,75 @@ class _UploadListingPageState extends State<UploadListingPage> {
     }
   }
 
+  Future<String> fetchProfilePhoto(String username) async {
+    try {
+      final profileResponse = await dio.post(
+        'http://${getHost()}:5000/api/getProfilePhoto',
+        data: {'username': username},
+      );
+      String profilePhotoUrl = profileResponse.data['profilePhotoUrl'];
+      print('This is your profile photo URL: $profilePhotoUrl');
+      return profilePhotoUrl;
+    } catch (e) {
+      print('Error fetching profile photo: $e');
+      return ''; // Return an empty string if there's an error
+    }
+  }
+
+    Future<String> getUsername() async {
+    final response = await dio.post('http://${getHost()}:5000/api/getUsername');
+    print(response.data['username']);
+    return response.data['username'];
+  }
+
+  Future<String> getStreamToken() async {
+    final response = await dio.post('http://${getHost()}:5000/api/getStreamToken');
+    print(response.data['token']);
+    return response.data['token'];
+  }
+
+  Future<void> fetchData() async {
+    // Fetch the username
+    username = await getUsername();
+
+    // Fetch the profile photo and store the directory
+    photoDirectory = await fetchProfilePhoto(username);
+    print('---------------------PhotoDirectory: $photoDirectory');
+    // Fetch the image URL from the directory
+
+    setState(() {});
+  }
+
+  Future<void> connectUserToStream(String token) async {
+  final client = globalStreamChatClient; // Access the global StreamChatClient instance
+  if (client == null) {
+    logger.e('StreamChatClient instance is null.');
+    return;
+  }
+
+  try {
+    String imageUrl = await fetchProfilePhoto(username);
+    // Check if the user is already connected
+    if (client.state.currentUser != null) {
+      return;
+    }
+    // User is not connected, proceed with connection
+    await client.connectUser(
+      User(
+        id: 'username',
+        extraData: {
+          'name': username,
+          'image': imageUrl,
+        },
+      ),
+      token,
+    );
+
+  } on Exception catch (e, st) {
+    logger.e('Could not connect user', error: e, stackTrace: st);
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -286,6 +360,8 @@ class _UploadListingPageState extends State<UploadListingPage> {
                 onPressed: () async {
                   // Inside an asynchronous function or method
                   int listingId = await _submitListingDetails();
+                  String token = await getStreamToken();
+                  await connectUserToStream(token);
                   if (listingId != -1) {
                     // Do something with the listingId
                     print('Listing ID: $listingId');

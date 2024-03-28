@@ -276,7 +276,7 @@ class _ListingPageState extends State<ListingPage> {
                               Expanded(
                                 child: FutureBuilder<Uint8List>(
                                   future: fetchImageData(
-                                      'http://${getHost()}:5000/images/${listing['ImageID']}'),
+                                      'http://${getHost()}:5000/images/Listing/${listing['ImageID']}'),
                                   builder: (context, snapshot) {
                                     if (snapshot.connectionState ==
                                         ConnectionState.waiting) {
