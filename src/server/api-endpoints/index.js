@@ -16,3 +16,5 @@ exports.changePassword = require('./changePassword');
 exports.getCategories = require('./getCategories');
 exports.RetrieveListingImages = require('./RetrieveListingImages');
 exports.authenticate = require('./authenticate');
+exports.createStreamUserAndToken = require ('./createStreamUserAndToken');
+exports.getStreamToken = require('./getStreamToken');

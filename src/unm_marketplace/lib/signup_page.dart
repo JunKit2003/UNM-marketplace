@@ -51,7 +51,7 @@ class _SignupPageState extends State<SignupPage> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Signup Failed')));
       }
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       // Handling DioError separately
       if (e.response?.statusCode == 400) {
         String errorMessage = e.response?.data['message'] ?? 'Signup Failed';

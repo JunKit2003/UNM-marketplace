@@ -2,22 +2,30 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
+import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
+import 'package:unm_marketplace/Chat/UI/chat_screens.dart';
+import 'package:unm_marketplace/Chat/app.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
+import 'package:unm_marketplace/main.dart';
 import 'package:unm_marketplace/utils.dart';
 
 class ViewListingPage extends StatefulWidget {
   final int listingId;
 
-  ViewListingPage({required this.listingId});
+  const ViewListingPage({Key? key, required this.listingId}) : super(key: key);
 
   @override
-  _ViewListingPageState createState() => _ViewListingPageState();
+  ViewListingPageState createState() => ViewListingPageState();
 }
 
-class _ViewListingPageState extends State<ViewListingPage> {
+class ViewListingPageState extends State<ViewListingPage> {
   late Dio dio;
   Uint8List? _imageBytes;
   Map<String, dynamic>? _listingDetails;
+  Dio dioSingleton = DioSingleton.getInstance();
+  String username = '';
+  Uint8List? profilePhoto;
+  String photoDirectory = '';
 
   @override
   void initState() {
@@ -64,13 +72,112 @@ class _ViewListingPageState extends State<ViewListingPage> {
     }
   }
 
+  Future<String> fetchProfilePhoto(String username) async {
+    try {
+      final profileResponse = await dioSingleton.post(
+        'http://${getHost()}:5000/api/getProfilePhoto',
+        data: {'username': username},
+      );
+      String profilePhotoUrl = profileResponse.data['profilePhotoUrl'];
+      print('This is your profile photo URL: $profilePhotoUrl');
+      return profilePhotoUrl;
+    } catch (e) {
+      print('Error fetching profile photo: $e');
+      return ''; // Return an empty string if there's an error
+    }
+  }
+
+  Future<String> getUsername() async {
+    final response =
+        await dioSingleton.post('http://${getHost()}:5000/api/getUsername');
+    print(response.data['username']);
+    return response.data['username'];
+  }
+
+  Future<String> getStreamToken() async {
+    final response =
+        await dio.post('http://${getHost()}:5000/api/getStreamToken');
+    print(response.data['token']);
+    return response.data['token'];
+  }
+
+  Future<void> fetchData() async {
+    // Fetch the username
+    username = await getUsername();
+
+    // Fetch the profile photo and store the directory
+    photoDirectory = await fetchProfilePhoto(username);
+    print('---------------------PhotoDirectory: $photoDirectory');
+    // Fetch the image URL from the directory
+
+    setState(() {});
+  }
+
+  bool _loading = false;
+
+  Future<void> connectUserToStream(String token) async {
+    final client =
+        globalStreamChatClient; // Access the global StreamChatClient instance
+    if (client == null) {
+      logger.e('StreamChatClient instance is null.');
+      return;
+    }
+
+    setState(() {
+      _loading = true;
+    });
+    try {
+      String imageUrl = await fetchProfilePhoto(username);
+      // Check if the user is already connected
+      if (client.state.currentUser != null) {
+        return;
+      }
+      // User is not connected, proceed with connection
+      await client.connectUser(
+        User(
+          id: 'username',
+          extraData: {
+            'name': username,
+            'image': imageUrl,
+          },
+        ),
+        token,
+      );
+    } on Exception catch (e, st) {
+      logger.e('Could not connect user', error: e, stackTrace: st);
+      // Log error when navigation fails
+      logger.e('Navigation to ChatScreen failed');
+    } finally {
+      // Set the loading state to false regardless of success or failure
+      setState(() {
+        _loading = false;
+      });
+    }
+  }
+
+  Future<void> createChannel(BuildContext context, sellerUsername) async {
+    final core = StreamChatCore.of(context);
+    final nav = Navigator.of(context);
+    final channel = core.client.channel('messaging', extraData: {
+      'members': [
+        core.currentUser!.id,
+        sellerUsername,
+      ]
+    });
+    await channel.watch();
+
+    nav.push(
+      ChatScreens.routeWithChannel(channel),
+    );
+  }
+
   String formatPostedDate(String postedDate) {
     try {
       // Parse the posted date and adjust to Malaysia time
       DateTime postedDateTime =
-          DateTime.parse(postedDate).add(Duration(hours: 8));
-      DateTime now =
-          DateTime.now().add(Duration(hours: 8)); // Adjust for Malaysia time
+          DateTime.parse(postedDate).add(const Duration(hours: 8));
+      DateTime now = DateTime.now()
+          .add(const Duration(hours: 8)); // Adjust for Malaysia time
 
       Duration difference = now.difference(postedDateTime);
       String differenceString = '';
@@ -100,10 +207,10 @@ class _ViewListingPageState extends State<ViewListingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('View Listing'),
+        title: const Text('View Listing'),
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -116,29 +223,46 @@ class _ViewListingPageState extends State<ViewListingPage> {
                   fit: BoxFit.contain, // Set fit property to contain
                 ),
               ),
-            SizedBox(height: 16.0),
+            const SizedBox(height: 16.0),
             if (_listingDetails != null) ...[
               Text(
                 'Title: ${_listingDetails!['title']}',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text('Description: ${_listingDetails!['description']}'),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text(
                   'Condition: ${_listingDetails!['condition']}'), // Display the condition
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text('Price: RM ${_listingDetails!['price']}'),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text(
                   'Contact Description: ${_listingDetails!['ContactDescription']}'),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text('Category: ${_listingDetails!['category']}'),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text(
                   'Posted Time: ${formatPostedDate(_listingDetails!['postedDate'])}'),
-              SizedBox(height: 8.0),
+              const SizedBox(height: 8.0),
               Text('Posted By: ${_listingDetails!['PostedBy']}'),
+              const SizedBox(height: 8.0),
+              // Show the button only if the seller is not the current user
+              if (_listingDetails!['PostedBy'] != username)
+                ElevatedButton(
+                  onPressed: () async {
+                    if (!_loading) {
+                      String token = await getStreamToken();
+                      print('AMATOKEN: $token');
+                      await connectUserToStream(token);
+                      String sellerUsername = _listingDetails!['PostedBy'];
+                      if (mounted) {
+                        await createChannel(context, sellerUsername);
+                      }
+                    }
+                  },
+                  child: const Text('Chat with the seller'),
+                ),
             ],
           ],
         ),

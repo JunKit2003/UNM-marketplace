@@ -5,16 +5,32 @@ import 'listing_page.dart';
 import 'package:dio/dio.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
 import 'package:unm_marketplace/utils.dart';
+import 'package:unm_marketplace/Chat/app.dart';
+import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
+
+StreamChatClient?
+    globalStreamChatClient; // Global variable to hold the StreamChatClient instance
 
 void main() async {
   // Initialize date formatting with the desired timezone (GMT+8)
   await initializeDateFormatting('en_US', null);
 
-  runApp(const MyApp());
+  // Initialize StreamChatClient
+  final client = StreamChatClient(streamKey,
+      logLevel: Level.INFO); // Set log level as needed);
+  globalStreamChatClient = client; // Assign the client to the global variable
+
+  runApp(
+    MyApp(client: client),
+  );
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+  final StreamChatClient client;
+  const MyApp({
+    Key? key,
+    required this.client,
+  }) : super(key: key);
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -69,11 +85,18 @@ class _MyAppState extends State<MyApp> {
             onSurface: Colors.black, // Text color on the surface
           ),
           appBarTheme: const AppBarTheme(color: Colors.blue)),
+      builder: (context, child) {
+        return StreamChatCore(
+          client: widget.client,
+          child: child!,
+        );
+      },
       home: FutureBuilder<bool>(
         future: _authenticationResult,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Scaffold(body: Center(child: CircularProgressIndicator()));
+            return const Scaffold(
+                body: Center(child: CircularProgressIndicator()));
           } else {
             if (snapshot.hasData && snapshot.data!) {
               return ListingPage(); // Navigate to ListingPage if authenticated
