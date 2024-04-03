@@ -33,14 +33,13 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Future<String> getUsername() async {
-    final response = await dio.post('http://${getHost()}:5000/api/getUsername');
+    final response = await dio.post('http://${getHost()}/api/getUsername');
     print(response.data['username']);
     return response.data['username'];
   }
 
   Future<String> getStreamToken() async {
-    final response =
-        await dio.post('http://${getHost()}:5000/api/getStreamToken');
+    final response = await dio.post('http://${getHost()}/api/getStreamToken');
     print(response.data['token']);
     return response.data['token'];
   }
@@ -116,7 +115,7 @@ class _AppDrawerState extends State<AppDrawer> {
   Future<String> fetchProfilePhoto(String username) async {
     try {
       final profileResponse = await dio.post(
-        'http://${getHost()}:5000/api/getProfilePhoto',
+        'http://${getHost()}/api/getProfilePhoto',
         data: {'username': username},
       );
       String profilePhotoUrl = profileResponse.data['profilePhotoUrl'];
@@ -129,8 +128,6 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Future<Uint8List?> fetchImageData(String imageUrl) async {
-    print(
-        '--------------------------------------------------------------------');
     print(imageUrl);
     try {
       var response = await dio.get(imageUrl,
@@ -149,7 +146,7 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Future<void> logoutUser(BuildContext context) async {
-    var url = 'http://${getHost()}:5000/api/logout'; // Adjust as needed
+    var url = 'http://${getHost()}/api/logout'; // Adjust as needed
 
     try {
       var response = await dio.post(url);
@@ -185,7 +182,7 @@ class _AppDrawerState extends State<AppDrawer> {
             decoration: BoxDecoration(color: Colors.blue),
             child: FutureBuilder<Uint8List?>(
               future: fetchImageData(
-                'http://${getHost()}:5000/images/ProfilePhoto/$photoDirectory',
+                'http://${getHost()}/images/ProfilePhoto/$photoDirectory',
               ),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {

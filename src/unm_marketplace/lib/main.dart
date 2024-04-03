@@ -48,7 +48,7 @@ class _MyAppState extends State<MyApp> {
   Future<bool> authenticateUser() async {
     Dio dio = DioSingleton.getInstance();
     var url =
-        'http://${getHost()}:5000/api/authenticate'; // Adjust the URL as per your server setup
+        'http://${getHost()}/api/authenticate'; // Adjust the URL as per your server setup
 
     try {
       var response = await dio.post(url);

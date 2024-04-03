@@ -8,5 +8,5 @@ String getHost() {
   } catch (e) {
     // If the Platform access fails, assume it's not android.
   }
-  return 'localhost';
+  return 'localhost:5000';
 }

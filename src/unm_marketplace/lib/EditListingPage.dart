@@ -47,7 +47,7 @@ class _EditListingPageState extends State<EditListingPage> {
   Future<void> _fetchCategories() async {
     try {
       var response =
-          await dio.post('http://${getHost()}:5000/api/getCategories');
+          await dio.post('http://${getHost()}/api/getCategories');
 
       if (response.statusCode == 200) {
         setState(() {
@@ -65,7 +65,7 @@ class _EditListingPageState extends State<EditListingPage> {
   Future<void> _fetchListingDetails(int listingId) async {
     try {
       var response = await dio.post(
-        'http://${getHost()}:5000/api/RetrieveListing',
+        'http://${getHost()}/api/RetrieveListing',
         queryParameters: {'id': listingId},
       );
 
@@ -85,7 +85,7 @@ class _EditListingPageState extends State<EditListingPage> {
           });
 
           var imageDataResponse = await dio.get(
-            'http://${getHost()}:5000/images/${listing['ImageID']}',
+            'http://${getHost()}/images/Listing/${listing['ImageID']}',
             options: Options(responseType: ResponseType.bytes),
           );
 
@@ -139,7 +139,7 @@ class _EditListingPageState extends State<EditListingPage> {
         });
 
         var response = await dio.post(
-          'http://${getHost()}:5000/api/UploadListingPhoto',
+          'http://${getHost()}/api/UploadListingPhoto',
           data: formData,
           options: Options(
             headers: {
@@ -169,7 +169,7 @@ class _EditListingPageState extends State<EditListingPage> {
   Future<void> _deleteOldPhoto(int listingId) async {
     try {
       final response = await dio.post(
-        'http://${getHost()}:5000/api/DeleteListingPhoto',
+        'http://${getHost()}/api/DeleteListingPhoto',
         data: {'id': listingId},
       );
 
@@ -192,7 +192,7 @@ class _EditListingPageState extends State<EditListingPage> {
         }
 
         final response = await dio.post(
-          'http://${getHost()}:5000/api/EditListing',
+          'http://${getHost()}/api/EditListing',
           data: {
             'id': widget.listingId,
             'title': title.text,
@@ -228,7 +228,7 @@ class _EditListingPageState extends State<EditListingPage> {
   Future<String> _getUsername() async {
     try {
       final response =
-          await dio.post('http://${getHost()}:5000/api/getUsername');
+          await dio.post('http://${getHost()}/api/getUsername');
       return response.data['username'];
     } catch (e) {
       print('Error getting username: $e');

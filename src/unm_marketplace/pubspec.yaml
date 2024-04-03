@@ -41,6 +41,8 @@ dependencies:
   intl: ^0.19.0
   meta: ^1.9.1
   universal_io: ^2.2.2
+  carousel_slider: ^4.2.1
+  dotted_border: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -51,3 +53,23 @@ flutter:
   uses-material-design: true
   assets:
     - assets/DefaultProfilePicture.jpg
+    - assets\NoImageAvailable.jpg
+    - assets/images.png
+    - assets/all_image.png
+    - assets/SEimage.png
+    - assets/books_image.png
+    - assets/vehicles_image.png
+    - assets/property_rentals_image.png
+    - assets/home_garden_image.png
+    - assets/electronics_image.png
+    - assets/hobbies_image.png
+    - assets/clothing_accessories_image.png
+    - assets/family_image.png
+    - assets/entertainment_image.png
+    - assets/other_image.png
+    - assets/close_image.png
+    - assets/advertisement.png
+    - assets/mobile_image.png
+    - assets/mobile_advertisement.png
+    - assets/logo.jpg
+    - assets/university-of-nottingham.jpg

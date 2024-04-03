@@ -20,7 +20,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
   Future<void> _updatePassword() async {
     try {
       final response = await dio.post(
-        'http://${getHost()}:5000/api/ChangePassword',
+        'http://${getHost()}/api/ChangePassword',
         data: {
           'username': widget.username,
           'currentPassword': currentPasswordController.text,

@@ -37,9 +37,11 @@ class ViewListingPageState extends State<ViewListingPage> {
   Future<void> _fetchListingDetails(int listingId) async {
     try {
       var response = await dio.post(
-        'http://${getHost()}:5000/api/RetrieveListing',
+        'http://${getHost()}/api/RetrieveListing',
         queryParameters: {'id': listingId},
       );
+
+      print('Listing details response: $response');
 
       if (response.statusCode == 200) {
         if (response.data['listings'] != null &&
@@ -50,9 +52,11 @@ class ViewListingPageState extends State<ViewListingPage> {
           });
 
           var imageDataResponse = await dio.get(
-            'http://${getHost()}:5000/images/Listing/${listing['ImageID']}',
+            'http://${getHost()}/images/Listing/${listing['ImageID']}',
             options: Options(responseType: ResponseType.bytes),
           );
+
+          print('Image data response: $imageDataResponse');
 
           if (imageDataResponse.statusCode == 200) {
             setState(() {
@@ -75,11 +79,11 @@ class ViewListingPageState extends State<ViewListingPage> {
   Future<String> fetchProfilePhoto(String username) async {
     try {
       final profileResponse = await dioSingleton.post(
-        'http://${getHost()}:5000/api/getProfilePhoto',
+        'http://${getHost()}/api/getProfilePhoto',
         data: {'username': username},
       );
       String profilePhotoUrl = profileResponse.data['profilePhotoUrl'];
-      print('This is your profile photo URL: $profilePhotoUrl');
+      print('Profile photo URL: $profilePhotoUrl');
       return profilePhotoUrl;
     } catch (e) {
       print('Error fetching profile photo: $e');
@@ -89,27 +93,27 @@ class ViewListingPageState extends State<ViewListingPage> {
 
   Future<String> getUsername() async {
     final response =
-        await dioSingleton.post('http://${getHost()}:5000/api/getUsername');
-    print(response.data['username']);
+        await dioSingleton.post('http://${getHost()}/api/getUsername');
+    print('Username: ${response.data['username']}');
     return response.data['username'];
   }
 
   Future<String> getStreamToken() async {
-    final response =
-        await dio.post('http://${getHost()}:5000/api/getStreamToken');
-    print(response.data['token']);
+    final response = await dio.post('http://${getHost()}/api/getStreamToken');
+    print('Stream token: ${response.data['token']}');
     return response.data['token'];
   }
 
   Future<void> fetchData() async {
     // Fetch the username
     username = await getUsername();
+    print('Fetched username: $username');
 
     // Fetch the profile photo and store the directory
     photoDirectory = await fetchProfilePhoto(username);
-    print('---------------------PhotoDirectory: $photoDirectory');
-    // Fetch the image URL from the directory
+    print('Fetched photo directory: $photoDirectory');
 
+    // Fetch the image URL from the directory
     setState(() {});
   }
 
@@ -128,6 +132,7 @@ class ViewListingPageState extends State<ViewListingPage> {
     });
     try {
       String imageUrl = await fetchProfilePhoto(username);
+      print('Image URL for stream: $imageUrl');
       // Check if the user is already connected
       if (client.state.currentUser != null) {
         return;
@@ -207,63 +212,210 @@ class ViewListingPageState extends State<ViewListingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('View Listing'),
+        title: Text('View Listing'),
+        backgroundColor: Colors.blue,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (_imageBytes != null)
-              Container(
-                height: 400, // Set a fixed height for the container
-                alignment: Alignment.center, // Align the image to center
-                child: Image.memory(
-                  _imageBytes!,
-                  fit: BoxFit.contain, // Set fit property to contain
-                ),
-              ),
-            const SizedBox(height: 16.0),
-            if (_listingDetails != null) ...[
-              Text(
-                'Title: ${_listingDetails!['title']}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8.0),
-              Text('Description: ${_listingDetails!['description']}'),
-              const SizedBox(height: 8.0),
-              Text(
-                  'Condition: ${_listingDetails!['condition']}'), // Display the condition
-              const SizedBox(height: 8.0),
-              Text('Price: RM ${_listingDetails!['price']}'),
-              const SizedBox(height: 8.0),
-              Text(
-                  'Contact Description: ${_listingDetails!['ContactDescription']}'),
-              const SizedBox(height: 8.0),
-              Text('Category: ${_listingDetails!['category']}'),
-              const SizedBox(height: 8.0),
-              Text(
-                  'Posted Time: ${formatPostedDate(_listingDetails!['postedDate'])}'),
-              const SizedBox(height: 8.0),
-              Text('Posted By: ${_listingDetails!['PostedBy']}'),
-              const SizedBox(height: 8.0),
-              // Show the button only if the seller is not the current user
-              if (_listingDetails!['PostedBy'] != username)
-                ElevatedButton(
-                  onPressed: () async {
-                    if (!_loading) {
-                      String token = await getStreamToken();
-                      await connectUserToStream(token);
-                      String sellerUsername = _listingDetails!['PostedBy'];
-                      if (mounted) {
-                        await createChannel(context, sellerUsername);
-                      }
-                    }
-                  },
-                  child: const Text('Chat with the seller'),
-                ),
-            ],
-          ],
+        padding: EdgeInsets.all(16.0),
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            double maxWidth = constraints.maxWidth;
+            bool isMobile = maxWidth < 600;
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (_imageBytes != null)
+                  Container(
+                    height: isMobile ? 200 : 400,
+                    width: MediaQuery.of(context).size.width,
+                    alignment: Alignment.center,
+                    child: Image.memory(
+                      _imageBytes!,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                SizedBox(height: 16.0),
+                if (_listingDetails != null) ...[
+                  Container(
+                    height: isMobile
+                        ? null
+                        : MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: SingleChildScrollView(
+                        child: Card(
+                          elevation: 4.0,
+                          child: Padding(
+                            padding: EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _listingDetails!['title'] ?? '',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 20.0 : 25.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  _listingDetails!['condition'] ??
+                                      '', // Display condition
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 13.0 : 15.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  'RM ${_listingDetails!['price'] ?? ''}',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 20.0 : 25.0,
+                                  ),
+                                ),
+                                Divider(height: 16.0),
+                                Padding(
+                                  padding: EdgeInsets.only(bottom: 8.0),
+                                  child: Text(
+                                    'Description:',
+                                    style: TextStyle(
+                                      fontSize: isMobile ? 15.0 : 17.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  _listingDetails!['description'] ?? '',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 13.0 : 15.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                                Divider(height: 16.0),
+                                Text(
+                                  'Contact Description :',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 15.0 : 17.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  _listingDetails?['ContactDescription'] ??
+                                      'N/A',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 13.0 : 15.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  'Category:',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 15.0 : 17.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  _listingDetails!['category'] ?? '',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 13.0 : 15.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  'Posted By:', // Display postedBy
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 15.0 : 17.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  _listingDetails!['PostedBy'] ??
+                                      '', // Display postedBy
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 13.0 : 15.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  'Posted Time:',
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 15.0 : 17.0,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 8.0),
+                                Text(
+                                  formatPostedDate(
+                                      _listingDetails!['postedDate'] ?? ''),
+                                  style: TextStyle(
+                                    fontSize: isMobile ? 13.0 : 15.0,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Container(
+                    height: isMobile
+                        ? MediaQuery.of(context).size.width * 0.3
+                        : MediaQuery.of(context).size.width * 0.1,
+                    width: isMobile
+                        ? MediaQuery.of(context).size.width * 0.9
+                        : null,
+                    child: FractionallySizedBox(
+                      widthFactor: isMobile ? 1.0 : 0.4,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 2.0,
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10.0),
+                          child: Image.asset(
+                            isMobile
+                                ? 'mobile_advertisement.png'
+                                : 'advertisement.png',
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  // Show the button only if the seller is not the current user
+                  if (_listingDetails!['PostedBy'] != username)
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (!_loading) {
+                          String token = await getStreamToken();
+                          await connectUserToStream(token);
+                          String sellerUsername = _listingDetails!['PostedBy'];
+                          if (mounted) {
+                            await createChannel(context, sellerUsername);
+                          }
+                        }
+                      },
+                      child: const Text('Chat with the seller'),
+                    ),
+                ],
+              ],
+            );
+          },
         ),
       ),
     );

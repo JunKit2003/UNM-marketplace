@@ -11,7 +11,6 @@ const categories = [
     'Family',
     'Entertainment',
     'Sports equipment',
-    'uqiwjdbfdiwqebf',
     'Other'
 ];
 

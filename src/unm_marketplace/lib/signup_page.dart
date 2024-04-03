@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:unm_marketplace/DioSingleton.dart';
+import 'package:unm_marketplace/login_page.dart';
 import 'package:unm_marketplace/utils.dart';
 
 class SignupPage extends StatefulWidget {
@@ -19,7 +20,7 @@ class _SignupPageState extends State<SignupPage> {
 
   Future<void> registerUser(String firstName, String lastName, String email,
       String phone_number, String password, BuildContext context) async {
-    var url = 'http://${getHost()}:5000/api/signup'; // URL for local server
+    var url = 'http://${getHost()}/api/signup'; // URL for local server
     Dio dio = DioSingleton.getInstance();
 
     try {
@@ -78,67 +79,132 @@ class _SignupPageState extends State<SignupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Signup")),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Container(
-            padding: EdgeInsets.all(16.0),
-            constraints: BoxConstraints(
-                maxWidth: 400), // Limit width for better readability
-            child: Form(
-              key: _formKey,
+      appBar: AppBar(title: const Text("Signup")),
+      body: Container(
+        decoration: const BoxDecoration(
+          color: Color.fromARGB(255, 16, 38, 59),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Container(
+              padding: const EdgeInsets.all(16.0),
+              constraints: const BoxConstraints(
+                  maxWidth: 400), // Limit width for better readability
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  TextFormField(
-                    decoration: InputDecoration(labelText: 'First Name'),
-                    validator: (value) =>
-                        value!.isEmpty ? 'Please enter your first name' : null,
-                    onSaved: (value) => firstName = value!,
+                children: [
+                  const Text(
+                    'Sign Up',
+                    style: TextStyle(
+                      fontSize: 24, // Adjust the font size as needed
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
-                  TextFormField(
-                    decoration: InputDecoration(labelText: 'Last Name'),
-                    validator: (value) =>
-                        value!.isEmpty ? 'Please enter your last name' : null,
-                    onSaved: (value) => lastName = value!,
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(labelText: 'Username'),
-                    validator: (value) =>
-                        value!.isEmpty ? 'Please enter a username' : null,
-                    onSaved: (value) => username = value!,
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(labelText: 'Email'),
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (value) => value!.isEmpty || !value.contains('@')
-                        ? 'Please enter a valid email'
-                        : null,
-                    onSaved: (value) => email = value!,
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(labelText: 'Phone Number'),
-                    keyboardType: TextInputType.phone,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter a valid phone number';
-                      }
-                      return null;
-                    },
-                    onSaved: (value) => phone_number = value!,
-                  ),
-                  TextFormField(
-                    decoration: InputDecoration(labelText: 'Password'),
-                    obscureText: true,
-                    validator: (value) =>
-                        value!.isEmpty ? 'Please enter a password' : null,
-                    onSaved: (value) => password = value!,
-                  ),
-                  SizedBox(height: 20), // Add space between fields and button
-                  ElevatedButton(
-                    onPressed: _submitForm,
-                    child: Text('Sign Up'),
+                  SizedBox(height: 20),
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.black),
+                      color: Colors.white.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          TextFormField(
+                            decoration:
+                                InputDecoration(labelText: 'First Name'),
+                            validator: (value) => value!.isEmpty
+                                ? 'Please enter your first name'
+                                : null,
+                            onSaved: (value) => firstName = value!,
+                          ),
+                          TextFormField(
+                            decoration: InputDecoration(labelText: 'Last Name'),
+                            validator: (value) => value!.isEmpty
+                                ? 'Please enter your last name'
+                                : null,
+                            onSaved: (value) => lastName = value!,
+                          ),
+                          TextFormField(
+                            decoration: InputDecoration(labelText: 'Username'),
+                            validator: (value) => value!.isEmpty
+                                ? 'Please enter a username'
+                                : null,
+                            onSaved: (value) => username = value!,
+                          ),
+                          TextFormField(
+                            decoration: InputDecoration(labelText: 'Email'),
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (value) =>
+                                value!.isEmpty || !value.contains('@')
+                                    ? 'Please enter a valid email'
+                                    : null,
+                            onSaved: (value) => email = value!,
+                          ),
+                          TextFormField(
+                            decoration:
+                                InputDecoration(labelText: 'Phone Number'),
+                            keyboardType: TextInputType.phone,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a valid phone number';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) => phone_number = value!,
+                          ),
+                          TextFormField(
+                            decoration: InputDecoration(labelText: 'Password'),
+                            obscureText: true,
+                            validator: (value) => value!.isEmpty
+                                ? 'Please enter a password'
+                                : null,
+                            onSaved: (value) => password = value!,
+                          ),
+                          SizedBox(
+                              height:
+                                  20), // Add space between fields and button
+                          ElevatedButton(
+                            onPressed: _submitForm,
+                            child: Text('Sign Up'),
+                          ),
+                          SizedBox(
+                              height:
+                                  10), // Add space between login button and text
+                          MouseRegion(
+                            cursor: SystemMouseCursors.click,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => LoginPage()),
+                                );
+                              },
+                              child: const Text(
+                                "Already have an account? Log in here",
+                                style: TextStyle(
+                                  shadows: [
+                                    Shadow(
+                                        color: Color.fromARGB(255, 16, 38, 59),
+                                        offset: Offset(0, -4))
+                                  ],
+                                  color: Colors.transparent,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor:
+                                      Color.fromARGB(255, 16, 38, 59),
+                                  decorationThickness: 1.5,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),

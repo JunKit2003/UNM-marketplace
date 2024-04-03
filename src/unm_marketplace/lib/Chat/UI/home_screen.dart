@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:unm_marketplace/Chat/app.dart';
-import 'package:unm_marketplace/Chat/pages/contacts_page.dart';
 import 'package:unm_marketplace/Chat/pages/messages_page.dart';
 import 'package:unm_marketplace/Chat/theme.dart';
 import 'package:unm_marketplace/Chat/widgets/widgets.dart';
@@ -21,15 +20,14 @@ class HomeScreen extends StatelessWidget {
 
   final pages = const [
     MessagesPage(),
-    ContactsPage(),
   ];
 
-  final pageTitles = const ['Messages', 'Contacts'];
+  final pageTitles = const ['Messages'];
 
   final Dio dio = DioSingleton.getInstance();
 
   Future<String> getUsername() async {
-    final response = await dio.post('http://${getHost()}:5000/api/getUsername');
+    final response = await dio.post('http://${getHost()}/api/getUsername');
     print(response.data['username']);
     return response.data['username'];
   }
@@ -71,7 +69,7 @@ class HomeScreen extends StatelessWidget {
               tag: 'hero-profile-picture',
               child: Avatar.small(
                 url: context.currentUserImage != null
-                    ? 'http://${getHost()}:5000/images/ProfilePhoto/${context.currentUserImage}'
+                    ? 'http://${getHost()}/images/ProfilePhoto/${context.currentUserImage}'
                     : null,
                 onTap: () async {
                   String username = await getUsername();
@@ -140,22 +138,6 @@ class _BottomNavigationBarState extends State<_BottomNavigationBar> {
           padding: const EdgeInsets.only(top: 16, left: 8, right: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _NavigationBarItem(
-                index: 0,
-                label: 'Messages',
-                icon: Icons.message,
-                isSelected: (selectedIndex == 0),
-                onTap: handleSelectedItem,
-              ),
-              _NavigationBarItem(
-                index: 1,
-                label: 'Contacts',
-                icon: Icons.contact_mail,
-                isSelected: (selectedIndex == 2),
-                onTap: handleSelectedItem,
-              ),
-            ],
           ),
         ),
       ),

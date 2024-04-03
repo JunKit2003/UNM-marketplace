@@ -34,13 +34,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<String> _getUsername() async {
     Dio dio = DioSingleton.getInstance();
-    final response = await dio.post('http://${getHost()}:5000/api/getUsername');
+    final response = await dio.post('http://${getHost()}/api/getUsername');
     print(response.data['username']);
     return response.data['username'];
   }
 
   Future<void> _fetchProfileInfo() async {
-    var url = 'http://${getHost()}:5000/api/profile';
+    var url = 'http://${getHost()}/api/profile';
     try {
       var response = await dio.post(url, data: {'username': widget.username});
 
@@ -109,7 +109,7 @@ class _ProfilePageState extends State<ProfilePage> {
         });
 
         var response = await dio.post(
-          'http://${getHost()}:5000/api/UpdateProfilePhoto',
+          'http://${getHost()}/api/UpdateProfilePhoto',
           data: formData,
           options: Options(
             headers: {
@@ -161,7 +161,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         FutureBuilder<Uint8List>(
                           future: fetchImageData(
-                            'http://${getHost()}:5000/images/ProfilePhoto/$profilePicture',
+                            'http://${getHost()}/images/ProfilePhoto/$profilePicture',
                           ),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==

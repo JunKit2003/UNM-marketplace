@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'login_page.dart';
 import 'signup_page.dart';
-import 'utils.dart';
 
 class LoginSignupPage extends StatelessWidget {
   @override
@@ -17,7 +16,7 @@ class LoginSignupPage extends StatelessWidget {
           decoration: BoxDecoration(
             image: DecorationImage(
               image: NetworkImage(
-                  'http://${getHost()}:5000/images/assets/university-of-nottingham.jpg'), // Replace with your server's URL and image path
+                  'assets/university-of-nottingham.jpg'), // Replace with your server's URL and image path
               fit: BoxFit.cover,
             ),
           ),

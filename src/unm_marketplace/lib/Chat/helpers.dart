@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:stream_chat_flutter_core/stream_chat_flutter_core.dart';
+import 'package:unm_marketplace/utils.dart';
 
 abstract class Helpers {
   static final random = Random();
@@ -36,7 +37,7 @@ abstract class Helpers {
 
   static String? getChannelImage(Channel channel, User currentUser) {
     if (channel.image != null) {
-      return 'http://localhost:5000/images/ProfilePhoto/${channel.image}'; // Add URL prefix
+      return 'http://${getHost()}/images/ProfilePhoto/${channel.image}'; // Add URL prefix
     } else if (channel.state?.members.isNotEmpty ?? false) {
       final otherMembers = channel.state?.members
           .where(
@@ -44,7 +45,7 @@ abstract class Helpers {
           )
           .toList();
       if (otherMembers?.length == 1) {
-        return 'http://localhost:5000/images/ProfilePhoto/${otherMembers!.first.user?.image}'; // Add URL prefix
+        return 'http://${getHost()}/images/ProfilePhoto/${otherMembers!.first.user?.image}'; // Add URL prefix
       }
     }
     return null;
