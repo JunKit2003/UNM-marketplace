@@ -10,6 +10,11 @@ module.exports = async function signup(req, res){
     console.log("IN register backend");
     const { first_name, last_name, username, email, phone_number, password } = req.body;
 
+    // Check if the username contains spaces
+    if (username.includes(' ')) {
+        return res.status(400).send({ message: 'Username cannot contain spaces' });
+    }
+
     // Check if the username, email, and phone number already exist in the database
     const usernameCheckQuery = 'SELECT username FROM accounts WHERE username = ?';
     const emailCheckQuery = 'SELECT email FROM accounts WHERE email = ?';

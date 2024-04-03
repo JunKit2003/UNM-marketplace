@@ -13,7 +13,7 @@ import 'package:flutter/cupertino.dart';
 class HomeScreen extends StatelessWidget {
   static Route get route => MaterialPageRoute(
         builder: (context) => HomeScreen(),
-  );
+      );
   HomeScreen({Key? key}) : super(key: key);
 
   final ValueNotifier<int> pageIndex = ValueNotifier(0);
@@ -24,10 +24,7 @@ class HomeScreen extends StatelessWidget {
     ContactsPage(),
   ];
 
-  final pageTitles = const [
-    'Messages',
-    'Contacts'
-  ];
+  final pageTitles = const ['Messages', 'Contacts'];
 
   final Dio dio = DioSingleton.getInstance();
 
@@ -36,7 +33,7 @@ class HomeScreen extends StatelessWidget {
     print(response.data['username']);
     return response.data['username'];
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,49 +43,49 @@ class HomeScreen extends StatelessWidget {
         elevation: 0,
         title: ValueListenableBuilder(
           valueListenable: title,
-          builder: (BuildContext context, String value, _){
+          builder: (BuildContext context, String value, _) {
             return Text(
               title.value,
               style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          );
-        },
-      ),  
-      centerTitle: true, // Set this property to true to center the title
-      leadingWidth: 54,
-      leading: Align(
-        alignment: Alignment.centerRight,
-        child: IconBackground(
-          icon: CupertinoIcons.back,
-          onTap: () {
-            Navigator.of(context).pop();
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            );
           },
         ),
-      ),
-      actions: [
+        centerTitle: true, // Set this property to true to center the title
+        leadingWidth: 54,
+        leading: Align(
+          alignment: Alignment.centerRight,
+          child: IconBackground(
+            icon: CupertinoIcons.back,
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
+        actions: [
           Padding(
             padding: const EdgeInsets.only(right: 24.0),
             child: Hero(
               tag: 'hero-profile-picture',
               child: Avatar.small(
-                url: context.currentUserImage != null ? 'http://localhost:5000/images/${context.currentUserImage}' : null,
+                url: context.currentUserImage != null
+                    ? 'http://${getHost()}:5000/images/ProfilePhoto/${context.currentUserImage}'
+                    : null,
                 onTap: () async {
                   String username = await getUsername();
                   Navigator.push(
-                            context,             
-                            MaterialPageRoute(
-                                builder: (context) => ProfilePage(username: username)),
-                          );
-
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ProfilePage(username: username)),
+                  );
                 },
               ),
             ),
           ),
         ],
-      
-    ),
+      ),
       body: ValueListenableBuilder(
         valueListenable: pageIndex,
         builder: (BuildContext context, int value, _) {
@@ -102,9 +99,9 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _onNavigationItemSelected(index) {
-        title.value = pageTitles[index];
-        pageIndex.value = index;
-      }
+    title.value = pageTitles[index];
+    pageIndex.value = index;
+  }
 }
 
 class _BottomNavigationBar extends StatefulWidget {
@@ -120,15 +117,14 @@ class _BottomNavigationBar extends StatefulWidget {
 }
 
 class _BottomNavigationBarState extends State<_BottomNavigationBar> {
-
   var selectedIndex = 0;
 
   void handleSelectedItem(int index) {
-      setState(() {
-        selectedIndex = index;
-      });
-      widget.onItemSelected(index);
-    }
+    setState(() {
+      selectedIndex = index;
+    });
+    widget.onItemSelected(index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -147,14 +143,14 @@ class _BottomNavigationBarState extends State<_BottomNavigationBar> {
             children: [
               _NavigationBarItem(
                 index: 0,
-                label: 'Messages', 
+                label: 'Messages',
                 icon: Icons.message,
                 isSelected: (selectedIndex == 0),
                 onTap: handleSelectedItem,
-                ),
+              ),
               _NavigationBarItem(
                 index: 1,
-                label: 'Contacts', 
+                label: 'Contacts',
                 icon: Icons.contact_mail,
                 isSelected: (selectedIndex == 2),
                 onTap: handleSelectedItem,
@@ -169,7 +165,7 @@ class _BottomNavigationBarState extends State<_BottomNavigationBar> {
 
 class _NavigationBarItem extends StatelessWidget {
   const _NavigationBarItem({
-    Key? key, 
+    Key? key,
     required this.index,
     required this.label,
     required this.icon,
@@ -191,29 +187,30 @@ class _NavigationBarItem extends StatelessWidget {
         onTap(index);
       },
       child: SizedBox(
-        height: 70,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 20,
-              color: isSelected ? AppColors.secondary : null, 
-             ),
-            SizedBox(height: 8,),
-            Text(
-              label, 
-              style: isSelected 
-              ? const TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-                color: AppColors.secondary,
-                )
-              : const TextStyle(fontSize: 11),
-            )
-          ],
-        )
-      ),
+          height: 70,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 20,
+                color: isSelected ? AppColors.secondary : null,
+              ),
+              SizedBox(
+                height: 8,
+              ),
+              Text(
+                label,
+                style: isSelected
+                    ? const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.secondary,
+                      )
+                    : const TextStyle(fontSize: 11),
+              )
+            ],
+          )),
     );
   }
 }

@@ -253,7 +253,6 @@ class ViewListingPageState extends State<ViewListingPage> {
                   onPressed: () async {
                     if (!_loading) {
                       String token = await getStreamToken();
-                      print('AMATOKEN: $token');
                       await connectUserToStream(token);
                       String sellerUsername = _listingDetails!['PostedBy'];
                       if (mounted) {
