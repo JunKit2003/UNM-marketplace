@@ -76,8 +76,7 @@ class _ListedAdState extends State<ListedAd> {
   }
 
   Future<void> _deleteListing(dynamic listing) async {
-    var url =
-        'http://${getHost()}/api/DeleteListing'; // Endpoint without ID
+    var url = 'http://${getHost()}/api/DeleteListing'; // Endpoint without ID
 
     try {
       var response = await dio.post(
@@ -117,6 +116,8 @@ class _ListedAdState extends State<ListedAd> {
         .where((listing) => listing['PostedBy'] == widget.username)
         .toList();
 
+    final isSmallScreen = MediaQuery.of(context).size.width < 600;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Your Listed Advertisements'),
@@ -127,54 +128,201 @@ class _ListedAdState extends State<ListedAd> {
           },
         ),
       ),
-      body: userAds.isEmpty
-          ? Center(child: Text('You have not listed any advertisements.'))
-          : ListView.builder(
-              itemCount: userAds.length,
-              itemBuilder: (context, index) {
-                var listing = userAds[index];
-                return Card(
-                  child: ListTile(
-                    leading: SizedBox(
-                      width: 100,
-                      height: 100,
-                      child: FutureBuilder<Uint8List>(
-                        future: fetchImageData(
-                            'http://${getHost()}/images/Listing/${listing['ImageID']}'),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(child: CircularProgressIndicator());
-                          }
-                          if (snapshot.hasError || !snapshot.hasData) {
-                            return Icon(Icons.error);
-                          }
-                          return Image.memory(
-                            snapshot.data!,
-                            fit: BoxFit.cover,
-                          );
-                        },
-                      ),
-                    ),
-                    title: Text(listing['title']),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(listing['description']),
-                        Text('Price: \RM${listing['price']}'),
-                        Text('Category: ${listing['category']}'),
-                        Text(
-                            'Posted Date: ${formatPostedDate(listing['postedDate'])}'),
-                      ],
-                    ),
-                    onTap: () {
-                      _showEditDeleteDialog(
-                          listing['id']); // Pass the listing ID to the dialog
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(8),
+            child: Text(
+              'Number of Listed Advertisements: ${userAds.length}',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          Expanded(
+            child: userAds.isEmpty
+                ? Center(child: Text('You have not listed any advertisements.'))
+                : ListView.builder(
+                    itemCount: userAds.length,
+                    itemBuilder: (context, index) {
+                      var listing = userAds[index];
+                      return Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Card(
+                          elevation: 3,
+                          child: ListTile(
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: 8,
+                              horizontal: 16,
+                            ),
+                            leading: SizedBox(
+                              width: 150,
+                              height: 100,
+                              child: FutureBuilder<Uint8List>(
+                                future: fetchImageData(
+                                  'http://${getHost()}/images/Listing/${listing['ImageID']}',
+                                ),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+                                  if (snapshot.hasError || !snapshot.hasData) {
+                                    return Icon(Icons.error);
+                                  }
+                                  return Image.memory(
+                                    snapshot.data!,
+                                    fit: BoxFit.cover,
+                                  );
+                                },
+                              ),
+                            ),
+                            title: Text(
+                              listing['title'],
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                SizedBox(height: 8),
+                                Text(
+                                  'Description:',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  listing['description'],
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  'Posted Date: ${formatPostedDate(listing['postedDate'])}',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(height: 8),
+                                Container(
+                                  width: 120,
+                                  padding: EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.lightBlue[100],
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      'RM${listing['price']}',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        color: Colors.blue[900],
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                              ],
+                            ),
+                            trailing: isSmallScreen
+                                ? IconButton(
+                                    icon: Icon(Icons.more_vert),
+                                    onPressed: () {
+                                      _showEditDeleteDialog(listing['id']);
+                                    },
+                                  )
+                                : Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      MouseRegion(
+                                        cursor: SystemMouseCursors.click,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    EditListingPage(
+                                                  listingId: listing['id'],
+                                                  onSubmitted: fetchListings,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                          child: Container(
+                                            width: 90,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              color: Colors.green,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.edit,
+                                                    color: Colors.white),
+                                                SizedBox(width: 4),
+                                                Text(
+                                                  'Edit',
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 8),
+                                      MouseRegion(
+                                        cursor: SystemMouseCursors.click,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            _deleteListing(
+                                                {'id': listing['id']});
+                                          },
+                                          child: Container(
+                                            width: 100,
+                                            height: 40,
+                                            decoration: BoxDecoration(
+                                              color: Colors.red,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.delete,
+                                                    color: Colors.white),
+                                                SizedBox(width: 4),
+                                                Text(
+                                                  'Delete',
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                          ),
+                        ),
+                      );
                     },
                   ),
-                );
-              },
-            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -34,7 +36,8 @@ abstract class AppTheme {
         brightness: Brightness.light,
         hintColor: accentColor,
         visualDensity: visualDensity,
-        textTheme: GoogleFonts.mulishTextTheme().apply(bodyColor: AppColors.textDark),
+        textTheme:
+            GoogleFonts.mulishTextTheme().apply(bodyColor: AppColors.textDark),
         backgroundColor: _LightColors.background,
         scaffoldBackgroundColor: _LightColors.background,
         cardColor: _LightColors.card,
@@ -49,8 +52,8 @@ abstract class AppTheme {
         brightness: Brightness.dark,
         hintColor: accentColor,
         visualDensity: visualDensity,
-        textTheme: GoogleFonts.interTextTheme()
-            .apply(bodyColor: AppColors.textLigth),
+        textTheme:
+            GoogleFonts.interTextTheme().apply(bodyColor: AppColors.textLigth),
         backgroundColor: _DarkColors.background,
         scaffoldBackgroundColor: _DarkColors.background,
         cardColor: _DarkColors.card,
@@ -60,3 +63,4 @@ abstract class AppTheme {
         iconTheme: const IconThemeData(color: AppColors.iconLight),
       );
 }
+  

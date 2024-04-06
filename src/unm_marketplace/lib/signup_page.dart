@@ -78,12 +78,17 @@ class _SignupPageState extends State<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight =
+        MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top;
     return Scaffold(
-      appBar: AppBar(title: const Text("Signup")),
+      //appBar: AppBar(title: const Text("Signup")),
       body: Container(
-        decoration: const BoxDecoration(
-          color: Color.fromARGB(255, 16, 38, 59),
-        ),
+        decoration: BoxDecoration(
+            //color: Color.fromARGB(255, 16, 38, 59),
+            image: DecorationImage(
+          image: NetworkImage('assets/wpp1.jpg'),
+          fit: BoxFit.cover,
+        )),
         child: Center(
           child: SingleChildScrollView(
             child: Container(
@@ -92,6 +97,12 @@ class _SignupPageState extends State<SignupPage> {
                   maxWidth: 400), // Limit width for better readability
               child: Column(
                 children: [
+                  Padding(
+                    padding: EdgeInsets.only(bottom: screenHeight * 0.04),
+                    child: Image.network(
+                        'assets/logo.jpg'), // Image positioned above the "Log In" text
+                  ),
+                  SizedBox(height: 20),
                   const Text(
                     'Sign Up',
                     style: TextStyle(

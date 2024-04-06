@@ -141,18 +141,27 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight =
+        MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top;
+    //double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
       ),
       body: Center(
-        child: SingleChildScrollView(
+        child: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: NetworkImage('assets/wpp2.png'),
+              fit: BoxFit.cover,
+            ),
+          ),
           child: Center(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: ConstrainedBox(
-                constraints:
-                    BoxConstraints(maxWidth: 600), // Limit maximum width
+                constraints: BoxConstraints(maxWidth: 600),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -161,8 +170,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       children: [
                         FutureBuilder<Uint8List>(
                           future: fetchImageData(
-                            'http://${getHost()}/images/ProfilePhoto/$profilePicture',
-                          ),
+                              'http://${getHost()}/images/ProfilePhoto/$profilePicture'),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
@@ -170,48 +178,92 @@ class _ProfilePageState extends State<ProfilePage> {
                             } else if (snapshot.hasError) {
                               return Icon(Icons.error);
                             } else {
-                              return CircleAvatar(
-                                radius: 80,
-                                backgroundColor: Colors.grey[300],
-                                backgroundImage: snapshot.hasData
-                                    ? MemoryImage(snapshot.data!)
-                                    : const AssetImage(
-                                            'assets/DefaultProfilePicture.jpg')
-                                        as ImageProvider<Object>,
+                              return Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.lightBlue[400]!,
+                                    width: 1.0,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      spreadRadius: 2,
+                                      blurRadius: 3,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                  shape: BoxShape.circle,
+                                ),
+                                child: CircleAvatar(
+                                  radius: 80,
+                                  backgroundColor: Colors.grey[300],
+                                  backgroundImage: snapshot.hasData
+                                      ? MemoryImage(snapshot.data!)
+                                      : AssetImage(
+                                              'assets/DefaultProfilePicture.jpg')
+                                          as ImageProvider<Object>,
+                                ),
                               );
                             }
                           },
                         ),
                         SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () async {
-                            await _pickProfilePhoto();
-                            await _updateProfilePicture();
-                          },
-                          child: Text('Change Profile Picture'),
-                        ),
-                        SizedBox(height: 20),
-                        ElevatedButton(
-                          onPressed: () {
-                            // Navigate to the page where the user can change their password
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    UpdatePasswordPage(username: username),
-                              ),
-                            );
-                          },
-                          child: Text('Change Password'),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () async {
+                                await _pickProfilePhoto();
+                                await _updateProfilePicture();
+                              },
+                              child: Text('Change Profile Picture'),
+                            ),
+                            SizedBox(width: 20),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        UpdatePasswordPage(username: username),
+                                  ),
+                                );
+                              },
+                              child: Text('Change Password'),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                     SizedBox(height: 20),
-                    _buildProfileItem('First Name', firstName),
-                    _buildProfileItem('Last Name', lastName),
-                    _buildProfileItem('Email', email),
-                    _buildProfileItem('Username', username),
-                    _buildProfileItem('Phone Number', phoneNumber),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            spreadRadius: 2,
+                            blurRadius: 3,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      padding: EdgeInsets.all(10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildProfileItem(
+                              'First Name', firstName, screenHeight),
+                          _buildProfileItem(
+                              'Last Name', lastName, screenHeight),
+                          _buildProfileItem('Email', email, screenHeight),
+                          _buildProfileItem('Username', username, screenHeight),
+                          _buildProfileItem(
+                              'Phone Number', phoneNumber, screenHeight),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -222,21 +274,22 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _buildProfileItem(String label, String value) {
+  Widget _buildProfileItem(String label, String value, screenHeight) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SizedBox(height: 10),
         Text(
           label,
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(
+              fontWeight: FontWeight.bold, fontSize: screenHeight * 0.02),
         ),
         SizedBox(height: 5),
         Text(
           value,
-          style: TextStyle(fontSize: 14),
+          style: TextStyle(fontSize: screenHeight * 0.018),
         ),
-        Divider(), // Add divider for separation
+        Divider(),
       ],
     );
   }

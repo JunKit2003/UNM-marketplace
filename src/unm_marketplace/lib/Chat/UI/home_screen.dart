@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, unused_element
+
 import 'package:dio/dio.dart';
 import 'package:unm_marketplace/Chat/app.dart';
 import 'package:unm_marketplace/Chat/pages/messages_page.dart';
@@ -28,7 +30,6 @@ class HomeScreen extends StatelessWidget {
 
   Future<String> getUsername() async {
     final response = await dio.post('http://${getHost()}/api/getUsername');
-    print(response.data['username']);
     return response.data['username'];
   }
 
@@ -44,7 +45,7 @@ class HomeScreen extends StatelessWidget {
           builder: (BuildContext context, String value, _) {
             return Text(
               title.value,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
@@ -131,11 +132,11 @@ class _BottomNavigationBarState extends State<_BottomNavigationBar> {
       color: (brightness == Brightness.light) ? Colors.transparent : null,
       elevation: 0,
       margin: const EdgeInsets.all(0),
-      child: SafeArea(
+      child: const SafeArea(
         top: false,
         bottom: true,
         child: Padding(
-          padding: const EdgeInsets.only(top: 16, left: 8, right: 8),
+          padding: EdgeInsets.only(top: 16, left: 8, right: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
           ),
@@ -163,12 +164,17 @@ class _NavigationBarItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () {
-        onTap(index);
-      },
-      child: SizedBox(
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor:
+            Colors.blue, // Set the background color of the app bar to blue
+      ),
+      body: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          onTap(index);
+        },
+        child: SizedBox(
           height: 70,
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -178,7 +184,7 @@ class _NavigationBarItem extends StatelessWidget {
                 size: 20,
                 color: isSelected ? AppColors.secondary : null,
               ),
-              SizedBox(
+              const SizedBox(
                 height: 8,
               ),
               Text(
@@ -192,7 +198,9 @@ class _NavigationBarItem extends StatelessWidget {
                     : const TextStyle(fontSize: 11),
               )
             ],
-          )),
+          ),
+        ),
+      ),
     );
   }
 }

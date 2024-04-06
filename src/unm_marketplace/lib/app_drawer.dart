@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, duplicate_ignore
+
 import 'package:flutter/material.dart';
 import 'package:unm_marketplace/listing_page.dart';
 import 'package:unm_marketplace/login_signup_page.dart';
@@ -17,7 +19,10 @@ const apiKey = 'adqmr32mfsg4';
 var logger = log.Logger();
 
 class AppDrawer extends StatefulWidget {
+  const AppDrawer({Key? key}) : super(key: key);
+
   @override
+  // ignore: library_private_types_in_public_api
   _AppDrawerState createState() => _AppDrawerState();
 }
 
@@ -34,13 +39,11 @@ class _AppDrawerState extends State<AppDrawer> {
 
   Future<String> getUsername() async {
     final response = await dio.post('http://${getHost()}/api/getUsername');
-    print(response.data['username']);
     return response.data['username'];
   }
 
   Future<String> getStreamToken() async {
     final response = await dio.post('http://${getHost()}/api/getStreamToken');
-    print(response.data['token']);
     return response.data['token'];
   }
 
@@ -50,7 +53,6 @@ class _AppDrawerState extends State<AppDrawer> {
 
     // Fetch the profile photo and store the directory
     photoDirectory = await fetchProfilePhoto(username);
-    print('---------------------PhotoDirectory: $photoDirectory');
 
     setState(() {});
   }
@@ -119,16 +121,13 @@ class _AppDrawerState extends State<AppDrawer> {
         data: {'username': username},
       );
       String profilePhotoUrl = profileResponse.data['profilePhotoUrl'];
-      print('This is your profile photo URL: $profilePhotoUrl');
       return profilePhotoUrl;
     } catch (e) {
-      print('Error fetching profile photo: $e');
       return ''; // Return an empty string if there's an error
     }
   }
 
   Future<Uint8List?> fetchImageData(String imageUrl) async {
-    print(imageUrl);
     try {
       var response = await dio.get(imageUrl,
           options: Options(responseType: ResponseType.bytes));
@@ -136,11 +135,9 @@ class _AppDrawerState extends State<AppDrawer> {
       if (response.statusCode == 200) {
         return Uint8List.fromList(response.data);
       } else {
-        print('Unexpected status code: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      print('Error fetching image data: $e');
       return null;
     }
   }
@@ -158,15 +155,18 @@ class _AppDrawerState extends State<AppDrawer> {
           await client.disconnectUser();
         }
 
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Successful Logout')));
+            .showSnackBar(const SnackBar(content: Text('Successful Logout')));
+        // ignore: use_build_context_synchronously
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => LoginSignupPage()),
           (route) => false, // Clear the navigation stack
         );
       }
-    } on DioException catch (e) {
+    } on DioException {
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Error logging out')));
     }
@@ -179,7 +179,7 @@ class _AppDrawerState extends State<AppDrawer> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            decoration: BoxDecoration(color: Colors.blue),
+            decoration: const BoxDecoration(color: Colors.blue),
             child: FutureBuilder<Uint8List?>(
               future: fetchImageData(
                 'http://${getHost()}/images/ProfilePhoto/$photoDirectory',
@@ -188,7 +188,7 @@ class _AppDrawerState extends State<AppDrawer> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Container();
                 } else if (snapshot.hasError) {
-                  return Icon(Icons.error);
+                  return const Icon(Icons.error);
                 } else {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,20 +203,20 @@ class _AppDrawerState extends State<AppDrawer> {
                                     'assets/DefaultProfilePicture.jpg')
                                 as ImageProvider<Object>,
                       ),
-                      SizedBox(height: 10),
+                      const SizedBox(height: 10),
                       FutureBuilder<String>(
                         future: getUsername(),
                         builder: (context, snapshot) {
                           if (snapshot.hasData) {
                             return Text(
                               'Welcome ${snapshot.data}',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 color: Colors.white,
                                 fontSize: 18,
                               ),
                             );
                           } else {
-                            return Text(
+                            return const Text(
                               'Welcome User',
                               style: TextStyle(
                                 color: Colors.white,
@@ -233,8 +233,8 @@ class _AppDrawerState extends State<AppDrawer> {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.list),
-            title: Text('Listing'),
+            leading: const Icon(Icons.list),
+            title: const Text('Listing'),
             onTap: () {
               Navigator.push(
                 context,
@@ -243,8 +243,8 @@ class _AppDrawerState extends State<AppDrawer> {
             },
           ),
           ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Profile Page'),
+            leading: const Icon(Icons.person),
+            title: const Text('Profile Page'),
             onTap: () async {
               String username = await getUsername();
               Navigator.push(
@@ -256,8 +256,8 @@ class _AppDrawerState extends State<AppDrawer> {
           ),
 
           ListTile(
-            leading: Icon(Icons.cloud_upload),
-            title: Text('Upload Listing'),
+            leading: const Icon(Icons.cloud_upload),
+            title: const Text('Upload Listing'),
             onTap: () {
               // Navigate to the UploadListingPage
               Navigator.push(
@@ -268,8 +268,9 @@ class _AppDrawerState extends State<AppDrawer> {
           ),
 
           ListTile(
-            leading: Icon(Icons.list_alt), // Icon for the new option
-            title: Text('Listed Advertisements'), // Text for the new option
+            leading: const Icon(Icons.list_alt), // Icon for the new option
+            title:
+                const Text('Listed Advertisements'), // Text for the new option
             onTap: () async {
               String username = await getUsername(); // Fetch the username
               Navigator.push(
@@ -283,7 +284,7 @@ class _AppDrawerState extends State<AppDrawer> {
           ),
           ListTile(
             leading: const Icon(Icons.chat),
-            title: Text('Chat'),
+            title: const Text('Chat'),
             onTap: () async {
               // Ensure that the loading state is not set to true again if it's already loading
               if (!_loading) {
@@ -293,8 +294,8 @@ class _AppDrawerState extends State<AppDrawer> {
             },
           ),
           ListTile(
-            leading: Icon(Icons.logout),
-            title: Text('Log out'),
+            leading: const Icon(Icons.logout),
+            title: const Text('Log out'),
             onTap: () {
               logoutUser(context);
             },

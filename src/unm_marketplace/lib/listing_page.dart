@@ -29,6 +29,7 @@ class _ListingPageState extends State<ListingPage> {
   void initState() {
     super.initState();
     fetchListings();
+    fetchCategories();
     _timer = Timer.periodic(Duration(seconds: 30), (timer) {
       fetchListings();
     });
@@ -112,7 +113,6 @@ class _ListingPageState extends State<ListingPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Marketplace'),
         backgroundColor: Colors.blue,
         actions: [
           IconButton(
@@ -287,8 +287,9 @@ class _ListingPageState extends State<ListingPage> {
                         viewportFraction: 0.6,
                       ),
                       items: [
-                        'assets/images.png',
-                        'assets/advertisement.png',
+                        'images.png',
+                        'advertisement.png',
+                        'advertisement2.png',
                       ].map((image) {
                         return Builder(
                           builder: (BuildContext context) {
@@ -316,7 +317,7 @@ class _ListingPageState extends State<ListingPage> {
                     ),
               SizedBox(height: 20),
               SizedBox(
-                height: 95,
+                height: 110,
                 child: SingleChildScrollView(
                   scrollDirection:
                       Axis.horizontal, // Set the scroll direction to horizontal
@@ -430,14 +431,23 @@ class _ListingPageState extends State<ListingPage> {
                                                   CircularProgressIndicator());
                                         }
                                         if (snapshot.hasError ||
-                                            !snapshot.hasData) {
-                                          return Icon(Icons.error);
+                                            !snapshot.hasData ||
+                                            snapshot.data == []) {
+                                          return Image.asset(
+                                              'assets/NoImageAvailable.jpg');
                                         }
-                                        return Image.memory(
-                                          snapshot.data!,
-                                          fit: BoxFit.contain,
-                                          width: double.infinity,
-                                        );
+
+                                        if (!snapshot.data!.isEmpty) {
+                                          return Image.memory(
+                                            snapshot.data!,
+                                            fit: BoxFit
+                                                .contain, // Adjust the fit property
+                                            width: double.infinity,
+                                          );
+                                        } else {
+                                          return Image.asset(
+                                              'assets/NoImageAvailable.jpg');
+                                        }
                                       },
                                     ),
                                   ),
@@ -481,19 +491,32 @@ class _ListingPageState extends State<ListingPage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                selectedCategory = category;
-              });
-              applyFilters();
-            },
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(14.0),
-              child: Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                width: double.infinity,
+          Padding(
+            padding:
+                EdgeInsets.only(bottom: 10.0), // Add margin below the button
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(14.0),
+                border: Border.all(
+                  color: Color.fromARGB(255, 0, 0, 0),
+                  width: 1.2, // Adjust the border width as needed
+                ),
+              ),
+              child: FloatingActionButton(
+                onPressed: () {
+                  setState(() {
+                    selectedCategory = category;
+                  });
+                  applyFilters();
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14.0),
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.fill,
+                    width: double.infinity,
+                  ),
+                ),
               ),
             ),
           ),
@@ -505,6 +528,8 @@ class _ListingPageState extends State<ListingPage> {
                 categoryNameParts[
                     0], // Display the first part of the category name
                 textAlign: TextAlign.center, // Align the text to center
+                maxLines: 1, // Limit the text to one line
+                overflow: TextOverflow.ellipsis, // Add ellipsis for overflow
                 style:
                     TextStyle(fontSize: 12), // Adjust the font size as needed
               ),
@@ -512,6 +537,8 @@ class _ListingPageState extends State<ListingPage> {
                 categoryNameParts.sublist(1).join(
                     ' '), // Display the remaining parts of the category name
                 textAlign: TextAlign.center, // Align the text to center
+                maxLines: 1, // Limit the text to one line
+                overflow: TextOverflow.ellipsis, // Add ellipsis for overflow
                 style:
                     TextStyle(fontSize: 12), // Adjust the font size as needed
               ),

@@ -5,18 +5,20 @@ import 'signup_page.dart';
 class LoginSignupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    double screenHeight =
+        MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top;
     return WillPopScope(
       onWillPop: () async {
         // Handle Android back button press
         return false; // Prevent back navigation
       },
       child: Scaffold(
-        appBar: AppBar(title: Text("Login/Signup")),
+        //appBar: AppBar(title: Text("Login/Signup")),
         body: Container(
           decoration: BoxDecoration(
             image: DecorationImage(
               image: NetworkImage(
-                  'assets/university-of-nottingham.jpg'), // Replace with your server's URL and image path
+                  'assets/wpp1.jpg'), // Replace with your server's URL and image path
               fit: BoxFit.cover,
             ),
           ),
@@ -24,22 +26,10 @@ class LoginSignupPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.black.withOpacity(0.6),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  padding: EdgeInsets.all(20),
-                  margin: EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    'Welcome to UNM Marketplace',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
+                Padding(
+                  padding: EdgeInsets.only(bottom: screenHeight * 0.08),
+                  child: Image.network(
+                      'assets/logo.jpg'), // Image positioned above the "Log In" text
                 ),
                 SizedBox(height: 40), // Adds space between the text and buttons
                 ElevatedButton(

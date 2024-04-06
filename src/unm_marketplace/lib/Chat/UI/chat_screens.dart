@@ -22,6 +22,7 @@ class ChatScreens extends StatefulWidget {
   }) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _ChatScreenState createState() => _ChatScreenState();
 }
 
@@ -81,8 +82,7 @@ class _ChatScreenState extends State<ChatScreens> {
                   return const Center(child: CircularProgressIndicator());
                 },
                 emptyBuilder: (context) => const SizedBox.shrink(),
-                errorBuilder: (context, error) =>
-                    DisplayError(error: error),
+                errorBuilder: (context, error) => DisplayError(error: error),
                 messageListBuilder: (context, messages) =>
                     _MessageList(messages: messages),
               ),
@@ -121,8 +121,8 @@ class _MessageList extends StatelessWidget {
           } else if (index <= messages.length) {
             final message = messages[index];
             final nextMessage = messages[index + 1];
-            if (!Jiffy.parseFromDateTime(message.createdAt.toLocal())
-                .isSame(Jiffy.parseFromDateTime(nextMessage.createdAt.toLocal()))) {
+            if (!Jiffy.parseFromDateTime(message.createdAt.toLocal()).isSame(
+                Jiffy.parseFromDateTime(nextMessage.createdAt.toLocal()))) {
               return _DateLable(
                 dateTime: message.createdAt,
               );
@@ -274,23 +274,18 @@ class _DateLable extends StatefulWidget {
 class __DateLableState extends State<_DateLable> {
   late String dayInfo;
 
-@override
+  @override
   void initState() {
     final createdAt = Jiffy.parseFromDateTime(widget.dateTime);
     final now = DateTime.now();
 
     if (createdAt.isSame(Jiffy.parseFromDateTime(now))) {
       dayInfo = 'TODAY';
-    } else if (createdAt
-        .isSame(Jiffy.now().subtract(days: 1))) {
+    } else if (createdAt.isSame(Jiffy.now().subtract(days: 1))) {
       dayInfo = 'YESTERDAY';
-    } else if (createdAt.isAfter(
-      Jiffy.now().subtract(days: 7)
-    )) {
+    } else if (createdAt.isAfter(Jiffy.now().subtract(days: 7))) {
       dayInfo = createdAt.EEEE;
-    } else if (createdAt.isAfter(
-      Jiffy.now().subtract(years: 1)
-    )) {
+    } else if (createdAt.isAfter(Jiffy.now().subtract(years: 1))) {
       dayInfo = createdAt.MMMd;
     } else {
       dayInfo = createdAt.MMMd;
@@ -298,6 +293,7 @@ class __DateLableState extends State<_DateLable> {
 
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Center(

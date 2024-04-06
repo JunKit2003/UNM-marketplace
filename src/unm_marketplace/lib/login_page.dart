@@ -63,12 +63,17 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenHeight =
+        MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top;
     return Scaffold(
-      appBar: AppBar(title: Text("Log In")),
+      //appBar: AppBar(title: Text("Log In")),
       body: Container(
-        decoration: const BoxDecoration(
-          color: Color.fromARGB(255, 16, 38, 59),
-        ),
+        decoration: BoxDecoration(
+            //color: Color.fromARGB(255, 16, 38, 59),
+            image: DecorationImage(
+          image: NetworkImage('assets/wpp1.jpg'),
+          fit: BoxFit.cover,
+        )),
         child: Center(
           child: SingleChildScrollView(
             child: Container(
@@ -76,6 +81,12 @@ class _LoginPageState extends State<LoginPage> {
               constraints: const BoxConstraints(maxWidth: 400),
               child: Column(
                 children: [
+                  Padding(
+                    padding: EdgeInsets.only(bottom: screenHeight * 0.08),
+                    child: Image.network(
+                        'assets/logo.jpg'), // Image positioned above the "Log In" text
+                  ),
+                  SizedBox(height: 20),
                   const Text(
                     'Log In',
                     style: TextStyle(
@@ -132,8 +143,7 @@ class _LoginPageState extends State<LoginPage> {
                                       builder: (context) => SignupPage()),
                                 );
                               },
-                              child: 
-                              const Text(
+                              child: const Text(
                                 "Don't have an account? Register here",
                                 style: TextStyle(
                                   shadows: [
