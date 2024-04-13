@@ -612,7 +612,7 @@ class _EditListingPageState extends State<EditListingPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Upload Listing'),
+        title: Text('Edit Listing Details'),
         backgroundColor: Colors.lightBlue,
       ),
       body: Center(

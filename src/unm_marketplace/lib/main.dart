@@ -67,7 +67,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Marketplace App',
+      title: 'Nott-A-Marketplace',
       theme: ThemeData(
           primarySwatch: Colors.blue,
           colorScheme: const ColorScheme(
