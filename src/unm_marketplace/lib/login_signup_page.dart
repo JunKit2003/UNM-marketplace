@@ -17,7 +17,7 @@ class LoginSignupPage extends StatelessWidget {
         body: Container(
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: NetworkImage(
+              image: AssetImage(
                   'assets/wpp1.jpg'), // Replace with your server's URL and image path
               fit: BoxFit.cover,
             ),

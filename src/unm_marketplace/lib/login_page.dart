@@ -71,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
         decoration: BoxDecoration(
             //color: Color.fromARGB(255, 16, 38, 59),
             image: DecorationImage(
-          image: NetworkImage('assets/wpp1.jpg'),
+          image: AssetImage('assets/wpp1.jpg'),
           fit: BoxFit.cover,
         )),
         child: Center(

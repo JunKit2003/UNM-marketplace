@@ -153,7 +153,7 @@ class _ProfilePageState extends State<ProfilePage> {
         child: Container(
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: NetworkImage('assets/wpp2.png'),
+              image: AssetImage('assets/wpp2.png'),
               fit: BoxFit.cover,
             ),
           ),
