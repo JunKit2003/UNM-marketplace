@@ -42,7 +42,7 @@ class _ListingPageState extends State<ListingPage> {
   }
 
   Future<void> fetchListings() async {
-    var url = 'http://${getHost()}/api/RetrieveListing';
+    var url = '${getHost()}/api/RetrieveListing';
 
     try {
       var response = await dio.post(url);
@@ -60,7 +60,7 @@ class _ListingPageState extends State<ListingPage> {
   }
 
   Future<void> fetchCategories() async {
-    var url = 'http://${getHost()}/api/getCategories';
+    var url = '${getHost()}/api/getCategories';
 
     try {
       var response = await dio.post(url);
@@ -422,7 +422,7 @@ class _ListingPageState extends State<ListingPage> {
                                   Expanded(
                                     child: FutureBuilder<Uint8List>(
                                       future: fetchImageData(
-                                          'http://${getHost()}/images/Listing/${listing['ImageID']}'),
+                                          '${getHost()}/images/Listing/${listing['ImageID']}'),
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState ==
                                             ConnectionState.waiting) {
@@ -586,7 +586,7 @@ class ListingDetailDialog extends StatelessWidget {
                 height: MediaQuery.of(context).size.height *
                     0.3, // Adjust the height of the image box
                 child: Image.network(
-                  'http://${getHost()}/images/Listing/${listing['ImageID']}',
+                  '${getHost()}/images/Listing/${listing['ImageID']}',
                   fit: BoxFit.contain,
                 ),
               ),

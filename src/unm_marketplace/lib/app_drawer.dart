@@ -38,12 +38,12 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Future<String> getUsername() async {
-    final response = await dio.post('http://${getHost()}/api/getUsername');
+    final response = await dio.post('${getHost()}/api/getUsername');
     return response.data['username'];
   }
 
   Future<String> getStreamToken() async {
-    final response = await dio.post('http://${getHost()}/api/getStreamToken');
+    final response = await dio.post('${getHost()}/api/getStreamToken');
     return response.data['token'];
   }
 
@@ -117,7 +117,7 @@ class _AppDrawerState extends State<AppDrawer> {
   Future<String> fetchProfilePhoto(String username) async {
     try {
       final profileResponse = await dio.post(
-        'http://${getHost()}/api/getProfilePhoto',
+        '${getHost()}/api/getProfilePhoto',
         data: {'username': username},
       );
       String profilePhotoUrl = profileResponse.data['profilePhotoUrl'];
@@ -143,7 +143,7 @@ class _AppDrawerState extends State<AppDrawer> {
   }
 
   Future<void> logoutUser(BuildContext context) async {
-    var url = 'http://${getHost()}/api/logout'; // Adjust as needed
+    var url = '${getHost()}/api/logout'; // Adjust as needed
 
     try {
       var response = await dio.post(url);
@@ -182,7 +182,7 @@ class _AppDrawerState extends State<AppDrawer> {
             decoration: const BoxDecoration(color: Colors.blue),
             child: FutureBuilder<Uint8List?>(
               future: fetchImageData(
-                'http://${getHost()}/images/ProfilePhoto/$photoDirectory',
+                '${getHost()}/images/ProfilePhoto/$photoDirectory',
               ),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {

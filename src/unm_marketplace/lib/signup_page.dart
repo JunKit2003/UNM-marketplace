@@ -20,7 +20,7 @@ class _SignupPageState extends State<SignupPage> {
 
   Future<void> registerUser(String firstName, String lastName, String email,
       String phone_number, String password, BuildContext context) async {
-    var url = 'http://${getHost()}/api/signup'; // URL for local server
+    var url = '${getHost()}/api/signup'; // URL for local server
     Dio dio = DioSingleton.getInstance();
 
     try {
@@ -99,7 +99,7 @@ class _SignupPageState extends State<SignupPage> {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(bottom: screenHeight * 0.04),
-                    child: Image.network(
+                    child: Image.asset(
                         'assets/logo.jpg'), // Image positioned above the "Log In" text
                   ),
                   SizedBox(height: 20),

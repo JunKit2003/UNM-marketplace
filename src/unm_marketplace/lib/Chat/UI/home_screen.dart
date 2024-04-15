@@ -29,7 +29,7 @@ class HomeScreen extends StatelessWidget {
   final Dio dio = DioSingleton.getInstance();
 
   Future<String> getUsername() async {
-    final response = await dio.post('http://${getHost()}/api/getUsername');
+    final response = await dio.post('${getHost()}/api/getUsername');
     return response.data['username'];
   }
 
@@ -70,7 +70,7 @@ class HomeScreen extends StatelessWidget {
               tag: 'hero-profile-picture',
               child: Avatar.small(
                 url: context.currentUserImage != null
-                    ? 'http://${getHost()}/images/ProfilePhoto/${context.currentUserImage}'
+                    ? '${getHost()}/images/ProfilePhoto/${context.currentUserImage}'
                     : null,
                 onTap: () async {
                   String username = await getUsername();

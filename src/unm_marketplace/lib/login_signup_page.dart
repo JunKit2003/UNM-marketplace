@@ -28,7 +28,7 @@ class LoginSignupPage extends StatelessWidget {
               children: <Widget>[
                 Padding(
                   padding: EdgeInsets.only(bottom: screenHeight * 0.08),
-                  child: Image.network(
+                  child: Image.asset(
                       'assets/logo.jpg'), // Image positioned above the "Log In" text
                 ),
                 SizedBox(height: 40), // Adds space between the text and buttons

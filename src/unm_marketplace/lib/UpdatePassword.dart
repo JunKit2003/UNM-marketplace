@@ -20,7 +20,7 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
   Future<void> _updatePassword() async {
     try {
       final response = await dio.post(
-        'http://${getHost()}/api/ChangePassword',
+        '${getHost()}/api/ChangePassword',
         data: {
           'username': widget.username,
           'currentPassword': currentPasswordController.text,
@@ -33,16 +33,29 @@ class _UpdatePasswordPageState extends State<UpdatePasswordPage> {
           SnackBar(content: Text('Password updated successfully')),
         );
         Navigator.pop(context);
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update password')),
-        );
-      }
+      } //else {
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(content: Text('Current password is incorrect')),
+      //   );
+      // }
     } catch (e) {
-      print('Error updating password: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error updating password')),
-      );
+      if (e is DioException) {
+        String errorMessage;
+        errorMessage = e.response?.data['message'] ??
+            'An error occurred while updating the password!';
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMessage)),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Error Updating Password")),
+          );
+        }
+      }
     }
   }
 

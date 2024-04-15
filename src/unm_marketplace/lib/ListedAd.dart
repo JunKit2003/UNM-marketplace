@@ -37,7 +37,7 @@ class _ListedAdState extends State<ListedAd> {
   }
 
   Future<void> fetchListings() async {
-    var url = 'http://${getHost()}/api/RetrieveListing';
+    var url = '${getHost()}/api/RetrieveListing';
 
     try {
       var response = await dio.post(url);
@@ -76,7 +76,7 @@ class _ListedAdState extends State<ListedAd> {
   }
 
   Future<void> _deleteListing(dynamic listing) async {
-    var url = 'http://${getHost()}/api/DeleteListing'; // Endpoint without ID
+    var url = '${getHost()}/api/DeleteListing'; // Endpoint without ID
 
     try {
       var response = await dio.post(
@@ -162,7 +162,7 @@ class _ListedAdState extends State<ListedAd> {
                               height: 100,
                               child: FutureBuilder<Uint8List>(
                                 future: fetchImageData(
-                                  'http://${getHost()}/images/Listing/${listing['ImageID']}',
+                                  '${getHost()}/images/Listing/${listing['ImageID']}',
                                 ),
                                 builder: (context, snapshot) {
                                   if (snapshot.connectionState ==

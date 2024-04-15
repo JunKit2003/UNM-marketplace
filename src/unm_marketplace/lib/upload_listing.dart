@@ -39,7 +39,7 @@ class _UploadListingPageState extends State<UploadListingPage> {
 
   Future<void> _fetchCategories() async {
     try {
-      var response = await dio.post('http://${getHost()}/api/getCategories');
+      var response = await dio.post('${getHost()}/api/getCategories');
 
       if (response.statusCode == 200) {
         setState(() {
@@ -56,7 +56,7 @@ class _UploadListingPageState extends State<UploadListingPage> {
 
   Future<String> _getUsername() async {
     Dio dio = DioSingleton.getInstance();
-    final response = await dio.post('http://${getHost()}/api/getUsername');
+    final response = await dio.post('${getHost()}/api/getUsername');
     print(response.data['username']);
     return response.data['username'];
   }
@@ -82,7 +82,7 @@ class _UploadListingPageState extends State<UploadListingPage> {
   Future<int> _submitListingDetails() async {
     if (_formKey.currentState!.validate()) {
       // Send data
-      var url = 'http://${getHost()}/api/UploadListingDetails';
+      var url = '${getHost()}/api/UploadListingDetails';
       try {
         final response = await dio.post(
           url,
@@ -138,7 +138,7 @@ class _UploadListingPageState extends State<UploadListingPage> {
         });
 
         var response = await dio.post(
-          'http://${getHost()}/api/UploadListingPhoto',
+          '${getHost()}/api/UploadListingPhoto',
           data: formData,
           options: Options(
             headers: {

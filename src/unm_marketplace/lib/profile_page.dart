@@ -32,15 +32,8 @@ class _ProfilePageState extends State<ProfilePage> {
     _fetchProfileInfo();
   }
 
-  Future<String> _getUsername() async {
-    Dio dio = DioSingleton.getInstance();
-    final response = await dio.post('http://${getHost()}/api/getUsername');
-    print(response.data['username']);
-    return response.data['username'];
-  }
-
   Future<void> _fetchProfileInfo() async {
-    var url = 'http://${getHost()}/api/profile';
+    var url = '${getHost()}/api/profile';
     try {
       var response = await dio.post(url, data: {'username': widget.username});
 
@@ -109,7 +102,7 @@ class _ProfilePageState extends State<ProfilePage> {
         });
 
         var response = await dio.post(
-          'http://${getHost()}/api/UpdateProfilePhoto',
+          '${getHost()}/api/UpdateProfilePhoto',
           data: formData,
           options: Options(
             headers: {
@@ -168,45 +161,53 @@ class _ProfilePageState extends State<ProfilePage> {
                   children: <Widget>[
                     Column(
                       children: [
-                        FutureBuilder<Uint8List>(
-                          future: fetchImageData(
-                              'http://${getHost()}/images/ProfilePhoto/$profilePicture'),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return CircularProgressIndicator();
-                            } else if (snapshot.hasError) {
-                              return Icon(Icons.error);
-                            } else {
-                              return Container(
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: Colors.lightBlue[400]!,
-                                    width: 1.0,
-                                  ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.1),
-                                      spreadRadius: 2,
-                                      blurRadius: 3,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                                  shape: BoxShape.circle,
-                                ),
-                                child: CircleAvatar(
-                                  radius: 80,
-                                  backgroundColor: Colors.grey[300],
-                                  backgroundImage: snapshot.hasData
-                                      ? MemoryImage(snapshot.data!)
-                                      : AssetImage(
-                                              'assets/DefaultProfilePicture.jpg')
-                                          as ImageProvider<Object>,
-                                ),
-                              );
-                            }
-                          },
-                        ),
+                        profilePicture.isEmpty
+                            ? CircleAvatar(
+                                radius: 80,
+                                backgroundColor: Colors.grey[300],
+                                backgroundImage: AssetImage(
+                                    'assets/DefaultProfilePicture.jpg'),
+                              )
+                            : FutureBuilder<Uint8List>(
+                                future: fetchImageData(
+                                    '${getHost()}/images/ProfilePhoto/$profilePicture'),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return CircularProgressIndicator();
+                                  } else if (snapshot.hasError) {
+                                    return Icon(Icons.error);
+                                  } else {
+                                    return Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: Colors.lightBlue[400]!,
+                                          width: 1.0,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.1),
+                                            spreadRadius: 2,
+                                            blurRadius: 3,
+                                            offset: Offset(0, 2),
+                                          ),
+                                        ],
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: CircleAvatar(
+                                        radius: 80,
+                                        backgroundColor: Colors.grey[300],
+                                        backgroundImage: snapshot.hasData
+                                            ? MemoryImage(snapshot.data!)
+                                            : AssetImage(
+                                                    'assets/DefaultProfilePicture.jpg')
+                                                as ImageProvider<Object>,
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
                         SizedBox(height: 20),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,

@@ -19,7 +19,7 @@ class _LoginPageState extends State<LoginPage> {
       String email, String password, BuildContext context) async {
     Dio dio = DioSingleton.getInstance();
     var url =
-        'http://${getHost()}/api/login'; // Adjust the URL as per your server setup
+        '${getHost()}/api/login'; // Adjust the URL as per your server setup
 
     try {
       var response = await dio.post(url, data: {
@@ -83,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(bottom: screenHeight * 0.08),
-                    child: Image.network(
+                    child: Image.asset(
                         'assets/logo.jpg'), // Image positioned above the "Log In" text
                   ),
                   SizedBox(height: 20),

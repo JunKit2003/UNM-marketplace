@@ -45,6 +45,8 @@ module.exports = async function signup(req, res){
         // Hash the password
         const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+        const profilePicture = "";
+
         // Create a Stream user
         const user = await serverClient.upsertUser({
             id: username,
@@ -55,8 +57,8 @@ module.exports = async function signup(req, res){
         const streamToken = serverClient.createToken(String(username));
 
         // Insert the new user into the database
-        const insertQuery = 'INSERT INTO accounts (first_name, last_name, username, email, phone_number, password, token) VALUES (?, ?, ?, ?, ?, ?, ?)';
-        await db.query(insertQuery, [first_name, last_name, username, email, phone_number, hashedPassword, streamToken]);
+        const insertQuery = 'INSERT INTO accounts (ProfilePicture, first_name, last_name, username, email, phone_number, password, token) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
+        await db.query(insertQuery, [profilePicture, first_name, last_name, username, email, phone_number, hashedPassword, streamToken]);
         
         res.status(200).send({ message: 'User registered successfully' });
     } catch (error) {

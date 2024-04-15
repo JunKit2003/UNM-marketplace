@@ -37,7 +37,7 @@ class ViewListingPageState extends State<ViewListingPage> {
   Future<void> _fetchListingDetails(int listingId) async {
     try {
       var response = await dio.post(
-        'http://${getHost()}/api/RetrieveListing',
+        '${getHost()}/api/RetrieveListing',
         queryParameters: {'id': listingId},
       );
 
@@ -52,7 +52,7 @@ class ViewListingPageState extends State<ViewListingPage> {
           });
 
           var imageDataResponse = await dio.get(
-            'http://${getHost()}/images/Listing/${listing['ImageID']}',
+            '${getHost()}/images/Listing/${listing['ImageID']}',
             options: Options(responseType: ResponseType.bytes),
           );
 
@@ -79,7 +79,7 @@ class ViewListingPageState extends State<ViewListingPage> {
   Future<String> fetchProfilePhoto(String username) async {
     try {
       final profileResponse = await dioSingleton.post(
-        'http://${getHost()}/api/getProfilePhoto',
+        '${getHost()}/api/getProfilePhoto',
         data: {'username': username},
       );
       String profilePhotoUrl = profileResponse.data['profilePhotoUrl'];
@@ -92,14 +92,13 @@ class ViewListingPageState extends State<ViewListingPage> {
   }
 
   Future<String> getUsername() async {
-    final response =
-        await dioSingleton.post('http://${getHost()}/api/getUsername');
+    final response = await dioSingleton.post('${getHost()}/api/getUsername');
     print('Username: ${response.data['username']}');
     return response.data['username'];
   }
 
   Future<String> getStreamToken() async {
-    final response = await dio.post('http://${getHost()}/api/getStreamToken');
+    final response = await dio.post('${getHost()}/api/getStreamToken');
     print('Stream token: ${response.data['token']}');
     return response.data['token'];
   }
