@@ -159,6 +159,10 @@ class ViewListingPageState extends State<ViewListingPage> {
     }
   }
 
+  Future<String> _getCurrentUsername() async {
+    return await getUsername();
+  }
+
   Future<void> createChannel(BuildContext context, sellerUsername) async {
     final core = StreamChatCore.of(context);
     final nav = Navigator.of(context);
@@ -258,8 +262,7 @@ class ViewListingPageState extends State<ViewListingPage> {
                                 ),
                                 SizedBox(height: 8.0),
                                 Text(
-                                  _listingDetails!['condition'] ??
-                                      '', // Display condition
+                                  _listingDetails!['condition'] ?? '',
                                   style: TextStyle(
                                     fontSize: isMobile ? 13.0 : 15.0,
                                     fontWeight: FontWeight.normal,
@@ -326,7 +329,7 @@ class ViewListingPageState extends State<ViewListingPage> {
                                 ),
                                 SizedBox(height: 8.0),
                                 Text(
-                                  'Posted By:', // Display postedBy
+                                  'Posted By:',
                                   style: TextStyle(
                                     fontSize: isMobile ? 15.0 : 17.0,
                                     fontWeight: FontWeight.bold,
@@ -334,8 +337,7 @@ class ViewListingPageState extends State<ViewListingPage> {
                                 ),
                                 SizedBox(height: 8.0),
                                 Text(
-                                  _listingDetails!['PostedBy'] ??
-                                      '', // Display postedBy
+                                  _listingDetails!['PostedBy'] ?? '',
                                   style: TextStyle(
                                     fontSize: isMobile ? 13.0 : 15.0,
                                     fontWeight: FontWeight.normal,
@@ -387,8 +389,8 @@ class ViewListingPageState extends State<ViewListingPage> {
                           borderRadius: BorderRadius.circular(10.0),
                           child: Image.asset(
                             isMobile
-                                ? 'mobile_advertisement.png'
-                                : 'advertisement.png',
+                                ? 'assets/mobile_advertisement.png'
+                                : 'assets/advertisement.png',
                             fit: BoxFit.contain,
                           ),
                         ),
@@ -397,20 +399,33 @@ class ViewListingPageState extends State<ViewListingPage> {
                   ),
                   SizedBox(height: 20),
                   // Show the button only if the seller is not the current user
-                  if (_listingDetails!['PostedBy'] != username)
-                    ElevatedButton(
-                      onPressed: () async {
-                        if (!_loading) {
-                          String token = await getStreamToken();
-                          await connectUserToStream(token);
-                          String sellerUsername = _listingDetails!['PostedBy'];
-                          if (mounted) {
-                            await createChannel(context, sellerUsername);
-                          }
-                        }
-                      },
-                      child: const Text('Chat with the seller'),
-                    ),
+                  FutureBuilder<String>(
+                    future: _getCurrentUsername(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasData &&
+                          snapshot.data != _listingDetails!['PostedBy']) {
+                        return ElevatedButton(
+                          onPressed: () async {
+                            if (!_loading) {
+                              String token = await getStreamToken();
+                              await connectUserToStream(token);
+                              String sellerUsername =
+                                  _listingDetails!['PostedBy'];
+                              if (mounted) {
+                                await createChannel(context, sellerUsername);
+                              }
+                            }
+                          },
+                          child: const Text('Chat with the seller'),
+                        );
+                      } else {
+                        return SizedBox.shrink();
+                      }
+                    },
+                  ),
                 ],
               ],
             );

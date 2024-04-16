@@ -287,9 +287,9 @@ class _ListingPageState extends State<ListingPage> {
                         viewportFraction: 0.6,
                       ),
                       items: [
-                        'images.png',
-                        'advertisement.png',
-                        'advertisement2.png',
+                        'assets/images.png',
+                        'assets/advertisement.png',
+                        'assets/advertisement2.png',
                       ].map((image) {
                         return Builder(
                           builder: (BuildContext context) {

@@ -136,14 +136,15 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     double screenHeight =
         MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top;
-    //double screenWidth = MediaQuery.of(context).size.width;
+    double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Profile'),
       ),
-      body: Center(
+      body: SingleChildScrollView(
         child: Container(
+          height: screenHeight, // Set the height to fill the screen
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage('assets/wpp2.png'),

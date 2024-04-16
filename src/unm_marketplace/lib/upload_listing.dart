@@ -18,7 +18,7 @@ class _UploadListingPageState extends State<UploadListingPage> {
   String description = '';
   String price = '';
   String category = ''; // Updated category field
-  String ContactDescription = '';
+  String ContactDescription = 'Message me with the button below !';
   String PostedBy = '';
   String condition = ''; // New field for item condition
   Dio dio = DioSingleton.getInstance();
@@ -90,7 +90,7 @@ class _UploadListingPageState extends State<UploadListingPage> {
             'title': title,
             'description': description,
             'condition': condition, // Include condition in data payload
-            'price': price,
+            'price': double.tryParse(price),
             'ContactDescription': ContactDescription,
             'category': category,
             'PostedBy': await _getUsername(),
@@ -482,9 +482,6 @@ class _UploadListingPageState extends State<UploadListingPage> {
             });
           },
           validator: (value) {
-            if (value!.isEmpty) {
-              return 'Please enter a contact description';
-            }
             return null;
           },
         ),

@@ -168,16 +168,26 @@ class _ListedAdState extends State<ListedAd> {
                                   if (snapshot.connectionState ==
                                       ConnectionState.waiting) {
                                     return Center(
-                                      child: CircularProgressIndicator(),
+                                        child: CircularProgressIndicator());
+                                  }
+                                  if (snapshot.hasError ||
+                                      !snapshot.hasData ||
+                                      snapshot.data == []) {
+                                    return Image.asset(
+                                        'assets/NoImageAvailable.jpg');
+                                  }
+
+                                  if (!snapshot.data!.isEmpty) {
+                                    return Image.memory(
+                                      snapshot.data!,
+                                      fit: BoxFit
+                                          .contain, // Adjust the fit property
+                                      width: double.infinity,
                                     );
+                                  } else {
+                                    return Image.asset(
+                                        'assets/NoImageAvailable.jpg');
                                   }
-                                  if (snapshot.hasError || !snapshot.hasData) {
-                                    return Icon(Icons.error);
-                                  }
-                                  return Image.memory(
-                                    snapshot.data!,
-                                    fit: BoxFit.cover,
-                                  );
                                 },
                               ),
                             ),
