@@ -47,6 +47,10 @@ class _SignupPageState extends State<SignupPage> {
         // Success response
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Signup Successful')));
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
       } else {
         // Error response
         ScaffoldMessenger.of(context)

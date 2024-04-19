@@ -22,7 +22,6 @@ class _ListingPageState extends State<ListingPage> {
   double? minPrice;
   double? maxPrice;
   Dio dio = DioSingleton.getInstance();
-  late Timer _timer;
   List<String> categories = [];
 
   @override
@@ -30,14 +29,10 @@ class _ListingPageState extends State<ListingPage> {
     super.initState();
     fetchListings();
     fetchCategories();
-    _timer = Timer.periodic(Duration(seconds: 30), (timer) {
-      fetchListings();
-    });
   }
 
   @override
   void dispose() {
-    _timer.cancel();
     super.dispose();
   }
 
@@ -247,7 +242,7 @@ class _ListingPageState extends State<ListingPage> {
                 ],
               ),
               SizedBox(height: 20),
-              screenWidth < 500
+              screenWidth < 800
                   ? Container(
                       width: double.infinity,
                       height: MediaQuery.of(context).size.height * 0.2,
@@ -381,7 +376,8 @@ class _ListingPageState extends State<ListingPage> {
                     ? MediaQuery.of(context).size.height * 0.45
                     : null, // Set a fixed height when there are no listings, otherwise, let it expand
                 padding: EdgeInsets.all(8.0),
-                width: MediaQuery.of(context).size.width * 0.8,
+                
+                width: MediaQuery.of(context).size.width * 0.99,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.black, width: 1.0),
                   borderRadius: BorderRadius.circular(24.0),
@@ -462,7 +458,12 @@ class _ListingPageState extends State<ListingPage> {
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold),
                                         ),
-                                        Text('Price: RM ${listing['price']}'),
+                                        Text(
+                                          'RM ${listing['price']}',
+                                          style: TextStyle(
+                                            color: Colors.green,
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),
