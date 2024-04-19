@@ -19,21 +19,11 @@ class ListedAd extends StatefulWidget {
 class _ListedAdState extends State<ListedAd> {
   List<dynamic> listings = [];
   Dio dio = DioSingleton.getInstance();
-  late Timer _timer;
 
   @override
   void initState() {
     super.initState();
     fetchListings();
-    _timer = Timer.periodic(Duration(seconds: 30), (timer) {
-      fetchListings();
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    super.dispose();
   }
 
   Future<void> fetchListings() async {

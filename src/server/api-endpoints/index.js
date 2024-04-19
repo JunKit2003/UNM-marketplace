@@ -18,3 +18,6 @@ exports.RetrieveListingImages = require('./RetrieveListingImages');
 exports.authenticate = require('./authenticate');
 exports.createStreamUserAndToken = require ('./createStreamUserAndToken');
 exports.getStreamToken = require('./getStreamToken');
+exports.SaveListing = require('./SaveListing');
+exports.DeleteSavedListing = require('./DeleteSavedListing');
+exports.GetUserSavedListings = require('./GetUserSavedListings');

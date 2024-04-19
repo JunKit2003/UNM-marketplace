@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously, duplicate_ignore
 
 import 'package:flutter/material.dart';
+import 'package:unm_marketplace/SavedListingPage.dart';
 import 'package:unm_marketplace/listing_page.dart';
 import 'package:unm_marketplace/login_signup_page.dart';
 import 'package:dio/dio.dart';
@@ -263,6 +264,21 @@ class _AppDrawerState extends State<AppDrawer> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => UploadListingPage()),
+              );
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(Icons.bookmark), // Icon for the new option
+            title: const Text('Saved Listing'), // Text for the new option
+            onTap: () async {
+              String username = await getUsername(); // Fetch the username
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => SavedListingPage(
+                        username:
+                            username)), // Provide the username to ListedAd
               );
             },
           ),

@@ -18,7 +18,10 @@ const { ping,
     RetrieveListingImages,
     authenticate,
     createStreamUserAndToken,
-    getStreamToken } = require('../api-endpoints');
+    getStreamToken,
+    SaveListing,
+    DeleteSavedListing,
+    GetUserSavedListings } = require('../api-endpoints');
 
 // All API Endpoints go here
 router.post('/ping', ping);
@@ -41,4 +44,7 @@ router.post('/RetrieveListingImages', RetrieveListingImages);
 router.post('/authenticate', authenticate);
 router.post('/createStreamUserAndToken', createStreamUserAndToken);
 router.post('/getStreamToken', getStreamToken);
+router.post('/SaveListing', SaveListing);
+router.post('/DeleteSavedListing', DeleteSavedListing);
+router.post('/GetUserSavedListings', GetUserSavedListings);
 module.exports = router;    

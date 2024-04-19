@@ -26,12 +26,14 @@ class ViewListingPageState extends State<ViewListingPage> {
   String username = '';
   Uint8List? profilePhoto;
   String photoDirectory = '';
+  bool _isListingSaved = false;
 
   @override
   void initState() {
-    super.initState();
+    super.initState(); // Call super.initState() first
     dio = DioSingleton.getInstance();
     _fetchListingDetails(widget.listingId);
+    checkIfListingIsSaved();
   }
 
   Future<void> _fetchListingDetails(int listingId) async {
@@ -40,8 +42,6 @@ class ViewListingPageState extends State<ViewListingPage> {
         '${getHost()}/api/RetrieveListing',
         queryParameters: {'id': listingId},
       );
-
-      print('Listing details response: $response');
 
       if (response.statusCode == 200) {
         if (response.data['listings'] != null &&
@@ -55,8 +55,6 @@ class ViewListingPageState extends State<ViewListingPage> {
             '${getHost()}/images/Listing/${listing['ImageID']}',
             options: Options(responseType: ResponseType.bytes),
           );
-
-          print('Image data response: $imageDataResponse');
 
           if (imageDataResponse.statusCode == 200) {
             setState(() {
@@ -73,6 +71,33 @@ class ViewListingPageState extends State<ViewListingPage> {
       }
     } catch (e) {
       print('Error fetching listing details: $e');
+    }
+  }
+
+  Future<void> checkIfListingIsSaved() async {
+    try {
+      // Fetch the user's saved listings from the backend
+      var response = await dio.post(
+        '${getHost()}/api/GetUserSavedListings',
+        // Pass any necessary parameters, such as the current user's username
+        queryParameters: {'username': await getUsername()},
+      );
+
+      if (response.statusCode == 200) {
+        // Extract the IDs of the saved listings
+        List<int> savedListingIds =
+            List<int>.from(response.data['savedListingIds']);
+
+        // Check if the ID of the current listing is in the savedListingIds list
+        if (savedListingIds.contains(widget.listingId)) {
+          // If the ID is found, set _isListingSaved to true
+          setState(() {
+            _isListingSaved = true;
+          });
+        }
+      }
+    } catch (e) {
+      print('Error checking saved listings: $e');
     }
   }
 
@@ -253,12 +278,78 @@ class ViewListingPageState extends State<ViewListingPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  _listingDetails!['title'] ?? '',
-                                  style: TextStyle(
-                                    fontSize: isMobile ? 20.0 : 25.0,
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        _listingDetails!['title'] ?? '',
+                                        style: TextStyle(
+                                          fontSize: isMobile ? 20.0 : 25.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: Icon(
+                                        _isListingSaved
+                                            ? Icons.bookmark
+                                            : Icons.bookmark_border,
+                                        color: _isListingSaved
+                                            ? Colors.blue
+                                            : null,
+                                      ),
+                                      onPressed: () async {
+                                        setState(() {
+                                          _isListingSaved = !_isListingSaved;
+                                        });
+
+                                        try {
+                                          if (_isListingSaved) {
+                                            // Save the listing
+                                            var response = await dio.post(
+                                              '${getHost()}/api/SaveListing',
+                                              data: {
+                                                'username':
+                                                    await getUsername(), // Replace with the current user's username
+                                                'listingId': widget
+                                                    .listingId, // Replace with the ID of the listing
+                                              },
+                                            );
+
+                                            if (response.statusCode == 200) {
+                                              print(
+                                                  'Listing saved successfully');
+                                            } else {
+                                              print('Failed to save listing');
+                                            }
+                                          } else {
+                                            // Delete the saved listing
+                                            var response = await dio.post(
+                                              '${getHost()}/api/DeleteSavedListing',
+                                              data: {
+                                                'username':
+                                                    await getUsername(), // Replace with the current user's username
+                                                'listingId': widget
+                                                    .listingId, // Replace with the ID of the listing
+                                              },
+                                            );
+
+                                            if (response.statusCode == 200) {
+                                              print(
+                                                  'Saved listing deleted successfully');
+                                            } else {
+                                              print(
+                                                  'Failed to delete saved listing');
+                                            }
+                                          }
+                                        } catch (e) {
+                                          print('Error: $e');
+                                        }
+                                      },
+                                    ),
+                                  ],
                                 ),
                                 SizedBox(height: 8.0),
                                 Text(
@@ -367,6 +458,7 @@ class ViewListingPageState extends State<ViewListingPage> {
                       ),
                     ),
                   ),
+
                   SizedBox(height: 20),
                   Container(
                     height: isMobile

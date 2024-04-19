@@ -454,6 +454,11 @@ class _UploadListingPageState extends State<UploadListingPage> {
             if (value!.isEmpty) {
               return 'Please enter a price';
             }
+            // Use a regular expression to check if the value is a valid number
+            final RegExp numberRegex = RegExp(r'^\d+(\.\d+)?$');
+            if (!numberRegex.hasMatch(value)) {
+              return 'Please enter a valid number';
+            }
             return null;
           },
         ),
