@@ -19,6 +19,7 @@ class SavedListingPage extends StatefulWidget {
 class _SavedListingPageState extends State<SavedListingPage> {
   List<dynamic> listingsID = [];
   List<dynamic> listings = [];
+
   Dio dio = DioSingleton.getInstance();
 
   @override
@@ -36,7 +37,7 @@ class _SavedListingPageState extends State<SavedListingPage> {
     var url = '${getHost()}/api/RetrieveListing';
 
     try {
-      var response = await dio.post(url, queryParameters: {'id': listingsID});
+      var response = await dio.post(url);
       if (response.statusCode == 200) {
         setState(() {
           listings = response.data['listings'];
@@ -50,19 +51,24 @@ class _SavedListingPageState extends State<SavedListingPage> {
   }
 
   Future<void> fetchUserSavedListings(String username) async {
-    var url = '${getHost()}/api/getUserSavedListings';
+    var url = '${getHost()}/api/GetUserSavedListings';
 
     try {
       var response =
           await dio.post(url, queryParameters: {'username': username});
       if (response.statusCode == 200) {
         // Extract saved listing IDs from the response
-        List<String> savedListingIds =
-            List<String>.from(response.data['savedListingIds']);
+        List<dynamic> savedListingIds =
+            List<dynamic>.from(response.data['savedListingIds']);
 
-        // Store the saved listing IDs in the listings list
-        listingsID.clear();
-        listingsID.addAll(savedListingIds);
+        // Ensure listingsID is not null
+        listingsID ??= [];
+
+        // Store the saved listing IDs in the listingsID list
+        setState(() {
+          listingsID.clear();
+          listingsID.addAll(savedListingIds);
+        });
       } else {
         // Handle error responses
         print('Error fetching saved listings: ${response.statusCode}');
@@ -101,41 +107,133 @@ class _SavedListingPageState extends State<SavedListingPage> {
       appBar: AppBar(
         title: Text('Saved Listings'),
       ),
-      body: ListView.builder(
-        itemCount: listings.length,
-        itemBuilder: (context, index) {
-          var listing = listings[index];
-          return ListTile(
-            title: Text(listing[
-                'title']), // Assuming 'title' is a key in your listing data
-            subtitle: Text(formatPostedDate(listing[
-                'postedDate'])), // Assuming 'postedDate' is a key in your listing data
-            leading: FutureBuilder(
-              future: fetchImageData(
-                  '${getHost()}/images/Listing/${listing['ImageID']}'),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  return Icon(Icons.error);
-                } else {
-                  return CircleAvatar(
-                    backgroundImage: MemoryImage(snapshot.data as Uint8List),
-                  );
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.all(8),
+            child: Text(
+              'Number of Saved Listings: ${listingsID.length}',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: listings.length,
+              itemBuilder: (context, index) {
+                var listing = listings[index];
+                // Check if the listing ID is contained in listingsID
+                if (!listingsID.contains(listing['id'])) {
+                  // If not contained, skip this listing
+                  return SizedBox.shrink();
                 }
+
+                return Padding(
+                  padding: EdgeInsets.all(8),
+                  child: Card(
+                    elevation: 3,
+                    color: Colors.white, // Set background color of the Card
+                    child: ListTile(
+                      contentPadding:
+                          EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                      leading: SizedBox(
+                        width: 150,
+                        height: 100,
+                        child: FutureBuilder<Uint8List>(
+                          future: fetchImageData(
+                            '${getHost()}/images/Listing/${listing['ImageID']}',
+                          ),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(child: CircularProgressIndicator());
+                            }
+                            if (snapshot.hasError ||
+                                !snapshot.hasData ||
+                                snapshot.data == []) {
+                              return Image.asset('assets/NoImageAvailable.jpg');
+                            }
+
+                            if (!snapshot.data!.isEmpty) {
+                              return Image.memory(
+                                snapshot.data!,
+                                fit: BoxFit
+                                    .contain, // Maintain aspect ratio and cover the box
+                              );
+                            } else {
+                              return Image.asset('assets/NoImageAvailable.jpg');
+                            }
+                          },
+                        ),
+                      ),
+                      title: Text(
+                        listing['title'],
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(height: 8),
+                          Text(
+                            'Description:',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            listing['description'],
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Posted Date: ${formatPostedDate(listing['postedDate'])}',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 8),
+                          Container(
+                            width: 120,
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.lightBlue[100],
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'RM${listing['price']}',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Colors.blue[900],
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                        ],
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                ViewListingPage(listingId: listing['id']),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                );
               },
             ),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) =>
-                      ViewListingPage(listingId: listing['id']),
-                ),
-              );
-            },
-          );
-        },
+          ),
+        ],
       ),
     );
   }
