@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'tokens.dart';
 
+/// A style pinned to the bundled body font. Component styles (buttons, chips, nav labels)
+/// do not inherit the theme's font, and without one Flutter web downloads Roboto.
+TextStyle _ui(TextStyle s) => s.copyWith(fontFamily: AppTokens.body);
+
 ThemeData buildTheme(Brightness brightness) {
   final dark = brightness == Brightness.dark;
   final scheme = ColorScheme(
@@ -47,6 +51,8 @@ ThemeData buildTheme(Brightness brightness) {
 
   return base.copyWith(
     textTheme: text,
+    textButtonTheme: TextButtonThemeData(style: TextButton.styleFrom(textStyle: _ui(const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)))),
+    segmentedButtonTheme: SegmentedButtonThemeData(style: SegmentedButton.styleFrom(textStyle: _ui(const TextStyle(fontWeight: FontWeight.w600)))),
     scaffoldBackgroundColor: scheme.surface,
     splashFactory: InkSparkle.splashFactory,
     appBarTheme: AppBarTheme(
@@ -78,7 +84,7 @@ ThemeData buildTheme(Brightness brightness) {
         minimumSize: const Size(48, 48),
         padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        textStyle: _ui(const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
@@ -87,32 +93,32 @@ ThemeData buildTheme(Brightness brightness) {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         side: BorderSide(color: scheme.outline),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        textStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+        textStyle: _ui(const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
       ),
     ),
     chipTheme: base.chipTheme.copyWith(
       shape: StadiumBorder(side: BorderSide(color: scheme.outline)),
       backgroundColor: dark ? const Color(0x0DFFFFFF) : Colors.white,
       selectedColor: AppTokens.violet.withValues(alpha: 0.25),
-      labelStyle: TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w500),
+      labelStyle: _ui(TextStyle(color: scheme.onSurface, fontWeight: FontWeight.w500)),
       side: BorderSide(color: scheme.outline),
     ),
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: dark ? const Color(0xE60B1020) : const Color(0xF2FFFFFF),
       indicatorColor: AppTokens.violet.withValues(alpha: 0.22),
-      labelTextStyle: WidgetStatePropertyAll(TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: scheme.onSurface)),
+      labelTextStyle: WidgetStatePropertyAll(_ui(TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: scheme.onSurface))),
       height: 68,
     ),
     navigationRailTheme: NavigationRailThemeData(
       backgroundColor: Colors.transparent,
       indicatorColor: AppTokens.violet.withValues(alpha: 0.22),
-      selectedLabelTextStyle: TextStyle(fontWeight: FontWeight.w600, color: scheme.onSurface),
-      unselectedLabelTextStyle: TextStyle(color: scheme.onSurfaceVariant),
+      selectedLabelTextStyle: _ui(TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: scheme.onSurface)),
+      unselectedLabelTextStyle: _ui(TextStyle(fontSize: 12, color: scheme.onSurfaceVariant)),
     ),
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
       backgroundColor: dark ? AppTokens.surfaceHigh : AppTokens.inkText,
-      contentTextStyle: const TextStyle(color: Colors.white),
+      contentTextStyle: _ui(const TextStyle(color: Colors.white)),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
     ),
     dividerTheme: DividerThemeData(color: scheme.outlineVariant, space: 1),
