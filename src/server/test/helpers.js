@@ -1,15 +1,16 @@
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import mysql from 'mysql2/promise';
 import request from 'supertest';
 import { createApp } from '../src/app.js';
 import { loadConfig } from '../src/config.js';
+import { createPool } from '../src/db/pool.js';
 import { testDbConfig } from './dbConfig.js';
 
 let pool;
 export function getPool() {
-  pool ??= mysql.createPool({ ...testDbConfig(), multipleStatements: true, dateStrings: false });
+  // Same options as production (UTC, utf8mb4) so date handling matches.
+  pool ??= createPool(testDbConfig());
   return pool;
 }
 

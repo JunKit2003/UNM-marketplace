@@ -7,6 +7,7 @@ import { errorHandler, notFoundHandler } from './http/errors.js';
 import { createRateLimits } from './http/rateLimits.js';
 import { routes as defaultRoutes } from './routes.js';
 import { createChatService } from './modules/chat/service.js';
+import { giveGuestStarterContent } from './seed/seed.js';
 
 const MySQLStore = MySQLStoreFactory(session);
 
@@ -54,6 +55,9 @@ export function createApp({ pool, config, sessionStore, routes = defaultRoutes, 
     }
   });
   services.chat ??= createChatService({ pool, config });
+  if (config.seedDemo && !hooks.onGuestCreated) {
+    hooks = { ...hooks, onGuestCreated: (guest) => giveGuestStarterContent(pool, services.chat, guest) };
+  }
   const limits = createRateLimits();
   for (const register of routes) register(api, { pool, config, hooks, services, limits });
   api.use(notFoundHandler);
