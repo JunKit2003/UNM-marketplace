@@ -34,6 +34,9 @@ check "X-Forwarded-Proto defaults to http" 'curl -s $B/api/echo | grep -q "\"pro
 check "/images is proxied" 'curl -s $B/images/x.webp | grep -q "\"url\":\"/images/x.webp\""'
 check "socket.io gets WebSocket upgrade headers" \
   'curl -s -H "Upgrade: websocket" -H "Connection: Upgrade" "$B/socket.io/?EIO=4&transport=websocket" | grep -q "\"upgrade\":\"websocket\""'
+check "socket.io keeps the Host port and forwarded proto (same-origin check)" \
+  'r=$(curl -s -H "Upgrade: websocket" -H "Connection: Upgrade" -H "X-Forwarded-Proto: https" "$B/socket.io/?EIO=4&transport=websocket"); echo "$r" | grep -q "\"host\":\"127.0.0.1:$PORT\"" && echo "$r" | grep -q "\"proto\":\"https\""'
+check "/images keeps the Host header" 'curl -s $B/images/x.webp | grep -q "\"host\":\"127.0.0.1:$PORT\""'
 check "service worker is revalidated" 'curl -sI $B/flutter_service_worker.js | grep -qi "cache-control: no-cache"'
 check "index.html is revalidated" 'curl -sI $B/ | grep -qi "cache-control: no-cache"'
 check "main.dart.js is served gzipped" 'curl -sI -H "Accept-Encoding: gzip" $B/main.dart.js | grep -qi "content-encoding: gzip"'
