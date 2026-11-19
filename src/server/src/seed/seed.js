@@ -9,23 +9,18 @@ const read = async (f) => JSON.parse(await fs.readFile(path.join(here, 'data', f
 const SOURCE_IMAGES = path.join(here, 'images');
 const HOUR = 3600_000;
 
-function avatarSvg(initials, [from, to]) {
-  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256">
+/** Gradient-only fallback (the api image has no fonts, so no text in generated SVGs). */
+function gradientSvg([from, to], width = 256, height = 256) {
+  return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
     <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0" stop-color="${from}"/><stop offset="1" stop-color="${to}"/></linearGradient></defs>
-    <rect width="256" height="256" fill="url(#g)"/>
-    <text x="128" y="150" text-anchor="middle" font-family="sans-serif" font-size="96" font-weight="700" fill="#fff">${initials}</text>
+    <rect width="${width}" height="${height}" fill="url(#g)"/>
   </svg>`);
 }
 
 /** Gradient placeholder if a seed photo is missing, so the demo never shows a broken image. */
-function placeholder(label) {
-  return sharp(Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900">
-    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#10263B"/><stop offset="1" stop-color="#7C5CFF"/></linearGradient></defs>
-    <rect width="1200" height="900" fill="url(#g)"/>
-    <text x="600" y="470" text-anchor="middle" font-family="sans-serif" font-size="64" fill="#fff">${label.replace(/[<&>"]/g, '')}</text>
-  </svg>`)).webp({ quality: 80 }).toBuffer();
+function placeholder() {
+  return sharp(gradientSvg(['#10263B', '#7C5CFF'], 1200, 900)).webp({ quality: 80 }).toBuffer();
 }
 
 async function writeFile(uploadDir, rel, buffer) {
@@ -46,8 +41,9 @@ export async function seedDemo(pool, { uploadDir }) {
   const userId = {};
   for (const u of users) {
     const rel = `seed/avatars/${u.username}.webp`;
-    const initials = `${u.firstName[0]}${u.lastName[0]}`;
-    await writeFile(uploadDir, rel, await sharp(avatarSvg(initials, u.colors)).webp({ quality: 85 }).toBuffer());
+    // Pre-rendered initials (scripts/make-avatars.mjs); plain gradient if missing.
+    const avatar = await fs.readFile(path.join(SOURCE_IMAGES, 'avatars', `${u.username}.webp`)).catch(() => null);
+    await writeFile(uploadDir, rel, avatar ?? (await sharp(gradientSvg(u.colors)).webp({ quality: 85 }).toBuffer()));
     const [res] = await pool.query(
       `INSERT INTO users (username, first_name, last_name, avatar_path, is_seed, created_at)
        VALUES (?, ?, ?, ?, TRUE, NOW(3) - INTERVAL 30 DAY)`,
@@ -68,7 +64,7 @@ export async function seedDemo(pool, { uploadDir }) {
     const rel = `seed/listings/${l.slug}.webp`;
     const source = await fs.readFile(path.join(SOURCE_IMAGES, `${l.slug}.webp`)).catch(() => null);
     if (!source) logger.warn(`seed photo missing for ${l.slug}, using placeholder`);
-    await writeFile(uploadDir, rel, source ?? (await placeholder(l.title)));
+    await writeFile(uploadDir, rel, source ?? (await placeholder()));
     await pool.query('INSERT INTO listing_images (listing_id, path, position) VALUES (?, ?, 0)', [res.insertId, rel]);
   }
   logger.info(`seeded ${users.length} demo users and ${listings.length} listings`);
