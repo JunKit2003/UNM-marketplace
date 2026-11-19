@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <base href="$FLUTTER_BASE_HREF">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Nott-A-Marketplace: buy, sell and swap on the University of Nottingham Malaysia campus. A portfolio project by Jun Kit.">
+  <meta name="theme-color" content="#0B1020">
+  <meta property="og:title" content="Nott-A-Marketplace">
+  <meta property="og:description" content="Buy, sell and swap on campus.">
+  <meta property="og:image" content="icons/Icon-512.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Nott-A-Marketplace">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <title>Nott-A-Marketplace · Buy, sell and swap on campus</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0B1020; }
+    #splash {
+      position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+      background:
+        radial-gradient(circle at 20% 25%, rgba(124, 92, 255, .45), transparent 45%),
+        radial-gradient(circle at 80% 30%, rgba(34, 211, 238, .35), transparent 40%),
+        radial-gradient(circle at 60% 85%, rgba(244, 114, 182, .30), transparent 40%),
+        #0B1020;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #E6E9F2;
+      transition: opacity .4s ease;
+    }
+    #splash .mark {
+      width: 72px; height: 72px; border-radius: 22px; display: grid; place-items: center;
+      background: linear-gradient(135deg, #7C5CFF, #22D3EE); box-shadow: 0 10px 40px rgba(124, 92, 255, .5);
+      font-weight: 700; font-size: 38px; color: #fff; animation: pulse 1.6s ease-in-out infinite;
+    }
+    #splash p { margin: 0; color: #8A93A8; font-size: 14px; letter-spacing: .02em; }
+    @keyframes pulse { 50% { transform: scale(1.08); box-shadow: 0 14px 60px rgba(34, 211, 238, .55); } }
+    @media (prefers-reduced-motion: reduce) { #splash .mark { animation: none; } }
+  </style>
+</head>
+<body>
+  <div id="splash" aria-live="polite">
+    <div class="mark">N</div>
+    <p>Loading Nott-A-Marketplace…</p>
+  </div>
+  <noscript>Nott-A-Marketplace needs JavaScript to run.</noscript>
+  <script>
+    // Fade the splash out once Flutter paints its first frame.
+    window.addEventListener('flutter-first-frame', function () {
+      var s = document.getElementById('splash');
+      if (!s) return;
+      s.style.opacity = '0';
+      setTimeout(function () { s.remove(); }, 450);
+    });
+  </script>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>

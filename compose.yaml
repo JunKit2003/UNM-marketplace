@@ -46,6 +46,15 @@ services:
       timeout: 5s
       retries: 10
 
+  web:
+    build:
+      context: ./src/unm_marketplace
+      secrets: [npm_ca]
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      - api
+
   adminer:
     image: adminer:latest
     profiles: ["dev"]

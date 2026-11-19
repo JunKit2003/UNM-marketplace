@@ -1,0 +1,47 @@
+name: unm_marketplace
+description: "Nott-A-Marketplace: buy, sell and swap on the UNM campus."
+publish_to: 'none'
+version: 2.0.0+1
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  cached_network_image: ^4.0.3
+  desktop_drop: ^0.8.4
+  dio: ^5.11.1
+  flutter:
+    sdk: flutter
+  flutter_animate: ^4.5.2
+  flutter_riverpod: ^3.5.0
+  flutter_web_plugins:
+    sdk: flutter
+  go_router: ^18.1.4
+  image_picker: ^1.2.4
+  intl: ^0.20.2
+  socket_io_client: ^3.1.6
+  url_launcher: ^6.3.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-400.ttf
+        - asset: assets/fonts/Inter-500.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-600.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-700.ttf
+          weight: 700
+    - family: SpaceGrotesk
+      fonts:
+        - asset: assets/fonts/SpaceGrotesk-500.ttf
+          weight: 500
+        - asset: assets/fonts/SpaceGrotesk-700.ttf
+          weight: 700
