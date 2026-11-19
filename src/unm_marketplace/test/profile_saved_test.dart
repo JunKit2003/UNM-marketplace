@@ -12,7 +12,9 @@ void main() {
     expect(find.text("Guest accounts can't set a password."), findsOneWidget);
   });
 
-  testWidgets('members can change password and see their listings', (tester) async {
+  testWidgets('members can change password and see their listings', (
+    tester,
+  ) async {
     final fakes = Fakes()..auth.user = fakeUser();
     await pumpApp(tester, fakes, '/me');
     expect(find.text('Change password'), findsOneWidget);
@@ -32,6 +34,9 @@ void main() {
   testWidgets('saved page shows the empty copy', (tester) async {
     final fakes = Fakes()..auth.user = fakeUser();
     await pumpApp(tester, fakes, '/saved');
-    expect(find.text('No saved listings yet. Tap the heart on anything you like.'), findsOneWidget);
+    expect(
+      find.text('No saved listings yet. Tap the heart on anything you like.'),
+      findsOneWidget,
+    );
   });
 }

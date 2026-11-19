@@ -13,7 +13,8 @@ import 'package:unm_marketplace/state/providers.dart';
 
 import 'samples.dart';
 
-User fakeUser({bool isGuest = false}) => User.fromJson(userJson(isGuest: isGuest));
+User fakeUser({bool isGuest = false}) =>
+    User.fromJson(userJson(isGuest: isGuest));
 
 class FakeAuthRepository implements AuthRepository {
   User? user;
@@ -46,16 +47,29 @@ class FakeAuthRepository implements AuthRepository {
   @override
   Future<void> logout() async => user = null;
   @override
-  Future<User> updateProfile({String? firstName, String? lastName, String? phone}) async => user!;
+  Future<User> updateProfile({
+    String? firstName,
+    String? lastName,
+    String? phone,
+  }) async => user!;
   @override
-  Future<void> changePassword(String current, String next) async => calls.add('password');
+  Future<void> changePassword(String current, String next) async =>
+      calls.add('password');
   @override
   Future<User> uploadAvatar(PickedPhoto photo) async => user!;
 }
 
 class FakeListingsRepository implements ListingsRepository {
   List<Listing> listings = [Listing.fromJson(listingJson())];
-  List<Category> cats = const [Category(id: 3, slug: 'home-garden', name: 'Home & Garden', icon: 'chair', count: 1)];
+  List<Category> cats = const [
+    Category(
+      id: 3,
+      slug: 'home-garden',
+      name: 'Home & Garden',
+      icon: 'chair',
+      count: 1,
+    ),
+  ];
   final searches = <(BrowseFilters, int)>[];
   int pageSize = 24;
   int total = 1;
@@ -70,14 +84,24 @@ class FakeListingsRepository implements ListingsRepository {
     searches.add((f, page));
     final start = (page - 1) * pageSize;
     final items = listings.skip(start).take(pageSize).toList();
-    return PageResult(items: items, page: page, pageSize: pageSize, total: total, hasMore: start + items.length < total);
+    return PageResult(
+      items: items,
+      page: page,
+      pageSize: pageSize,
+      total: total,
+      hasMore: start + items.length < total,
+    );
   }
 
   @override
   Future<Listing> get(int id) async => listings.firstWhere(
-        (l) => l.id == id,
-        orElse: () => throw ApiError(status: 404, code: 'not_found', message: "This listing doesn't exist or was removed."),
-      );
+    (l) => l.id == id,
+    orElse: () => throw ApiError(
+      status: 404,
+      code: 'not_found',
+      message: "This listing doesn't exist or was removed.",
+    ),
+  );
   @override
   Future<Listing> create(ListingDraft draft, List<PickedPhoto> photos) async {
     created = draft;
@@ -86,19 +110,23 @@ class FakeListingsRepository implements ListingsRepository {
   }
 
   @override
-  Future<Listing> update(int id, Map<String, dynamic> fields) async => listings.first;
+  Future<Listing> update(int id, Map<String, dynamic> fields) async =>
+      listings.first;
   @override
   Future<void> delete(int id) async => listings.removeWhere((l) => l.id == id);
   @override
-  Future<Listing> addImages(int id, List<PickedPhoto> photos) async => listings.first;
+  Future<Listing> addImages(int id, List<PickedPhoto> photos) async =>
+      listings.first;
   @override
   Future<Listing> deleteImage(int id, int imageId) async => listings.first;
   @override
-  Future<Listing> reorderImages(int id, List<int> imageIds) async => listings.first;
+  Future<Listing> reorderImages(int id, List<int> imageIds) async =>
+      listings.first;
   @override
   Future<List<Listing>> mine({String? status}) async => listings;
   @override
-  Future<List<Listing>> saved() async => listings.where((l) => l.isSaved).toList();
+  Future<List<Listing>> saved() async =>
+      listings.where((l) => l.isSaved).toList();
   @override
   Future<void> save(int id) async => saves.add(id);
   @override
@@ -106,7 +134,9 @@ class FakeListingsRepository implements ListingsRepository {
 }
 
 class FakeChatRepository implements ChatRepository {
-  List<Conversation> conversations = [Conversation.fromJson(conversationJson())];
+  List<Conversation> conversations = [
+    Conversation.fromJson(conversationJson()),
+  ];
   List<Message> history = [Message.fromJson(messageJson())];
   ApiError? getError;
   final sent = <String>[];
@@ -124,18 +154,24 @@ class FakeChatRepository implements ChatRepository {
   @override
   Future<Conversation> start(int listingId) async => conversations.first;
   @override
-  Future<List<Message>> messages(int id, {int? before, int limit = 50}) async => before == null ? history : [];
+  Future<List<Message>> messages(int id, {int? before, int limit = 50}) async =>
+      before == null ? history : [];
   @override
   Future<Message> send(int id, String body) async {
-    if (failSend) throw ApiError(status: 0, code: 'network', message: 'offline');
+    if (failSend) {
+      throw ApiError(status: 0, code: 'network', message: 'offline');
+    }
     sent.add(body);
-    return Message.fromJson(messageJson(id: 900 + sent.length, senderId: 42, body: body));
+    return Message.fromJson(
+      messageJson(id: 900 + sent.length, senderId: 42, body: body),
+    );
   }
 
   @override
   Future<void> read(int id) async => reads.add(id);
   @override
-  Future<int> unread() async => conversations.fold<int>(0, (a, c) => a + c.unreadCount);
+  Future<int> unread() async =>
+      conversations.fold<int>(0, (a, c) => a + c.unreadCount);
 }
 
 class FakeChatSocket implements ChatSocket {
@@ -177,11 +213,11 @@ class Fakes {
   List<PickedPhoto> nextPicked = [];
 
   List<Override> overrides() => [
-        dioProvider.overrideWithValue(Dio()),
-        authRepositoryProvider.overrideWithValue(auth),
-        listingsRepositoryProvider.overrideWithValue(listings),
-        chatRepositoryProvider.overrideWithValue(chat),
-        chatSocketProvider.overrideWithValue(socket),
-        photoPickerProvider.overrideWithValue(() async => nextPicked),
-      ];
+    dioProvider.overrideWithValue(Dio()),
+    authRepositoryProvider.overrideWithValue(auth),
+    listingsRepositoryProvider.overrideWithValue(listings),
+    chatRepositoryProvider.overrideWithValue(chat),
+    chatSocketProvider.overrideWithValue(socket),
+    photoPickerProvider.overrideWithValue(() async => nextPicked),
+  ];
 }

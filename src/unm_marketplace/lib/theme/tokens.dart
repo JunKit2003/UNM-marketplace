@@ -20,7 +20,11 @@ abstract final class AppTokens {
   static const inkText = Color(0xFF0E1326);
   static const inkMuted = Color(0xFF5B6478);
 
-  static const accent = LinearGradient(colors: [violet, cyan], begin: Alignment.topLeft, end: Alignment.bottomRight);
+  static const accent = LinearGradient(
+    colors: [violet, cyan],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
   static const radius = 20.0;
   static const radiusSmall = 12.0;

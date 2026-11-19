@@ -14,7 +14,12 @@ class NetImage extends StatelessWidget {
   Widget build(BuildContext context) {
     final fallback = ColoredBox(
       color: Theme.of(context).colorScheme.surfaceContainerHigh,
-      child: Center(child: Icon(Icons.image_not_supported_outlined, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+      child: Center(
+        child: Icon(
+          Icons.image_not_supported_outlined,
+          color: Theme.of(context).colorScheme.onSurfaceVariant,
+        ),
+      ),
     );
     if (path == null) return fallback;
     return Image.network(
@@ -23,10 +28,17 @@ class NetImage extends StatelessWidget {
       gaplessPlayback: true,
       frameBuilder: (context, child, frame, sync) => sync
           ? child
-          : Stack(fit: StackFit.expand, children: [
-              if (frame == null) const Shimmer(radius: 0),
-              AnimatedOpacity(opacity: frame == null ? 0 : 1, duration: const Duration(milliseconds: 300), child: child),
-            ]),
+          : Stack(
+              fit: StackFit.expand,
+              children: [
+                if (frame == null) const Shimmer(radius: 0),
+                AnimatedOpacity(
+                  opacity: frame == null ? 0 : 1,
+                  duration: const Duration(milliseconds: 300),
+                  child: child,
+                ),
+              ],
+            ),
       errorBuilder: (_, _, _) => fallback,
     );
   }

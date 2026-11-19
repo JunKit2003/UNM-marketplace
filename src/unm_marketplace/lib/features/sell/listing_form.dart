@@ -16,7 +16,9 @@ class ListingFormData {
 
   void fillFrom(Listing l) {
     title.text = l.title;
-    price.text = l.price == l.price.roundToDouble() ? l.price.toInt().toString() : l.price.toString();
+    price.text = l.price == l.price.roundToDouble()
+        ? l.price.toInt().toString()
+        : l.price.toString();
     description.text = l.description;
     categorySlug = l.category.slug;
     condition = l.condition;
@@ -30,7 +32,12 @@ class ListingFormData {
 }
 
 class ListingForm extends ConsumerStatefulWidget {
-  const ListingForm({super.key, required this.data, required this.formKey, this.onChanged});
+  const ListingForm({
+    super.key,
+    required this.data,
+    required this.formKey,
+    this.onChanged,
+  });
   final ListingFormData data;
   final GlobalKey<FormState> formKey;
   final VoidCallback? onChanged;
@@ -50,71 +57,101 @@ class _ListingFormState extends ConsumerState<ListingForm> {
     return Form(
       key: widget.formKey,
       onChanged: widget.onChanged,
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        TextFormField(
-          key: const Key('field-title'),
-          controller: d.title,
-          maxLength: 80,
-          decoration: InputDecoration(labelText: 'Title', hintText: 'e.g. LED desk lamp with USB charging', errorText: server('title')),
-          validator: validateTitle,
-        ),
-        const SizedBox(height: 12),
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Expanded(
-            child: TextFormField(
-              key: const Key('field-price'),
-              controller: d.price,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: InputDecoration(labelText: 'Price', prefixText: 'RM ', errorText: server('price'), errorMaxLines: 3),
-              validator: validatePrice,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextFormField(
+            key: const Key('field-title'),
+            controller: d.title,
+            maxLength: 80,
+            decoration: InputDecoration(
+              labelText: 'Title',
+              hintText: 'e.g. LED desk lamp with USB charging',
+              errorText: server('title'),
             ),
+            validator: validateTitle,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: DropdownButtonFormField<String>(
-              key: const Key('field-category'),
-              initialValue: d.categorySlug,
-              isExpanded: true,
-              decoration: InputDecoration(labelText: 'Category', errorText: server('categorySlug')),
-              items: [for (final c in cats) DropdownMenuItem(value: c.slug, child: Text(c.name, overflow: TextOverflow.ellipsis))],
-              onChanged: (v) => setState(() {
-                d.categorySlug = v;
-                widget.onChanged?.call();
-              }),
-              validator: (v) => v == null ? 'Pick a category.' : null,
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: TextFormField(
+                  key: const Key('field-price'),
+                  controller: d.price,
+                  keyboardType: const TextInputType.numberWithOptions(
+                    decimal: true,
+                  ),
+                  decoration: InputDecoration(
+                    labelText: 'Price',
+                    prefixText: 'RM ',
+                    errorText: server('price'),
+                    errorMaxLines: 3,
+                  ),
+                  validator: validatePrice,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: DropdownButtonFormField<String>(
+                  key: const Key('field-category'),
+                  initialValue: d.categorySlug,
+                  isExpanded: true,
+                  decoration: InputDecoration(
+                    labelText: 'Category',
+                    errorText: server('categorySlug'),
+                  ),
+                  items: [
+                    for (final c in cats)
+                      DropdownMenuItem(
+                        value: c.slug,
+                        child: Text(c.name, overflow: TextOverflow.ellipsis),
+                      ),
+                  ],
+                  onChanged: (v) => setState(() {
+                    d.categorySlug = v;
+                    widget.onChanged?.call();
+                  }),
+                  validator: (v) => v == null ? 'Pick a category.' : null,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          Text('Condition', style: t.titleSmall),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final c in conditions)
+                ChoiceChip(
+                  label: Text(c),
+                  selected: d.condition == c,
+                  onSelected: (_) => setState(() {
+                    d.condition = c;
+                    widget.onChanged?.call();
+                  }),
+                ),
+            ],
+          ),
+          const SizedBox(height: 18),
+          TextFormField(
+            key: const Key('field-description'),
+            controller: d.description,
+            minLines: 4,
+            maxLines: 10,
+            maxLength: 2000,
+            decoration: InputDecoration(
+              labelText: 'Description',
+              hintText: 'Condition details, what is included, where to meet…',
+              alignLabelWithHint: true,
+              errorText: server('description'),
             ),
+            validator: validateDescription,
           ),
-        ]),
-        const SizedBox(height: 18),
-        Text('Condition', style: t.titleSmall),
-        const SizedBox(height: 8),
-        Wrap(spacing: 8, runSpacing: 8, children: [
-          for (final c in conditions)
-            ChoiceChip(
-              label: Text(c),
-              selected: d.condition == c,
-              onSelected: (_) => setState(() {
-                d.condition = c;
-                widget.onChanged?.call();
-              }),
-            ),
-        ]),
-        const SizedBox(height: 18),
-        TextFormField(
-          key: const Key('field-description'),
-          controller: d.description,
-          minLines: 4,
-          maxLines: 10,
-          maxLength: 2000,
-          decoration: InputDecoration(
-            labelText: 'Description',
-            hintText: 'Condition details, what is included, where to meet…',
-            alignLabelWithHint: true,
-            errorText: server('description'),
-          ),
-          validator: validateDescription,
-        ),
-      ]),
+        ],
+      ),
     );
   }
 }

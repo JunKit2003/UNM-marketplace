@@ -27,12 +27,20 @@ class SellPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (editId == null) return const _CreateFlow();
-    return ref.watch(listingProvider(editId!)).when(
+    return ref
+        .watch(listingProvider(editId!))
+        .when(
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, _) => EmptyState(icon: Icons.search_off_rounded, title: ApiError.from(e).message),
+          error: (e, _) => EmptyState(
+            icon: Icons.search_off_rounded,
+            title: ApiError.from(e).message,
+          ),
           data: (l) => l.isOwner
               ? _EditListing(listing: l)
-              : const EmptyState(icon: Icons.lock_outline_rounded, title: 'Only the seller can edit this listing.'),
+              : const EmptyState(
+                  icon: Icons.lock_outline_rounded,
+                  title: 'Only the seller can edit this listing.',
+                ),
         );
   }
 }
@@ -76,7 +84,8 @@ class _CreateFlowState extends ConsumerState<_CreateFlow> {
     setState(() => _photoMessage = problem);
   }
 
-  Future<void> _pick() async => _addPhotos(await ref.read(photoPickerProvider)());
+  Future<void> _pick() async =>
+      _addPhotos(await ref.read(photoPickerProvider)());
 
   void _next() {
     if (_step == 0 && _photos.isEmpty) {
@@ -96,7 +105,9 @@ class _CreateFlowState extends ConsumerState<_CreateFlow> {
       _error = null;
     });
     try {
-      final l = await ref.read(listingsRepositoryProvider).create(
+      final l = await ref
+          .read(listingsRepositoryProvider)
+          .create(
             ListingDraft(
               title: _data.title.text.trim(),
               description: _data.description.text.trim(),
@@ -109,7 +120,9 @@ class _CreateFlowState extends ConsumerState<_CreateFlow> {
       ref.read(listingsVersionProvider.notifier).bump();
       ref.invalidate(categoriesProvider);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Your listing is live.')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Your listing is live.')));
       context.go('/listing/${l.id}');
     } on ApiError catch (e) {
       setState(() {
@@ -128,64 +141,125 @@ class _CreateFlowState extends ConsumerState<_CreateFlow> {
     final t = Theme.of(context).textTheme;
 
     final stepBody = switch (_step) {
-      0 => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      0 => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Text('Add photos', style: t.headlineSmall),
           const SizedBox(height: 6),
-          Text('Bright, clear photos sell faster. Natural light works best.', style: t.bodyMedium),
+          Text(
+            'Bright, clear photos sell faster. Natural light works best.',
+            style: t.bodyMedium,
+          ),
           const SizedBox(height: 18),
           PhotoPickerGrid(
             photos: _photos,
             onAdd: _pick,
             onDropped: _addPhotos,
             onRemove: (i) => setState(() => _photos.removeAt(i)),
-            onReorder: (a, b) => setState(() => _photos.insert(b, _photos.removeAt(a))),
+            onReorder: (a, b) =>
+                setState(() => _photos.insert(b, _photos.removeAt(a))),
           ),
-        ]),
-      1 => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        ],
+      ),
+      1 => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Text('Describe it', style: t.headlineSmall),
           const SizedBox(height: 18),
-          ListingForm(data: _data, formKey: _formKey, onChanged: () => setState(() {})),
-        ]),
-      _ => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          ListingForm(
+            data: _data,
+            formKey: _formKey,
+            onChanged: () => setState(() {}),
+          ),
+        ],
+      ),
+      _ => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
           Text('Review', style: t.headlineSmall),
           const SizedBox(height: 6),
-          Text("This is how buyers will see it. Happy? Publish it.", style: t.bodyMedium),
-          if (!wide) ...[const SizedBox(height: 18), Center(child: SizedBox(width: 320, child: _PreviewCard(photos: _photos, data: _data)))],
-        ]),
+          Text(
+            "This is how buyers will see it. Happy? Publish it.",
+            style: t.bodyMedium,
+          ),
+          if (!wide) ...[
+            const SizedBox(height: 18),
+            Center(
+              child: SizedBox(
+                width: 320,
+                child: _PreviewCard(photos: _photos, data: _data),
+              ),
+            ),
+          ],
+        ],
+      ),
     };
 
-    final content = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _StepHeader(step: _step),
-      const SizedBox(height: 28),
-      AnimatedSwitcher(
-        duration: const Duration(milliseconds: 300),
-        transitionBuilder: (c, a) => FadeTransition(opacity: a, child: SlideTransition(position: Tween(begin: const Offset(0.04, 0), end: Offset.zero).animate(a), child: c)),
-        child: KeyedSubtree(key: ValueKey(_step), child: stepBody),
-      ),
-      if (_photoMessage != null && _step == 0) ...[
-        const SizedBox(height: 12),
-        Text(_photoMessage!, style: TextStyle(color: Theme.of(context).colorScheme.error, fontWeight: FontWeight.w600)),
-      ],
-      if (_error != null) ...[
-        const SizedBox(height: 12),
-        Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error, fontWeight: FontWeight.w600)),
-      ],
-      const SizedBox(height: 28),
-      Row(children: [
-        if (_step > 0) OutlinedButton(onPressed: () => setState(() => _step--), child: const Text('Back')),
-        const Spacer(),
-        if (_step < 2)
-          FilledButton(onPressed: _next, child: const Text('Next'))
-        else
-          FilledButton.icon(
-            onPressed: _publishing ? null : _publish,
-            icon: _publishing
-                ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                : const Icon(Icons.rocket_launch_rounded),
-            label: const Text('Publish'),
+    final content = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _StepHeader(step: _step),
+        const SizedBox(height: 28),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          transitionBuilder: (c, a) => FadeTransition(
+            opacity: a,
+            child: SlideTransition(
+              position: Tween(
+                begin: const Offset(0.04, 0),
+                end: Offset.zero,
+              ).animate(a),
+              child: c,
+            ),
           ),
-      ]),
-    ]);
+          child: KeyedSubtree(key: ValueKey(_step), child: stepBody),
+        ),
+        if (_photoMessage != null && _step == 0) ...[
+          const SizedBox(height: 12),
+          Text(
+            _photoMessage!,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.error,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+        if (_error != null) ...[
+          const SizedBox(height: 12),
+          Text(
+            _error!,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.error,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+        const SizedBox(height: 28),
+        Row(
+          children: [
+            if (_step > 0)
+              OutlinedButton(
+                onPressed: () => setState(() => _step--),
+                child: const Text('Back'),
+              ),
+            const Spacer(),
+            if (_step < 2)
+              FilledButton(onPressed: _next, child: const Text('Next'))
+            else
+              FilledButton.icon(
+                onPressed: _publishing ? null : _publish,
+                icon: _publishing
+                    ? const SizedBox.square(
+                        dimension: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.rocket_launch_rounded),
+                label: const Text('Publish'),
+              ),
+          ],
+        ),
+      ],
+    );
 
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: wide ? 48 : 16, vertical: 28),
@@ -193,18 +267,31 @@ class _CreateFlowState extends ConsumerState<_CreateFlow> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1180),
           child: wide
-              ? Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Expanded(child: content),
-                  const SizedBox(width: 48),
-                  SizedBox(
-                    width: 340,
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text('Live preview', style: t.titleSmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-                      const SizedBox(height: 12),
-                      _PreviewCard(photos: _photos, data: _data),
-                    ]),
-                  ),
-                ])
+              ? Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: content),
+                    const SizedBox(width: 48),
+                    SizedBox(
+                      width: 340,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Live preview',
+                            style: t.titleSmall?.copyWith(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          _PreviewCard(photos: _photos, data: _data),
+                        ],
+                      ),
+                    ),
+                  ],
+                )
               : content,
         ),
       ),
@@ -219,44 +306,70 @@ class _StepHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = Theme.of(context).textTheme;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Sell something', style: t.displaySmall),
-      const SizedBox(height: 18),
-      Row(children: [
-        for (final (i, s) in _steps.indexed) ...[
-          if (i > 0)
-            Expanded(
-              child: AnimatedContainer(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Sell something', style: t.displaySmall),
+        const SizedBox(height: 18),
+        Row(
+          children: [
+            for (final (i, s) in _steps.indexed) ...[
+              if (i > 0)
+                Expanded(
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    height: 3,
+                    margin: const EdgeInsets.symmetric(horizontal: 8),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(9),
+                      gradient: i <= step ? AppTokens.accent : null,
+                      color: i <= step
+                          ? null
+                          : Theme.of(context).colorScheme.outline,
+                    ),
+                  ),
+                ),
+              AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
-                height: 3,
-                margin: const EdgeInsets.symmetric(horizontal: 8),
+                width: 30,
+                height: 30,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(9),
+                  shape: BoxShape.circle,
                   gradient: i <= step ? AppTokens.accent : null,
-                  color: i <= step ? null : Theme.of(context).colorScheme.outline,
+                  border: i <= step
+                      ? null
+                      : Border.all(
+                          color: Theme.of(context).colorScheme.outline,
+                        ),
+                ),
+                child: Center(
+                  child: i < step
+                      ? const Icon(
+                          Icons.check_rounded,
+                          size: 16,
+                          color: Colors.white,
+                        )
+                      : Text(
+                          '${i + 1}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
+                        ),
                 ),
               ),
-            ),
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: 30,
-            height: 30,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: i <= step ? AppTokens.accent : null,
-              border: i <= step ? null : Border.all(color: Theme.of(context).colorScheme.outline),
-            ),
-            child: Center(
-              child: i < step
-                  ? const Icon(Icons.check_rounded, size: 16, color: Colors.white)
-                  : Text('${i + 1}', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(s, style: t.labelLarge?.copyWith(fontWeight: i == step ? FontWeight.w700 : FontWeight.w500)),
-        ],
-      ]),
-    ]);
+              const SizedBox(width: 8),
+              Text(
+                s,
+                style: t.labelLarge?.copyWith(
+                  fontWeight: i == step ? FontWeight.w700 : FontWeight.w500,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
   }
 }
 
@@ -272,35 +385,63 @@ class _PreviewCard extends StatelessWidget {
     final price = num.tryParse(data.price.text.trim());
     return GlassPanel(
       padding: EdgeInsets.zero,
-      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        AspectRatio(
-          aspectRatio: 4 / 3,
-          child: Stack(fit: StackFit.expand, children: [
-            if (photos.isEmpty)
-              ColoredBox(
-                color: Theme.of(context).colorScheme.surfaceContainerHigh,
-                child: const Icon(Icons.photo_camera_back_rounded, size: 40),
-              )
-            else
-              Image.memory(photos.first.bytes, fit: BoxFit.cover, errorBuilder: (_, _, _) => const ColoredBox(color: Colors.black26)),
-            if (price != null)
-              Positioned(
-                left: 12,
-                bottom: 10,
-                child: Text(formatPrice(price),
-                    style: const TextStyle(color: Colors.white, fontFamily: AppTokens.display, fontWeight: FontWeight.w700, fontSize: 18, shadows: [Shadow(blurRadius: 8)])),
-              ),
-          ]),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(14),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(data.title.text.isEmpty ? 'Your title here' : data.title.text, style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600)),
-            const SizedBox(height: 8),
-            ConditionPill(data.condition),
-          ]),
-        ),
-      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AspectRatio(
+            aspectRatio: 4 / 3,
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                if (photos.isEmpty)
+                  ColoredBox(
+                    color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                    child: const Icon(
+                      Icons.photo_camera_back_rounded,
+                      size: 40,
+                    ),
+                  )
+                else
+                  Image.memory(
+                    photos.first.bytes,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) =>
+                        const ColoredBox(color: Colors.black26),
+                  ),
+                if (price != null)
+                  Positioned(
+                    left: 12,
+                    bottom: 10,
+                    child: Text(
+                      formatPrice(price),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontFamily: AppTokens.display,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 18,
+                        shadows: [Shadow(blurRadius: 8)],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  data.title.text.isEmpty ? 'Your title here' : data.title.text,
+                  style: t.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 8),
+                ConditionPill(data.condition),
+              ],
+            ),
+          ),
+        ],
+      ),
     ).animate().fadeIn(duration: 300.ms);
   }
 }
@@ -364,7 +505,9 @@ class _EditListingState extends ConsumerState<_EditListing> {
       ref.read(listingProvider(l.id).notifier).set(l);
       ref.read(listingsVersionProvider.notifier).bump();
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Changes saved.')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Changes saved.')));
       context.go('/listing/${l.id}');
     } on ApiError catch (e) {
       setState(() {
@@ -385,64 +528,126 @@ class _EditListingState extends ConsumerState<_EditListing> {
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 820),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('Edit listing', style: t.displaySmall),
-            const SizedBox(height: 24),
-            Text('Photos', style: t.titleMedium),
-            const SizedBox(height: 10),
-            Wrap(spacing: 12, runSpacing: 12, children: [
-              for (final (i, img) in images.indexed)
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(14),
-                  child: SizedBox(
-                    width: 140,
-                    height: 140,
-                    child: Stack(fit: StackFit.expand, children: [
-                      NetImage(img.url),
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: IconButton.filled(
-                          tooltip: 'Remove photo',
-                          style: IconButton.styleFrom(backgroundColor: Colors.black54, foregroundColor: Colors.white),
-                          onPressed: images.length == 1 ? null : () => _run(() => _repo.deleteImage(_listing.id, img.id)),
-                          icon: const Icon(Icons.close_rounded, size: 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Edit listing', style: t.displaySmall),
+              const SizedBox(height: 24),
+              Text('Photos', style: t.titleMedium),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  for (final (i, img) in images.indexed)
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(14),
+                      child: SizedBox(
+                        width: 140,
+                        height: 140,
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            NetImage(img.url),
+                            Positioned(
+                              top: 4,
+                              right: 4,
+                              child: IconButton.filled(
+                                tooltip: 'Remove photo',
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.black54,
+                                  foregroundColor: Colors.white,
+                                ),
+                                onPressed: images.length == 1
+                                    ? null
+                                    : () => _run(
+                                        () => _repo.deleteImage(
+                                          _listing.id,
+                                          img.id,
+                                        ),
+                                      ),
+                                icon: const Icon(Icons.close_rounded, size: 18),
+                              ),
+                            ),
+                            Positioned(
+                              left: 6,
+                              bottom: 6,
+                              child: i == 0
+                                  ? Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 3,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        gradient: AppTokens.accent,
+                                        borderRadius: BorderRadius.circular(99),
+                                      ),
+                                      child: const Text(
+                                        'Cover',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    )
+                                  : TextButton(
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: Colors.black54,
+                                        foregroundColor: Colors.white,
+                                        visualDensity: VisualDensity.compact,
+                                      ),
+                                      onPressed: () => _run(
+                                        () => _repo.reorderImages(_listing.id, [
+                                          img.id,
+                                          ...images
+                                              .where((x) => x.id != img.id)
+                                              .map((x) => x.id),
+                                        ]),
+                                      ),
+                                      child: const Text('Make cover'),
+                                    ),
+                            ),
+                          ],
                         ),
                       ),
-                      Positioned(
-                        left: 6,
-                        bottom: 6,
-                        child: i == 0
-                            ? Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(gradient: AppTokens.accent, borderRadius: BorderRadius.circular(99)),
-                                child: const Text('Cover', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w700)),
-                              )
-                            : TextButton(
-                                style: TextButton.styleFrom(backgroundColor: Colors.black54, foregroundColor: Colors.white, visualDensity: VisualDensity.compact),
-                                onPressed: () => _run(() => _repo.reorderImages(_listing.id, [img.id, ...images.where((x) => x.id != img.id).map((x) => x.id)])),
-                                child: const Text('Make cover'),
-                              ),
-                      ),
-                    ]),
+                    ),
+                  if (images.length < maxPhotos)
+                    OutlinedButton.icon(
+                      onPressed: _addPhotos,
+                      icon: const Icon(Icons.add_photo_alternate_rounded),
+                      label: const Text('Add photos'),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 28),
+              ListingForm(data: _data, formKey: _formKey),
+              if (_message != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  _message!,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.error,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-              if (images.length < maxPhotos)
-                OutlinedButton.icon(onPressed: _addPhotos, icon: const Icon(Icons.add_photo_alternate_rounded), label: const Text('Add photos')),
-            ]),
-            const SizedBox(height: 28),
-            ListingForm(data: _data, formKey: _formKey),
-            if (_message != null) ...[
-              const SizedBox(height: 12),
-              Text(_message!, style: TextStyle(color: Theme.of(context).colorScheme.error, fontWeight: FontWeight.w600)),
+              ],
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  TextButton(
+                    onPressed: () => context.go('/listing/${_listing.id}'),
+                    child: const Text('Cancel'),
+                  ),
+                  const Spacer(),
+                  FilledButton(
+                    onPressed: _saving ? null : _save,
+                    child: const Text('Save changes'),
+                  ),
+                ],
+              ),
             ],
-            const SizedBox(height: 24),
-            Row(children: [
-              TextButton(onPressed: () => context.go('/listing/${_listing.id}'), child: const Text('Cancel')),
-              const Spacer(),
-              FilledButton(onPressed: _saving ? null : _save, child: const Text('Save changes')),
-            ]),
-          ]),
+          ),
         ),
       ),
     );

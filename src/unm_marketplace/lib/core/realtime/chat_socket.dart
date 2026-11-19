@@ -41,13 +41,23 @@ class ChatSocket {
     if (_socket != null) return;
     final s = io.io(
       apiBase(),
-      io.OptionBuilder().setPath('/socket.io').setTransports(['websocket']).enableReconnection().disableAutoConnect().build(),
+      io.OptionBuilder()
+          .setPath('/socket.io')
+          .setTransports(['websocket'])
+          .enableReconnection()
+          .disableAutoConnect()
+          .build(),
     );
     s.onConnect((_) => _connected.add(true));
     s.onDisconnect((_) => _connected.add(false));
     s.on('message:new', (data) {
       final m = data as Map;
-      _messages.add(IncomingMessage(m['conversationId'] as int, Message.fromJson(Map<String, dynamic>.from(m['message'] as Map))));
+      _messages.add(
+        IncomingMessage(
+          m['conversationId'] as int,
+          Message.fromJson(Map<String, dynamic>.from(m['message'] as Map)),
+        ),
+      );
     });
     s.on('typing', (data) {
       final m = data as Map;
@@ -70,13 +80,21 @@ class ChatSocket {
   Future<Message?> send(int conversationId, String body) async {
     final s = _socket;
     if (s == null || !s.connected) return null;
-    final ack = await s.emitWithAckAsync('message:send', {'conversationId': conversationId, 'body': body})
+    final ack = await s
+        .emitWithAckAsync('message:send', {
+          'conversationId': conversationId,
+          'body': body,
+        })
         .timeout(const Duration(seconds: 8), onTimeout: () => null);
-    if (ack is Map && ack['ok'] == true) return Message.fromJson(Map<String, dynamic>.from(ack['message'] as Map));
+    if (ack is Map && ack['ok'] == true) {
+      return Message.fromJson(Map<String, dynamic>.from(ack['message'] as Map));
+    }
     return null;
   }
 
-  void sendTyping(int conversationId) => _socket?.emit('typing', {'conversationId': conversationId});
+  void sendTyping(int conversationId) =>
+      _socket?.emit('typing', {'conversationId': conversationId});
 
-  void markRead(int conversationId) => _socket?.emit('conversation:read', {'conversationId': conversationId});
+  void markRead(int conversationId) =>
+      _socket?.emit('conversation:read', {'conversationId': conversationId});
 }

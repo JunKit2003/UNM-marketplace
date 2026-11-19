@@ -7,12 +7,15 @@ import 'harness.dart';
 import 'samples.dart';
 
 List<Listing> manyListings(int n) => [
-      for (var i = 1; i <= n; i++) Listing.fromJson(listingJson(id: i, title: 'Item $i', price: i * 10)),
-    ];
+  for (var i = 1; i <= n; i++)
+    Listing.fromJson(listingJson(id: i, title: 'Item $i', price: i * 10)),
+];
 
 void main() {
   testWidgets('shows the hero and a card per listing', (tester) async {
-    final fakes = Fakes()..listings.listings = manyListings(3)..listings.total = 3;
+    final fakes = Fakes()
+      ..listings.listings = manyListings(3)
+      ..listings.total = 3;
     await pumpApp(tester, fakes, '/');
     expect(find.text('Buy, sell and swap on campus.'), findsOneWidget);
     expect(find.text('Try the demo'), findsOneWidget);
@@ -42,19 +45,30 @@ void main() {
   });
 
   testWidgets('loads the next page near the end of the list', (tester) async {
-    final fakes = Fakes()..listings.listings = manyListings(30)..listings.total = 30;
+    final fakes = Fakes()
+      ..listings.listings = manyListings(30)
+      ..listings.total = 30;
     await pumpApp(tester, fakes, '/');
     expect(fakes.listings.searches.map((s) => s.$2), [1]);
-    await tester.fling(find.byType(CustomScrollView), const Offset(0, -20000), 5000);
+    await tester.fling(
+      find.byType(CustomScrollView),
+      const Offset(0, -20000),
+      5000,
+    );
     await settle(tester);
     expect(fakes.listings.searches.map((s) => s.$2), [1, 2]);
     expect(find.text('Item 30', skipOffstage: false), findsOneWidget);
   });
 
   testWidgets('shows the empty state copy', (tester) async {
-    final fakes = Fakes()..listings.listings = []..listings.total = 0;
+    final fakes = Fakes()
+      ..listings.listings = []
+      ..listings.total = 0;
     await pumpApp(tester, fakes, '/?q=unicorn');
-    expect(find.text('Nothing here yet. Be the first to sell something.'), findsOneWidget);
+    expect(
+      find.text('Nothing here yet. Be the first to sell something.'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('works at phone width with bottom navigation', (tester) async {

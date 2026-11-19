@@ -12,10 +12,20 @@ class UserAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fallback = DecoratedBox(
-      decoration: const BoxDecoration(shape: BoxShape.circle, gradient: AppTokens.accent),
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: AppTokens.accent,
+      ),
       child: Center(
-        child: Text(user.initials,
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: size * 0.38, fontFamily: AppTokens.display)),
+        child: Text(
+          user.initials,
+          style: TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+            fontSize: size * 0.38,
+            fontFamily: AppTokens.display,
+          ),
+        ),
       ),
     );
     return SizedBox.square(
@@ -23,7 +33,11 @@ class UserAvatar extends StatelessWidget {
       child: ClipOval(
         child: user.avatarUrl == null
             ? fallback
-            : Image.network(resolveUrl(user.avatarUrl!), fit: BoxFit.cover, errorBuilder: (_, _, _) => fallback),
+            : Image.network(
+                resolveUrl(user.avatarUrl!),
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => fallback,
+              ),
       ),
     );
   }

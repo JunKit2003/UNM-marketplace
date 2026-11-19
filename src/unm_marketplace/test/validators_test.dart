@@ -15,7 +15,8 @@ void main() {
   });
 
   test('validatePhoto checks type and 5 MB size', () {
-    PickedPhoto p(String name, int bytes) => PickedPhoto(bytes: Uint8List(bytes), name: name);
+    PickedPhoto p(String name, int bytes) =>
+        PickedPhoto(bytes: Uint8List(bytes), name: name);
     expect(validatePhoto(p('a.jpg', 100)), isNull);
     expect(validatePhoto(p('a.JPEG', 100)), isNull);
     expect(validatePhoto(p('a.webp', 100)), isNull);

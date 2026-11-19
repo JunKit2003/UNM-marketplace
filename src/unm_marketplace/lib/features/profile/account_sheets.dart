@@ -7,20 +7,32 @@ import '../../state/auth.dart';
 import '../../state/providers.dart';
 
 Future<void> _sheet(BuildContext context, Widget child) => showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
-      builder: (c) => Padding(
-        padding: EdgeInsets.fromLTRB(24, 0, 24, 24 + MediaQuery.viewInsetsOf(c).bottom),
-        child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 520), child: child),
-      ),
-    );
+  context: context,
+  isScrollControlled: true,
+  showDragHandle: true,
+  backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+  builder: (c) => Padding(
+    padding: EdgeInsets.fromLTRB(
+      24,
+      0,
+      24,
+      24 + MediaQuery.viewInsetsOf(c).bottom,
+    ),
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 520),
+      child: child,
+    ),
+  ),
+);
 
-Future<void> showEditProfileSheet(BuildContext context, WidgetRef ref, User user) =>
-    _sheet(context, _EditProfile(user: user));
+Future<void> showEditProfileSheet(
+  BuildContext context,
+  WidgetRef ref,
+  User user,
+) => _sheet(context, _EditProfile(user: user));
 
-Future<void> showChangePasswordSheet(BuildContext context, WidgetRef ref) => _sheet(context, const _ChangePassword());
+Future<void> showChangePasswordSheet(BuildContext context, WidgetRef ref) =>
+    _sheet(context, const _ChangePassword());
 
 class _EditProfile extends ConsumerStatefulWidget {
   const _EditProfile({required this.user});
@@ -48,7 +60,9 @@ class _EditProfileState extends ConsumerState<_EditProfile> {
   Future<void> _save() async {
     setState(() => _busy = true);
     try {
-      final u = await ref.read(authRepositoryProvider).updateProfile(
+      final u = await ref
+          .read(authRepositoryProvider)
+          .updateProfile(
             firstName: _first.text.trim(),
             lastName: _last.text.trim(),
             phone: _phone.text.trim(),
@@ -63,18 +77,39 @@ class _EditProfileState extends ConsumerState<_EditProfile> {
   }
 
   @override
-  Widget build(BuildContext context) => Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Text('Edit profile', style: Theme.of(context).textTheme.headlineSmall),
-        const SizedBox(height: 20),
-        TextField(controller: _first, decoration: const InputDecoration(labelText: 'First name')),
-        const SizedBox(height: 12),
-        TextField(controller: _last, decoration: const InputDecoration(labelText: 'Last name')),
-        const SizedBox(height: 12),
-        TextField(controller: _phone, keyboardType: TextInputType.phone, decoration: const InputDecoration(labelText: 'Phone')),
-        if (_error != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error))),
-        const SizedBox(height: 20),
-        FilledButton(onPressed: _busy ? null : _save, child: const Text('Save')),
-      ]);
+  Widget build(BuildContext context) => Column(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Text('Edit profile', style: Theme.of(context).textTheme.headlineSmall),
+      const SizedBox(height: 20),
+      TextField(
+        controller: _first,
+        decoration: const InputDecoration(labelText: 'First name'),
+      ),
+      const SizedBox(height: 12),
+      TextField(
+        controller: _last,
+        decoration: const InputDecoration(labelText: 'Last name'),
+      ),
+      const SizedBox(height: 12),
+      TextField(
+        controller: _phone,
+        keyboardType: TextInputType.phone,
+        decoration: const InputDecoration(labelText: 'Phone'),
+      ),
+      if (_error != null)
+        Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: Text(
+            _error!,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+        ),
+      const SizedBox(height: 20),
+      FilledButton(onPressed: _busy ? null : _save, child: const Text('Save')),
+    ],
+  );
 }
 
 class _ChangePassword extends ConsumerStatefulWidget {
@@ -99,17 +134,25 @@ class _ChangePasswordState extends ConsumerState<_ChangePassword> {
   }
 
   Future<void> _save() async {
-    if (_next.text.length < 8) return setState(() => _fields = {'newPassword': 'Use at least 8 characters.'});
+    if (_next.text.length < 8) {
+      return setState(
+        () => _fields = {'newPassword': 'Use at least 8 characters.'},
+      );
+    }
     setState(() {
       _busy = true;
       _fields = {};
       _error = null;
     });
     try {
-      await ref.read(authRepositoryProvider).changePassword(_current.text, _next.text);
+      await ref
+          .read(authRepositoryProvider)
+          .changePassword(_current.text, _next.text);
       if (!mounted) return;
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Password changed')));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Password changed')));
     } on ApiError catch (e) {
       setState(() {
         _fields = e.fields;
@@ -121,14 +164,42 @@ class _ChangePasswordState extends ConsumerState<_ChangePassword> {
   }
 
   @override
-  Widget build(BuildContext context) => Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Text('Change password', style: Theme.of(context).textTheme.headlineSmall),
-        const SizedBox(height: 20),
-        TextField(controller: _current, obscureText: true, decoration: InputDecoration(labelText: 'Current password', errorText: _fields['currentPassword'])),
-        const SizedBox(height: 12),
-        TextField(controller: _next, obscureText: true, decoration: InputDecoration(labelText: 'New password', errorText: _fields['newPassword'])),
-        if (_error != null) Padding(padding: const EdgeInsets.only(top: 12), child: Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error))),
-        const SizedBox(height: 20),
-        FilledButton(onPressed: _busy ? null : _save, child: const Text('Change password')),
-      ]);
+  Widget build(BuildContext context) => Column(
+    mainAxisSize: MainAxisSize.min,
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Text('Change password', style: Theme.of(context).textTheme.headlineSmall),
+      const SizedBox(height: 20),
+      TextField(
+        controller: _current,
+        obscureText: true,
+        decoration: InputDecoration(
+          labelText: 'Current password',
+          errorText: _fields['currentPassword'],
+        ),
+      ),
+      const SizedBox(height: 12),
+      TextField(
+        controller: _next,
+        obscureText: true,
+        decoration: InputDecoration(
+          labelText: 'New password',
+          errorText: _fields['newPassword'],
+        ),
+      ),
+      if (_error != null)
+        Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: Text(
+            _error!,
+            style: TextStyle(color: Theme.of(context).colorScheme.error),
+          ),
+        ),
+      const SizedBox(height: 20),
+      FilledButton(
+        onPressed: _busy ? null : _save,
+        child: const Text('Change password'),
+      ),
+    ],
+  );
 }

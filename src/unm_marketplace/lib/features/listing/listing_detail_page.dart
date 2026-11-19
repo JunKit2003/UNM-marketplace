@@ -33,11 +33,14 @@ class _ListingDetailPageState extends ConsumerState<ListingDetailPage> {
   bool _busy = false;
   bool _autoChatDone = false;
 
-  void _snack(String text) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+  void _snack(String text) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
 
   Future<void> _message() async {
     if (ref.read(authProvider).value == null) {
-      context.go('/login?from=${Uri.encodeComponent('/listing/${widget.id}?chat=1')}');
+      context.go(
+        '/login?from=${Uri.encodeComponent('/listing/${widget.id}?chat=1')}',
+      );
       return;
     }
     setState(() => _busy = true);
@@ -54,13 +57,17 @@ class _ListingDetailPageState extends ConsumerState<ListingDetailPage> {
   Future<void> _toggleSave(Listing l) async {
     final saved = await toggleSave(context, ref, l);
     if (saved != null) {
-      ref.read(listingProvider(widget.id).notifier).set(l.copyWith(isSaved: saved));
+      ref
+          .read(listingProvider(widget.id).notifier)
+          .set(l.copyWith(isSaved: saved));
       ref.read(listingsVersionProvider.notifier).bump();
     }
   }
 
   Future<void> _share() async {
-    await Clipboard.setData(ClipboardData(text: '${apiBase()}/listing/${widget.id}'));
+    await Clipboard.setData(
+      ClipboardData(text: '${apiBase()}/listing/${widget.id}'),
+    );
     _snack('Link copied');
   }
 
@@ -78,11 +85,18 @@ class _ListingDetailPageState extends ConsumerState<ListingDetailPage> {
       context: context,
       builder: (c) => AlertDialog(
         title: const Text('Delete this listing?'),
-        content: const Text('It will disappear for everyone, including chats about it. This cannot be undone.'),
+        content: const Text(
+          'It will disappear for everyone, including chats about it. This cannot be undone.',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(c, false),
+            child: const Text('Cancel'),
+          ),
           FilledButton(
-            style: FilledButton.styleFrom(backgroundColor: Theme.of(c).colorScheme.error),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(c).colorScheme.error,
+            ),
             onPressed: () => Navigator.pop(c, true),
             child: const Text('Delete'),
           ),
@@ -116,20 +130,27 @@ class _ListingDetailPageState extends ConsumerState<ListingDetailPage> {
         loading: () => const _DetailSkeleton(),
         error: (e, _) => EmptyState(
           icon: Icons.search_off_rounded,
-          title: ApiError.from(e).isNotFound ? "This listing doesn't exist or was removed." : "Couldn't load this listing",
-          action: FilledButton(onPressed: () => context.go('/'), child: const Text('Back to browse')),
+          title: ApiError.from(e).isNotFound
+              ? "This listing doesn't exist or was removed."
+              : "Couldn't load this listing",
+          action: FilledButton(
+            onPressed: () => context.go('/'),
+            child: const Text('Back to browse'),
+          ),
         ),
         data: (l) {
           _maybeAutoChat(l);
-          return _DetailBody(
-            listing: l,
-            busy: _busy,
-            onMessage: _message,
-            onSave: () => _toggleSave(l),
-            onShare: _share,
-            onEdit: () => context.push('/listing/${l.id}/edit'),
-            onSold: () => _setStatus(l.isSold ? 'active' : 'sold'),
-            onDelete: _delete,
+          return SelectionArea(
+            child: _DetailBody(
+              listing: l,
+              busy: _busy,
+              onMessage: _message,
+              onSave: () => _toggleSave(l),
+              onShare: _share,
+              onEdit: () => context.push('/listing/${l.id}/edit'),
+              onSold: () => _setStatus(l.isSold ? 'active' : 'sold'),
+              onDelete: _delete,
+            ),
           );
         },
       ),
@@ -186,35 +207,58 @@ class _DetailBody extends StatelessWidget {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 1320),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              back,
-              const SizedBox(height: 12),
-              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Expanded(flex: 3, child: Gallery(listing: l)),
-                const SizedBox(width: 40),
-                Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [info, const SizedBox(height: 24), actions])),
-              ]),
-            ]),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                back,
+                const SizedBox(height: 12),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 3, child: Gallery(listing: l)),
+                    const SizedBox(width: 40),
+                    Expanded(
+                      flex: 2,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [info, const SizedBox(height: 24), actions],
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       );
     }
 
-    return Column(children: [
-      Expanded(
-        child: ListView(padding: const EdgeInsets.fromLTRB(16, 8, 16, 24), children: [
-          back,
-          const SizedBox(height: 8),
-          Gallery(listing: l),
-          const SizedBox(height: 20),
-          info,
-        ]),
-      ),
-      Material(
-        color: Theme.of(context).colorScheme.surfaceContainerLow,
-        child: SafeArea(top: false, child: Padding(padding: const EdgeInsets.fromLTRB(16, 12, 16, 12), child: actions)),
-      ),
-    ]);
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+            children: [
+              back,
+              const SizedBox(height: 8),
+              Gallery(listing: l),
+              const SizedBox(height: 20),
+              info,
+            ],
+          ),
+        ),
+        Material(
+          color: Theme.of(context).colorScheme.surfaceContainerLow,
+          child: SafeArea(
+            top: false,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
+              child: actions,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
 
@@ -227,29 +271,49 @@ class _Info extends StatelessWidget {
     final l = listing;
     final t = Theme.of(context).textTheme;
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Wrap(spacing: 8, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [
-        Chip(avatar: Icon(categoryIcon(l.category.icon), size: 16), label: Text(l.category.name)),
-        ConditionPill(l.condition),
-        if (l.isSold) const SoldBadge(),
-      ]),
-      const SizedBox(height: 14),
-      Text(l.title, style: t.headlineMedium),
-      const SizedBox(height: 10),
-      ShaderMask(
-        shaderCallback: (r) => AppTokens.accent.createShader(r),
-        blendMode: BlendMode.srcIn,
-        child: Text(formatPrice(l.price), style: t.displaySmall?.copyWith(color: Colors.white)),
-      ),
-      const SizedBox(height: 6),
-      Text('Posted ${timeAgo(l.createdAt)}', style: t.bodySmall?.copyWith(color: muted)),
-      const SizedBox(height: 22),
-      Text('About this item', style: t.titleMedium),
-      const SizedBox(height: 8),
-      SelectableText(l.description, style: t.bodyLarge?.copyWith(height: 1.6)),
-      const SizedBox(height: 24),
-      SellerCard(seller: l.seller),
-    ]).animate().fadeIn(duration: 400.ms).slideX(begin: 0.04, curve: Curves.easeOutCubic);
+    return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Chip(
+                  avatar: Icon(categoryIcon(l.category.icon), size: 16),
+                  label: Text(l.category.name),
+                ),
+                ConditionPill(l.condition),
+                if (l.isSold) const SoldBadge(),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Text(l.title, style: t.headlineMedium),
+            const SizedBox(height: 10),
+            ShaderMask(
+              shaderCallback: (r) => AppTokens.accent.createShader(r),
+              blendMode: BlendMode.srcIn,
+              child: Text(
+                formatPrice(l.price),
+                style: t.displaySmall?.copyWith(color: Colors.white),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Posted ${timeAgo(l.createdAt)}',
+              style: t.bodySmall?.copyWith(color: muted),
+            ),
+            const SizedBox(height: 22),
+            Text('About this item', style: t.titleMedium),
+            const SizedBox(height: 8),
+            Text(l.description, style: t.bodyLarge?.copyWith(height: 1.6)),
+            const SizedBox(height: 24),
+            SellerCard(seller: l.seller),
+          ],
+        )
+        .animate()
+        .fadeIn(duration: 400.ms)
+        .slideX(begin: 0.04, curve: Curves.easeOutCubic);
   }
 }
 
@@ -272,42 +336,70 @@ class _Actions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = listing;
-    final share = IconButton.outlined(tooltip: 'Copy link', onPressed: onShare, icon: const Icon(Icons.ios_share_rounded));
+    final share = IconButton.outlined(
+      tooltip: 'Copy link',
+      onPressed: onShare,
+      icon: const Icon(Icons.ios_share_rounded),
+    );
     if (l.isOwner) {
-      return Wrap(spacing: 10, runSpacing: 10, children: [
-        FilledButton.icon(onPressed: onEdit, icon: const Icon(Icons.edit_rounded), label: const Text('Edit')),
-        OutlinedButton.icon(
-          onPressed: onSold,
-          icon: Icon(l.isSold ? Icons.replay_rounded : Icons.check_circle_outline_rounded),
-          label: Text(l.isSold ? 'Mark as available' : 'Mark as sold'),
-        ),
-        TextButton.icon(
-          style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.error),
-          onPressed: onDelete,
-          icon: const Icon(Icons.delete_outline_rounded),
-          label: const Text('Delete'),
-        ),
-        share,
-      ]);
-    }
-    return Row(children: [
-      if (!l.isSold)
-        Expanded(
-          child: FilledButton.icon(
-            onPressed: busy ? null : onMessage,
-            icon: busy
-                ? const SizedBox.square(dimension: 18, child: CircularProgressIndicator(strokeWidth: 2))
-                : const Icon(Icons.chat_bubble_rounded),
-            label: const Text('Message seller'),
+      return Wrap(
+        spacing: 10,
+        runSpacing: 10,
+        children: [
+          FilledButton.icon(
+            onPressed: onEdit,
+            icon: const Icon(Icons.edit_rounded),
+            label: const Text('Edit'),
           ),
-        )
-      else
-        const Expanded(child: OutlinedButton(onPressed: null, child: Text('This item has been sold'))),
-      const SizedBox(width: 10),
-      SaveHeart(saved: l.isSaved, onPressed: onSave, size: 22),
-      const SizedBox(width: 6),
-      share,
-    ]);
+          OutlinedButton.icon(
+            onPressed: onSold,
+            icon: Icon(
+              l.isSold
+                  ? Icons.replay_rounded
+                  : Icons.check_circle_outline_rounded,
+            ),
+            label: Text(l.isSold ? 'Mark as available' : 'Mark as sold'),
+          ),
+          TextButton.icon(
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
+            onPressed: onDelete,
+            icon: const Icon(Icons.delete_outline_rounded),
+            label: const Text('Delete'),
+          ),
+          share,
+        ],
+      );
+    }
+    return Row(
+      children: [
+        if (!l.isSold)
+          Expanded(
+            child: FilledButton.icon(
+              onPressed: busy ? null : onMessage,
+              icon: busy
+                  ? const SizedBox.square(
+                      dimension: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Icon(Icons.chat_bubble_rounded),
+              label: const Text('Message seller'),
+            ),
+          )
+        else
+          const Expanded(
+            child: OutlinedButton(
+              onPressed: null,
+              child: Text('This item has been sold'),
+            ),
+          ),
+        const SizedBox(width: 10),
+        SaveHeart(saved: l.isSaved, onPressed: onSave, size: 22),
+        const SizedBox(width: 6),
+        share,
+      ],
+    );
   }
 }
 
@@ -316,13 +408,16 @@ class _DetailSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Padding(
-        padding: EdgeInsets.all(24),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          AspectRatio(aspectRatio: 16 / 9, child: Shimmer()),
-          SizedBox(height: 20),
-          Shimmer(height: 28, width: 320),
-          SizedBox(height: 12),
-          Shimmer(height: 36, width: 160),
-        ]),
-      );
+    padding: EdgeInsets.all(24),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        AspectRatio(aspectRatio: 16 / 9, child: Shimmer()),
+        SizedBox(height: 20),
+        Shimmer(height: 28, width: 320),
+        SizedBox(height: 12),
+        Shimmer(height: 36, width: 160),
+      ],
+    ),
+  );
 }

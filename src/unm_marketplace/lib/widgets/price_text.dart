@@ -9,7 +9,11 @@ class PriceText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Text(
-        formatPrice(price),
-        style: style ?? Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-      );
+    formatPrice(price),
+    style:
+        style ??
+        Theme.of(
+          context,
+        ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+  );
 }

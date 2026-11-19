@@ -13,8 +13,14 @@ void main() {
 
   test('timeAgo is short and friendly', () {
     final now = DateTime.utc(2026, 11, 20, 12);
-    expect(timeAgo(now.subtract(const Duration(seconds: 20)), now: now), 'just now');
-    expect(timeAgo(now.subtract(const Duration(minutes: 5)), now: now), '5m ago');
+    expect(
+      timeAgo(now.subtract(const Duration(seconds: 20)), now: now),
+      'just now',
+    );
+    expect(
+      timeAgo(now.subtract(const Duration(minutes: 5)), now: now),
+      '5m ago',
+    );
     expect(timeAgo(now.subtract(const Duration(hours: 2)), now: now), '2h ago');
     expect(timeAgo(now.subtract(const Duration(days: 3)), now: now), '3d ago');
     expect(timeAgo(DateTime.utc(2026, 9, 1), now: now), '1 Sep');

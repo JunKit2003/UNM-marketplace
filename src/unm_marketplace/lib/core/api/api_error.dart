@@ -2,7 +2,12 @@ import 'package:dio/dio.dart';
 
 /// Error returned by the API (`{ error: { code, message, fields } }`) or the network.
 class ApiError implements Exception {
-  ApiError({required this.status, required this.code, required this.message, this.fields = const {}});
+  ApiError({
+    required this.status,
+    required this.code,
+    required this.message,
+    this.fields = const {},
+  });
 
   final int status;
   final String code;
@@ -23,17 +28,23 @@ class ApiError implements Exception {
           code: '${e['code']}',
           message: '${e['message']}',
           fields: {
-            for (final entry in ((e['fields'] as Map?) ?? {}).entries) '${entry.key}': '${entry.value}',
+            for (final entry in ((e['fields'] as Map?) ?? {}).entries)
+              '${entry.key}': '${entry.value}',
           },
         );
       }
       return ApiError(
         status: error.response?.statusCode ?? 0,
         code: 'network',
-        message: "Couldn't reach the server. Check your connection and try again.",
+        message:
+            "Couldn't reach the server. Check your connection and try again.",
       );
     }
-    return ApiError(status: 0, code: 'unknown', message: 'Something went wrong. Please try again.');
+    return ApiError(
+      status: 0,
+      code: 'unknown',
+      message: 'Something went wrong. Please try again.',
+    );
   }
 
   @override

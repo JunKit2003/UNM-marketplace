@@ -18,4 +18,5 @@ String timeAgo(DateTime when, {DateTime? now}) {
 }
 
 /// Clock time for chat bubbles, e.g. "14:05".
-String clockTime(DateTime when) => DateFormat('HH:mm', 'en_US').format(when.toLocal());
+String clockTime(DateTime when) =>
+    DateFormat('HH:mm', 'en_US').format(when.toLocal());

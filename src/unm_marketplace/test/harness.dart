@@ -11,21 +11,35 @@ class Harness {
   Harness(this.container, this.router);
   final ProviderContainer container;
   final GoRouter router;
-  String get location => router.routerDelegate.currentConfiguration.uri.toString();
+  String get location =>
+      router.routerDelegate.currentConfiguration.uri.toString();
 }
 
 /// Pump the real app (router, theme, shell) with faked repositories at [location].
-Future<Harness> pumpApp(WidgetTester tester, Fakes fakes, String location, {Size size = const Size(1280, 900)}) async {
+Future<Harness> pumpApp(
+  WidgetTester tester,
+  Fakes fakes,
+  String location, {
+  Size size = const Size(1280, 900),
+}) async {
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 1;
   addTearDown(tester.view.reset);
-  final container = ProviderContainer(overrides: fakes.overrides(), retry: (_, _) => null);
+  final container = ProviderContainer(
+    overrides: fakes.overrides(),
+    retry: (_, _) => null,
+  );
   addTearDown(container.dispose);
   final router = container.read(routerProvider);
-  await tester.pumpWidget(UncontrolledProviderScope(
-    container: container,
-    child: MaterialApp.router(theme: buildTheme(Brightness.dark), routerConfig: router),
-  ));
+  await tester.pumpWidget(
+    UncontrolledProviderScope(
+      container: container,
+      child: MaterialApp.router(
+        theme: buildTheme(Brightness.dark),
+        routerConfig: router,
+      ),
+    ),
+  );
   await tester.pump();
   router.go(location);
   await settle(tester);

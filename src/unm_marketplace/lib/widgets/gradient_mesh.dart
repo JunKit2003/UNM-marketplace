@@ -14,8 +14,12 @@ class GradientMesh extends StatefulWidget {
   State<GradientMesh> createState() => _GradientMeshState();
 }
 
-class _GradientMeshState extends State<GradientMesh> with SingleTickerProviderStateMixin {
-  late final AnimationController _t = AnimationController(vsync: this, duration: const Duration(seconds: 24))..repeat();
+class _GradientMeshState extends State<GradientMesh>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _t = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 24),
+  )..repeat();
   Offset _pointer = Offset.zero;
 
   @override
@@ -33,7 +37,12 @@ class _GradientMeshState extends State<GradientMesh> with SingleTickerProviderSt
       onHover: (e) {
         final size = context.size;
         if (size == null || size.isEmpty) return;
-        setState(() => _pointer = Offset(e.localPosition.dx / size.width - 0.5, e.localPosition.dy / size.height - 0.5));
+        setState(
+          () => _pointer = Offset(
+            e.localPosition.dx / size.width - 0.5,
+            e.localPosition.dy / size.height - 0.5,
+          ),
+        );
       },
       child: AnimatedBuilder(
         animation: _t,
@@ -63,14 +72,18 @@ class _MeshPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawRect(Offset.zero & size, Paint()..color = dark ? AppTokens.ink : AppTokens.paper);
+    canvas.drawRect(
+      Offset.zero & size,
+      Paint()..color = dark ? AppTokens.ink : AppTokens.paper,
+    );
     final a = t * 2 * math.pi;
     for (final (i, b) in _blobs.indexed) {
       final (color, x, y, r, phase) = b;
       final depth = (i + 1) * 14.0;
       final c = Offset(
         size.width * (x + 0.06 * math.sin(a + phase)) + pointer.dx * depth,
-        size.height * (y + 0.08 * math.cos(a * 0.8 + phase)) + pointer.dy * depth,
+        size.height * (y + 0.08 * math.cos(a * 0.8 + phase)) +
+            pointer.dy * depth,
       );
       final radius = size.longestSide * r;
       final alpha = (dark ? 0.55 : 0.28) * intensity;
@@ -78,12 +91,17 @@ class _MeshPainter extends CustomPainter {
         c,
         radius,
         Paint()
-          ..shader = RadialGradient(colors: [color.withValues(alpha: alpha), color.withValues(alpha: 0)])
-              .createShader(Rect.fromCircle(center: c, radius: radius)),
+          ..shader = RadialGradient(
+            colors: [
+              color.withValues(alpha: alpha),
+              color.withValues(alpha: 0),
+            ],
+          ).createShader(Rect.fromCircle(center: c, radius: radius)),
       );
     }
   }
 
   @override
-  bool shouldRepaint(_MeshPainter old) => old.t != t || old.pointer != pointer || old.dark != dark;
+  bool shouldRepaint(_MeshPainter old) =>
+      old.t != t || old.pointer != pointer || old.dark != dark;
 }

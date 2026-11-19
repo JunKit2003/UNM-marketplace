@@ -31,7 +31,8 @@ String? validateDescription(String? v) {
 /// Quick client-side check; the server re-checks the actual bytes.
 String? validatePhoto(PickedPhoto p) {
   final name = p.name.toLowerCase();
-  final okType = ['.jpg', '.jpeg', '.png', '.webp'].any(name.endsWith) ||
+  final okType =
+      ['.jpg', '.jpeg', '.png', '.webp'].any(name.endsWith) ||
       ['image/jpeg', 'image/png', 'image/webp'].contains(p.mimeType);
   if (!okType || p.bytes.length > _maxBytes) return photoError;
   return null;

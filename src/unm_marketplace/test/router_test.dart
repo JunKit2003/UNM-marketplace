@@ -5,7 +5,9 @@ import 'fakes.dart';
 import 'harness.dart';
 
 void main() {
-  testWidgets('signed-out visitors are sent to login with a return path', (tester) async {
+  testWidgets('signed-out visitors are sent to login with a return path', (
+    tester,
+  ) async {
     final h = await pumpApp(tester, Fakes(), '/saved');
     expect(h.location, '/login?from=%2Fsaved');
   });
@@ -16,10 +18,41 @@ void main() {
   });
 
   test('authRedirect only follows same-site return paths', () {
-    expect(authRedirect(location: '/login?from=%2Fsell', signedIn: true, loading: false), '/sell');
-    expect(authRedirect(location: '/login?from=https%3A%2F%2Fevil.example', signedIn: true, loading: false), '/');
-    expect(authRedirect(location: '/login?from=%2F%2Fevil.example', signedIn: true, loading: false), '/');
-    expect(authRedirect(location: '/listing/1/edit', signedIn: false, loading: false), '/login?from=%2Flisting%2F1%2Fedit');
-    expect(authRedirect(location: '/saved', signedIn: false, loading: true), isNull);
+    expect(
+      authRedirect(
+        location: '/login?from=%2Fsell',
+        signedIn: true,
+        loading: false,
+      ),
+      '/sell',
+    );
+    expect(
+      authRedirect(
+        location: '/login?from=https%3A%2F%2Fevil.example',
+        signedIn: true,
+        loading: false,
+      ),
+      '/',
+    );
+    expect(
+      authRedirect(
+        location: '/login?from=%2F%2Fevil.example',
+        signedIn: true,
+        loading: false,
+      ),
+      '/',
+    );
+    expect(
+      authRedirect(
+        location: '/listing/1/edit',
+        signedIn: false,
+        loading: false,
+      ),
+      '/login?from=%2Flisting%2F1%2Fedit',
+    );
+    expect(
+      authRedirect(location: '/saved', signedIn: false, loading: true),
+      isNull,
+    );
   });
 }

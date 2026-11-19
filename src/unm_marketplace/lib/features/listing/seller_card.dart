@@ -13,17 +13,31 @@ class SellerCard extends StatelessWidget {
     final t = Theme.of(context).textTheme;
     return GlassPanel(
       padding: const EdgeInsets.all(16),
-      child: Row(children: [
-        UserAvatar(seller, size: 48),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(seller.displayName, style: t.titleMedium),
-            Text('@${seller.username} · UNM community', style: t.bodySmall?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant)),
-          ]),
-        ),
-        const Icon(Icons.verified_rounded, color: Color(0xFF22D3EE), size: 20),
-      ]),
+      child: Row(
+        children: [
+          UserAvatar(seller, size: 48),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(seller.displayName, style: t.titleMedium),
+                Text(
+                  '@${seller.username} · UNM community',
+                  style: t.bodySmall?.copyWith(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.verified_rounded,
+            color: Color(0xFF22D3EE),
+            size: 20,
+          ),
+        ],
+      ),
     );
   }
 }

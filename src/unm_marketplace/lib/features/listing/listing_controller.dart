@@ -17,7 +17,9 @@ class ListingController extends AsyncNotifier<Listing> {
   void set(Listing l) => state = AsyncData(l);
 
   Future<void> setStatus(String status) async {
-    final updated = await ref.read(listingsRepositoryProvider).update(id, {'status': status});
+    final updated = await ref.read(listingsRepositoryProvider).update(id, {
+      'status': status,
+    });
     state = AsyncData(updated);
     ref.read(listingsVersionProvider.notifier).bump();
   }
@@ -28,4 +30,5 @@ class ListingController extends AsyncNotifier<Listing> {
   }
 }
 
-final listingProvider = AsyncNotifierProvider.autoDispose.family<ListingController, Listing, int>(ListingController.new);
+final listingProvider = AsyncNotifierProvider.autoDispose
+    .family<ListingController, Listing, int>(ListingController.new);

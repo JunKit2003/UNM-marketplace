@@ -7,7 +7,8 @@ import 'package:unm_marketplace/core/api/models.dart';
 import 'fakes.dart';
 import 'harness.dart';
 
-PickedPhoto photo(String name, int size) => PickedPhoto(bytes: Uint8List(size), name: name);
+PickedPhoto photo(String name, int size) =>
+    PickedPhoto(bytes: Uint8List(size), name: name);
 
 void main() {
   testWidgets('needs a photo before Next', (tester) async {
@@ -26,7 +27,10 @@ void main() {
     await pumpApp(tester, fakes, '/sell');
     await tester.tap(find.byKey(const Key('add-photos')));
     await settle(tester);
-    expect(find.text('Photos must be JPEG, PNG or WebP, up to 5 MB.'), findsOneWidget);
+    expect(
+      find.text('Photos must be JPEG, PNG or WebP, up to 5 MB.'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('publishes a listing through the three steps', (tester) async {
@@ -40,7 +44,10 @@ void main() {
     await settle(tester);
     await tester.enterText(find.byKey(const Key('field-title')), 'Desk lamp');
     await tester.enterText(find.byKey(const Key('field-price')), '45');
-    await tester.enterText(find.byKey(const Key('field-description')), 'Warm light.');
+    await tester.enterText(
+      find.byKey(const Key('field-description')),
+      'Warm light.',
+    );
     await tester.tap(find.byKey(const Key('field-category')));
     await settle(tester);
     await tester.tap(find.text('Home & Garden').last);

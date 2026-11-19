@@ -17,7 +17,9 @@ void main() {
     expect(find.text('Edit'), findsNothing);
   });
 
-  testWidgets('owners see Edit, Mark as sold and Delete instead of Message', (tester) async {
+  testWidgets('owners see Edit, Mark as sold and Delete instead of Message', (
+    tester,
+  ) async {
     final fakes = Fakes()
       ..auth.user = fakeUser()
       ..listings.listings = [Listing.fromJson(listingJson(isOwner: true))];
@@ -28,21 +30,27 @@ void main() {
     expect(find.text('Message seller'), findsNothing);
   });
 
-  testWidgets('visitors pressing Message seller go to login and back to the chat', (tester) async {
-    final fakes = Fakes();
-    final h = await pumpApp(tester, fakes, '/listing/1');
-    await tester.tap(find.text('Message seller'));
-    await settle(tester);
-    expect(h.location, '/login?from=%2Flisting%2F1%3Fchat%3D1');
-  });
+  testWidgets(
+    'visitors pressing Message seller go to login and back to the chat',
+    (tester) async {
+      final fakes = Fakes();
+      final h = await pumpApp(tester, fakes, '/listing/1');
+      await tester.tap(find.text('Message seller'));
+      await settle(tester);
+      expect(h.location, '/login?from=%2Flisting%2F1%3Fchat%3D1');
+    },
+  );
 
-  testWidgets('signed-in buyers pressing Message seller open the conversation', (tester) async {
-    final fakes = Fakes()..auth.user = fakeUser();
-    final h = await pumpApp(tester, fakes, '/listing/1');
-    await tester.tap(find.text('Message seller'));
-    await settle(tester);
-    expect(h.location, '/messages/5');
-  });
+  testWidgets(
+    'signed-in buyers pressing Message seller open the conversation',
+    (tester) async {
+      final fakes = Fakes()..auth.user = fakeUser();
+      final h = await pumpApp(tester, fakes, '/listing/1');
+      await tester.tap(find.text('Message seller'));
+      await settle(tester);
+      expect(h.location, '/messages/5');
+    },
+  );
 
   testWidgets('saving toggles the heart and calls the API', (tester) async {
     final fakes = Fakes()..auth.user = fakeUser();
@@ -53,8 +61,11 @@ void main() {
     expect(find.byTooltip('Remove from saved'), findsWidgets);
   });
 
-  testWidgets('sold listings show a badge and no Message button', (tester) async {
-    final fakes = Fakes()..listings.listings = [Listing.fromJson(listingJson(status: 'sold'))];
+  testWidgets('sold listings show a badge and no Message button', (
+    tester,
+  ) async {
+    final fakes = Fakes()
+      ..listings.listings = [Listing.fromJson(listingJson(status: 'sold'))];
     await pumpApp(tester, fakes, '/listing/1');
     expect(find.text('Sold'), findsWidgets);
     expect(find.text('Message seller'), findsNothing);
@@ -63,6 +74,9 @@ void main() {
   testWidgets('unknown listing shows the removed copy', (tester) async {
     final fakes = Fakes();
     await pumpApp(tester, fakes, '/listing/999');
-    expect(find.text("This listing doesn't exist or was removed."), findsOneWidget);
+    expect(
+      find.text("This listing doesn't exist or was removed."),
+      findsOneWidget,
+    );
   });
 }

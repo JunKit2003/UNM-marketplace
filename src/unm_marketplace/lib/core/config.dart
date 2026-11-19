@@ -11,7 +11,8 @@ String apiBase() {
 }
 
 /// Turns an API path like `/images/x.webp` into an absolute URL.
-String resolveUrl(String path) => path.startsWith('http') ? path : '${apiBase()}$path';
+String resolveUrl(String path) =>
+    path.startsWith('http') ? path : '${apiBase()}$path';
 
 const portfolioUrl = 'https://junkit.my';
 const githubUrl = 'https://github.com/JunKit2003/UNM-marketplace';

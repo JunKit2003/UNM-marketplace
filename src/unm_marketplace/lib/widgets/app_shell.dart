@@ -18,9 +18,24 @@ class _Dest {
 
 const _dests = [
   _Dest('/', 'Browse', Icons.explore_outlined, Icons.explore_rounded),
-  _Dest('/sell', 'Sell', Icons.add_circle_outline_rounded, Icons.add_circle_rounded),
-  _Dest('/messages', 'Messages', Icons.chat_bubble_outline_rounded, Icons.chat_bubble_rounded),
-  _Dest('/saved', 'Saved', Icons.favorite_border_rounded, Icons.favorite_rounded),
+  _Dest(
+    '/sell',
+    'Sell',
+    Icons.add_circle_outline_rounded,
+    Icons.add_circle_rounded,
+  ),
+  _Dest(
+    '/messages',
+    'Messages',
+    Icons.chat_bubble_outline_rounded,
+    Icons.chat_bubble_rounded,
+  ),
+  _Dest(
+    '/saved',
+    'Saved',
+    Icons.favorite_border_rounded,
+    Icons.favorite_rounded,
+  ),
   _Dest('/me', 'Profile', Icons.person_outline_rounded, Icons.person_rounded),
 ];
 
@@ -47,15 +62,21 @@ class AppShell extends ConsumerWidget {
     Widget icon(_Dest d, bool selected) {
       final i = Icon(selected ? d.selectedIcon : d.icon);
       if (d.path != '/messages' || unread == 0) return i;
-      return Badge(label: Text('$unread'), backgroundColor: AppTokens.pink, child: i);
+      return Badge(
+        label: Text('$unread'),
+        backgroundColor: AppTokens.pink,
+        child: i,
+      );
     }
 
     void go(int i) => context.go(_dests[i].path);
 
-    final body = Column(children: [
-      const DemoBanner(),
-      Expanded(child: child),
-    ]);
+    final body = Column(
+      children: [
+        const DemoBanner(),
+        Expanded(child: child),
+      ],
+    );
 
     if (!wide) {
       return Scaffold(
@@ -64,33 +85,56 @@ class AppShell extends ConsumerWidget {
           selectedIndex: index,
           onDestinationSelected: go,
           destinations: [
-            for (final (i, d) in _dests.indexed) NavigationDestination(icon: icon(d, false), selectedIcon: icon(d, i == index), label: d.label),
+            for (final (i, d) in _dests.indexed)
+              NavigationDestination(
+                icon: icon(d, false),
+                selectedIcon: icon(d, i == index),
+                label: d.label,
+              ),
           ],
         ),
       );
     }
 
     return Scaffold(
-      body: Row(children: [
-        DecoratedBox(
-          decoration: BoxDecoration(border: Border(right: BorderSide(color: Theme.of(context).colorScheme.outlineVariant))),
-          child: NavigationRail(
-            selectedIndex: index,
-            onDestinationSelected: go,
-            labelType: NavigationRailLabelType.all,
-            leading: Padding(
-              padding: const EdgeInsets.only(top: 16, bottom: 24),
-              child: Tooltip(message: 'Nott-A-Marketplace', child: InkWell(onTap: () => context.go('/'), child: const BrandMark())),
+      body: Row(
+        children: [
+          DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border(
+                right: BorderSide(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
+              ),
             ),
-            trailing: const Expanded(child: _RailFooter()),
-            destinations: [
-              for (final (i, d) in _dests.indexed)
-                NavigationRailDestination(icon: icon(d, false), selectedIcon: icon(d, i == index), label: Text(d.label)),
-            ],
+            child: NavigationRail(
+              selectedIndex: index,
+              onDestinationSelected: go,
+              labelType: NavigationRailLabelType.all,
+              leading: Padding(
+                padding: const EdgeInsets.only(top: 16, bottom: 24),
+                child: Tooltip(
+                  message: 'Nott-A-Marketplace',
+                  child: InkWell(
+                    onTap: () => context.go('/'),
+                    child: const BrandMark(),
+                  ),
+                ),
+              ),
+              trailing: const Expanded(child: _RailFooter()),
+              destinations: [
+                for (final (i, d) in _dests.indexed)
+                  NavigationRailDestination(
+                    icon: icon(d, false),
+                    selectedIcon: icon(d, i == index),
+                    label: Text(d.label),
+                  ),
+              ],
+            ),
           ),
-        ),
-        Expanded(child: body),
-      ]),
+          Expanded(child: body),
+        ],
+      ),
     );
   }
 }
@@ -106,22 +150,33 @@ class _RailFooter extends ConsumerWidget {
       alignment: Alignment.bottomCenter,
       child: Padding(
         padding: const EdgeInsets.only(bottom: 20),
-        child: Column(mainAxisSize: MainAxisSize.min, children: [
-          IconButton(
-            tooltip: 'About this project',
-            onPressed: () => context.go('/about'),
-            icon: const Icon(Icons.info_outline_rounded),
-          ),
-          IconButton(
-            tooltip: mode == ThemeMode.dark ? 'Light mode' : 'Dark mode',
-            onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
-            icon: Icon(mode == ThemeMode.dark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
-          ),
-          if (user != null) ...[
-            const SizedBox(height: 8),
-            InkWell(customBorder: const CircleBorder(), onTap: () => context.go('/me'), child: UserAvatar(user, size: 36)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              tooltip: 'About this project',
+              onPressed: () => context.go('/about'),
+              icon: const Icon(Icons.info_outline_rounded),
+            ),
+            IconButton(
+              tooltip: mode == ThemeMode.dark ? 'Light mode' : 'Dark mode',
+              onPressed: () => ref.read(themeModeProvider.notifier).toggle(),
+              icon: Icon(
+                mode == ThemeMode.dark
+                    ? Icons.light_mode_outlined
+                    : Icons.dark_mode_outlined,
+              ),
+            ),
+            if (user != null) ...[
+              const SizedBox(height: 8),
+              InkWell(
+                customBorder: const CircleBorder(),
+                onTap: () => context.go('/me'),
+                child: UserAvatar(user, size: 36),
+              ),
+            ],
           ],
-        ]),
+        ),
       ),
     );
   }
@@ -134,16 +189,29 @@ class BrandMark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          gradient: AppTokens.accent,
-          borderRadius: BorderRadius.circular(size * 0.3),
-          boxShadow: [BoxShadow(color: AppTokens.violet.withValues(alpha: 0.45), blurRadius: 18, offset: const Offset(0, 6))],
+    width: size,
+    height: size,
+    decoration: BoxDecoration(
+      gradient: AppTokens.accent,
+      borderRadius: BorderRadius.circular(size * 0.3),
+      boxShadow: [
+        BoxShadow(
+          color: AppTokens.violet.withValues(alpha: 0.45),
+          blurRadius: 18,
+          offset: const Offset(0, 6),
         ),
-        child: Center(
-          child: Text('N',
-              style: TextStyle(fontFamily: AppTokens.display, fontWeight: FontWeight.w700, color: Colors.white, fontSize: size * 0.5)),
+      ],
+    ),
+    child: Center(
+      child: Text(
+        'N',
+        style: TextStyle(
+          fontFamily: AppTokens.display,
+          fontWeight: FontWeight.w700,
+          color: Colors.white,
+          fontSize: size * 0.5,
         ),
-      );
+      ),
+    ),
+  );
 }

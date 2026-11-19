@@ -12,33 +12,64 @@ Fakes signedIn() => Fakes()..auth.user = fakeUser();
 
 void main() {
   testWidgets('inbox lists conversations with an unread badge', (tester) async {
-    final fakes = signedIn()..chat.conversations = [Conversation.fromJson(conversationJson(unread: 3))];
+    final fakes = signedIn()
+      ..chat.conversations = [
+        Conversation.fromJson(conversationJson(unread: 3)),
+      ];
     await pumpApp(tester, fakes, '/messages', size: const Size(390, 844));
     expect(find.text('Priya Nair'), findsOneWidget);
     expect(find.text('Still available?'), findsOneWidget);
     expect(find.byKey(const Key('unread-5')), findsOneWidget);
-    expect(find.descendant(of: find.byKey(const Key('unread-5')), matching: find.text('3')), findsOneWidget);
+    expect(
+      find.descendant(
+        of: find.byKey(const Key('unread-5')),
+        matching: find.text('3'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('empty inbox copy', (tester) async {
     final fakes = signedIn()..chat.conversations = [];
     await pumpApp(tester, fakes, '/messages');
-    expect(find.text('No chats yet. Find something you like and message the seller.'), findsOneWidget);
+    expect(
+      find.text(
+        'No chats yet. Find something you like and message the seller.',
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('thread shows history and marks it read on open', (tester) async {
     final fakes = signedIn();
-    await pumpApp(tester, fakes, '/messages/5', size: const Size(390, 844));
+    await pumpApp(tester, fakes, '/messages/5');
     expect(find.text('Hi!'), findsOneWidget);
     expect(find.text('LED desk lamp'), findsWidgets);
     expect(fakes.chat.reads, contains(5));
   });
 
-  testWidgets('incoming live message appears and is marked read', (tester) async {
+  testWidgets('on a phone the header keeps room for the name', (tester) async {
+    final fakes = signedIn();
+    await pumpApp(tester, fakes, '/messages/5', size: const Size(390, 844));
+    expect(find.byKey(const Key('thread-listing-title')), findsNothing);
+    expect(find.text('RM 45'), findsOneWidget);
+    final name = tester.getSize(find.byKey(const Key('thread-name')));
+    expect(name.width, greaterThan(120));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('incoming live message appears and is marked read', (
+    tester,
+  ) async {
     final fakes = signedIn();
     await pumpApp(tester, fakes, '/messages/5', size: const Size(390, 844));
     fakes.socket.readMarks.clear();
-    fakes.socket.messagesCtl.add(IncomingMessage(5, Message.fromJson(messageJson(id: 101, body: 'Yes, still here!'))));
+    fakes.socket.messagesCtl.add(
+      IncomingMessage(
+        5,
+        Message.fromJson(messageJson(id: 101, body: 'Yes, still here!')),
+      ),
+    );
     await settle(tester);
     expect(find.text('Yes, still here!'), findsOneWidget);
     expect(fakes.socket.readMarks, [5]);
@@ -55,10 +86,15 @@ void main() {
     expect(find.byKey(const Key('typing-dots')), findsNothing);
   });
 
-  testWidgets('sending shows the message straight away and confirms it', (tester) async {
+  testWidgets('sending shows the message straight away and confirms it', (
+    tester,
+  ) async {
     final fakes = signedIn();
     await pumpApp(tester, fakes, '/messages/5', size: const Size(390, 844));
-    await tester.enterText(find.byKey(const Key('composer')), 'Can we meet at the library?');
+    await tester.enterText(
+      find.byKey(const Key('composer')),
+      'Can we meet at the library?',
+    );
     await tester.testTextInput.receiveAction(TextInputAction.send);
     await tester.pump();
     expect(find.text('Can we meet at the library?'), findsOneWidget);
@@ -81,12 +117,23 @@ void main() {
     expect(find.text('Not sent. Tap to retry.'), findsNothing);
   });
 
-  testWidgets('a thread whose listing was removed disables the composer', (tester) async {
+  testWidgets('a thread whose listing was removed disables the composer', (
+    tester,
+  ) async {
     final fakes = signedIn()
-      ..chat.getError = ApiError(status: 404, code: 'not_found', message: 'This listing was removed.');
+      ..chat.getError = ApiError(
+        status: 404,
+        code: 'not_found',
+        message: 'This listing was removed.',
+      );
     await pumpApp(tester, fakes, '/messages/5', size: const Size(390, 844));
     expect(find.text('This listing was removed.'), findsOneWidget);
-    final field = tester.widget<TextField>(find.descendant(of: find.byKey(const Key('composer')), matching: find.byType(TextField)));
+    final field = tester.widget<TextField>(
+      find.descendant(
+        of: find.byKey(const Key('composer')),
+        matching: find.byType(TextField),
+      ),
+    );
     expect(field.enabled, isFalse);
   });
 
@@ -94,6 +141,9 @@ void main() {
     await pumpApp(tester, Fakes(), '/about');
     expect(find.text('How it was built'), findsWidgets);
     expect(find.text('View the Portfolio'), findsOneWidget);
-    expect(find.text('Demo site. Data resets nightly. Built by Jun Kit'), findsOneWidget);
+    expect(
+      find.text('Demo site. Data resets nightly. Built by Jun Kit'),
+      findsOneWidget,
+    );
   });
 }

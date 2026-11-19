@@ -19,10 +19,13 @@ void main() {
   });
 
   test('PageResult.fromJson maps items', () {
-    final p = PageResult.fromJson(
-      {'items': [listingJson()], 'page': 1, 'pageSize': 24, 'total': 1, 'hasMore': false},
-      Listing.fromJson,
-    );
+    final p = PageResult.fromJson({
+      'items': [listingJson()],
+      'page': 1,
+      'pageSize': 24,
+      'total': 1,
+      'hasMore': false,
+    }, Listing.fromJson);
     expect(p.items.single.title, 'LED desk lamp');
     expect(p.hasMore, isFalse);
   });

@@ -8,8 +8,12 @@ class TypingDots extends StatefulWidget {
   State<TypingDots> createState() => _TypingDotsState();
 }
 
-class _TypingDotsState extends State<TypingDots> with SingleTickerProviderStateMixin {
-  late final _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1100))..repeat();
+class _TypingDotsState extends State<TypingDots>
+    with SingleTickerProviderStateMixin {
+  late final _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1100),
+  )..repeat();
 
   @override
   void dispose() {
@@ -30,19 +34,33 @@ class _TypingDotsState extends State<TypingDots> with SingleTickerProviderStateM
         ),
         child: AnimatedBuilder(
           animation: _c,
-          builder: (_, _) => Row(mainAxisSize: MainAxisSize.min, children: [
-            for (var i = 0; i < 3; i++) ...[
-              if (i > 0) const SizedBox(width: 4),
-              Transform.translate(
-                offset: Offset(0, -4 * _bounce((_c.value - i * 0.15) % 1)),
-                child: Container(width: 7, height: 7, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
-              ),
+          builder: (_, _) => Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < 3; i++) ...[
+                if (i > 0) const SizedBox(width: 4),
+                Transform.translate(
+                  offset: Offset(0, -4 * _bounce((_c.value - i * 0.15) % 1)),
+                  child: Container(
+                    width: 7,
+                    height: 7,
+                    decoration: BoxDecoration(
+                      color: color,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ]),
+          ),
         ),
       ),
     );
   }
 
-  static double _bounce(double t) => t < 0.3 ? Curves.easeOut.transform(t / 0.3) : t < 0.6 ? 1 - Curves.easeIn.transform((t - 0.3) / 0.3) : 0;
+  static double _bounce(double t) => t < 0.3
+      ? Curves.easeOut.transform(t / 0.3)
+      : t < 0.6
+      ? 1 - Curves.easeIn.transform((t - 0.3) / 0.3)
+      : 0;
 }
