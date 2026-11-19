@@ -33,13 +33,14 @@ browser ─https─> host nginx (TLS, this VPS) ─> 127.0.0.1:8090 web (nginx +
 | Secret | `DEPLOY_HOST` | VPS hostname or IP |
 | Secret | `DEPLOY_USER` | SSH user that runs Docker |
 | Secret | `DEPLOY_SSH_KEY` | private key for that user (its public key in `~/.ssh/authorized_keys`) |
+| Secret | `DEPLOY_KNOWN_HOSTS` | Verified SSH host keys for the VPS |
 | Secret | `DEPLOY_PORT` | SSH port, if not 22 |
 | Variable | `DEPLOY_PATH` | only if not `~/apps/unm-marketplace` |
 | Environment | `production` | created automatically on the first run; add protection rules if wanted |
 
 Same secret names as ConsignCars. Until they're set, the deploy job passes with a warning and deploys nothing.
 
-**Packages:** after the first push to `main`, open the `unm-marketplace-api` and `unm-marketplace-web` packages on GitHub → Package settings → **Change visibility → Public**, so the VPS can pull without logging in. (Or run `docker login ghcr.io` on the VPS with a token that has `read:packages`.)
+**Packages:** CI builds for the ARM64 VPS and uses its job token to pull the GHCR images during deployment.
 
 ## 3. How a deploy works
 
