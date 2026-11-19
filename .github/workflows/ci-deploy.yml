@@ -42,7 +42,7 @@ jobs:
       run:
         working-directory: src/server
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
@@ -60,7 +60,7 @@ jobs:
       run:
         working-directory: src/unm_marketplace
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
@@ -79,7 +79,7 @@ jobs:
     env:
       PUSH: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
       - name: Log in to GHCR
         if: env.PUSH == 'true'
@@ -140,7 +140,7 @@ jobs:
       DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '~/apps/unm-marketplace' }}
       TAG: ${{ inputs.image_tag || github.sha }}
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Check deploy secrets
         id: secrets
         run: |
