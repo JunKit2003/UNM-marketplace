@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../core/api/models.dart';
@@ -24,7 +23,7 @@ class UserAvatar extends StatelessWidget {
       child: ClipOval(
         child: user.avatarUrl == null
             ? fallback
-            : CachedNetworkImage(imageUrl: resolveUrl(user.avatarUrl!), fit: BoxFit.cover, errorWidget: (_, _, _) => fallback),
+            : Image.network(resolveUrl(user.avatarUrl!), fit: BoxFit.cover, errorBuilder: (_, _, _) => fallback),
       ),
     );
   }
