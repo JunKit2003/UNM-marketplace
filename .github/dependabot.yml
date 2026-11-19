@@ -1,0 +1,17 @@
+version: 2
+updates:
+  # Keeps the SHA-pinned actions in ci-deploy.yml up to date.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+  - package-ecosystem: npm
+    directory: /src/server
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+  - package-ecosystem: pub
+    directory: /src/unm_marketplace
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5

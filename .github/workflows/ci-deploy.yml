@@ -42,8 +42,8 @@ jobs:
       run:
         working-directory: src/server
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 24
           cache: npm
@@ -60,8 +60,8 @@ jobs:
       run:
         working-directory: src/unm_marketplace
     steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
         with:
           channel: stable
           cache: true
@@ -79,17 +79,17 @@ jobs:
     env:
       PUSH: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
       - name: Log in to GHCR
         if: env.PUSH == 'true'
-        uses: docker/login-action@v3
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build web image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:
           context: src/unm_marketplace
           load: true
@@ -100,7 +100,7 @@ jobs:
         run: IMAGE=unm-marketplace-web:ci bash src/unm_marketplace/nginx/test.sh
       - name: Push web image
         if: env.PUSH == 'true'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:
           context: src/unm_marketplace
           push: true
@@ -109,7 +109,7 @@ jobs:
             ${{ env.IMAGE_PREFIX }}-web:latest
           cache-from: type=gha,scope=web
       - name: Build and push api image
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:
           context: src/server
           push: ${{ env.PUSH == 'true' }}
@@ -140,7 +140,7 @@ jobs:
       DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '~/apps/unm-marketplace' }}
       TAG: ${{ inputs.image_tag || github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - name: Check deploy secrets
         id: secrets
         run: |
