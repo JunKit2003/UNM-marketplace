@@ -61,6 +61,11 @@ cd src/unm_marketplace && flutter pub get && flutter analyze && flutter test
 
 # nginx routing, against the built web image
 IMAGE=unm-marketplace-web bash src/unm_marketplace/nginx/test.sh
+
+# Browser walkthrough of the acceptance spec + README screenshots (stack running)
+PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm ci --prefix e2e
+docker run --rm --network host --user "$(id -u):$(id -g)" -e HOME=/tmp -e BASE=http://localhost:8080 \
+  -v "$PWD":/repo -w /repo/e2e mcr.microsoft.com/playwright:v1.65.1-noble node showcase.mjs
 ```
 
 ## Deploying
