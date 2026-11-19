@@ -16,3 +16,22 @@ export const signupBody = (n = 1, extra = {}) => ({
   password: 'correct-horse-1',
   ...extra,
 });
+
+export const listingFields = (extra = {}) => ({
+  title: 'Desk lamp',
+  description: 'Warm white LED desk lamp, three brightness levels.',
+  price: '45',
+  categorySlug: 'home-garden',
+  condition: 'Like new',
+  ...extra,
+});
+
+/** POST /api/listings as multipart with `photos` PNGs. */
+export async function postListing(a, extra = {}, photoCount = 1) {
+  let req = a.post('/api/listings');
+  for (const [k, v] of Object.entries(listingFields(extra))) req = req.field(k, v);
+  for (let i = 0; i < photoCount; i++) {
+    req = req.attach('photos', await pngBuffer(40 + i, 30), `p${i}.png`);
+  }
+  return req;
+}
