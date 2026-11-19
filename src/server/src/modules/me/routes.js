@@ -31,7 +31,7 @@ export function registerMe(api, { pool, config, limits }) {
     if (!(await bcrypt.compare(currentPassword, user.password_hash))) {
       throw badRequest('Your current password is wrong.', { currentPassword: 'Your current password is wrong.' });
     }
-    await updateUser(pool, user.id, { passwordHash: await bcrypt.hash(newPassword, 12) });
+    await updateUser(pool, user.id, { passwordHash: await bcrypt.hash(newPassword, config.bcryptCost) });
     res.status(204).end();
   });
 

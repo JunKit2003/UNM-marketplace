@@ -35,6 +35,7 @@ export function testConfig(overrides = {}) {
     UPLOAD_DIR: overrides.UPLOAD_DIR ?? path.join(os.tmpdir(), 'unm-test-uploads'),
     SEED_DEMO: 'false',
     DEMO_REPLY_DELAY_MS: '0',
+    BCRYPT_COST: '4',
     ...overrides,
   });
 }

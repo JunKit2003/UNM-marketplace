@@ -19,6 +19,7 @@ const schema = z
     DEMO_REPLY_DELAY_MS: z.coerce.number().int().min(0).default(1500),
     TRUST_PROXY: bool.default(false),
     LOG_LEVEL: z.string().default('info'),
+    BCRYPT_COST: z.coerce.number().int().min(4).max(15).default(12),
   })
   .superRefine((cfg, ctx) => {
     if (cfg.NODE_ENV === 'production' && cfg.SESSION_SECRET.length < 32) {
@@ -48,5 +49,6 @@ export function loadConfig(env = process.env) {
     demoReplyDelayMs: c.DEMO_REPLY_DELAY_MS,
     trustProxy: c.TRUST_PROXY,
     logLevel: c.LOG_LEVEL,
+    bcryptCost: c.BCRYPT_COST,
   };
 }

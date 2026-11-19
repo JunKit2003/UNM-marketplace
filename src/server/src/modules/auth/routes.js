@@ -7,7 +7,6 @@ import { validate } from '../../http/validate.js';
 import { createGuest, findUserByEmail, findUserById, insertUser } from '../users/repo.js';
 import { serializeUser } from '../users/serialize.js';
 
-const BCRYPT_COST = 12;
 const EMAIL_TAKEN = 'That email is already registered.';
 const USERNAME_TAKEN = 'That username is taken.';
 const WRONG_LOGIN = 'Email or password is wrong.';
@@ -33,7 +32,7 @@ const loginSchema = z.object({
   password: z.string().min(1, 'Enter your password.'),
 });
 
-export function registerAuth(api, { pool, hooks, limits }) {
+export function registerAuth(api, { pool, config, hooks, limits }) {
   api.post('/auth/signup', limits.signup, validate(signupSchema), async (req, res) => {
     const b = req.valid.body;
     if (await findUserByEmail(pool, b.email)) {
@@ -41,7 +40,7 @@ export function registerAuth(api, { pool, hooks, limits }) {
     }
     let user;
     try {
-      user = await insertUser(pool, { ...b, passwordHash: await bcrypt.hash(b.password, BCRYPT_COST) });
+      user = await insertUser(pool, { ...b, passwordHash: await bcrypt.hash(b.password, config.bcryptCost) });
     } catch (err) {
       if (err.code !== 'ER_DUP_ENTRY') throw err;
       if (String(err.message).includes('uq_users_email')) throw new HttpError(409, 'conflict', EMAIL_TAKEN, { email: EMAIL_TAKEN });

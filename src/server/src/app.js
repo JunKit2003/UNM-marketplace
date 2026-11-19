@@ -6,6 +6,7 @@ import path from 'node:path';
 import { errorHandler, notFoundHandler } from './http/errors.js';
 import { createRateLimits } from './http/rateLimits.js';
 import { routes as defaultRoutes } from './routes.js';
+import { createChatService } from './modules/chat/service.js';
 
 const MySQLStore = MySQLStoreFactory(session);
 
@@ -52,6 +53,7 @@ export function createApp({ pool, config, sessionStore, routes = defaultRoutes, 
       res.status(503).json({ ok: false });
     }
   });
+  services.chat ??= createChatService({ pool, config });
   const limits = createRateLimits();
   for (const register of routes) register(api, { pool, config, hooks, services, limits });
   api.use(notFoundHandler);
@@ -61,5 +63,5 @@ export function createApp({ pool, config, sessionStore, routes = defaultRoutes, 
   app.use('/images', express.static(path.resolve(config.uploadDir), { maxAge: '7d', fallthrough: false }));
 
   app.use(errorHandler);
-  return { app, sessionMiddleware, store };
+  return { app, sessionMiddleware, store, services };
 }

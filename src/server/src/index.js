@@ -4,6 +4,7 @@ import { loadConfig } from './config.js';
 import { createPool } from './db/pool.js';
 import { migrate } from './db/migrate.js';
 import { logger } from './logger.js';
+import { attachSocket } from './modules/chat/socket.js';
 
 const config = loadConfig();
 const pool = createPool(config.db);
@@ -25,12 +26,14 @@ await waitForDb();
 const ran = await migrate(pool);
 if (ran.length) logger.info({ ran }, 'migrations applied');
 
-const { app } = createApp({ pool, config });
+const { app, sessionMiddleware, services } = createApp({ pool, config });
 const server = http.createServer(app);
+const io = attachSocket(server, { sessionMiddleware, chat: services.chat });
 server.listen(config.port, () => logger.info(`api listening on :${config.port}`));
 
 for (const sig of ['SIGTERM', 'SIGINT']) {
   process.on(sig, () => {
+    io.close();
     server.close(() => pool.end().finally(() => process.exit(0)));
   });
 }
