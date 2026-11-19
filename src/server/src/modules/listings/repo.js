@@ -2,7 +2,7 @@ import { PAGE_SIZE } from './schemas.js';
 import { serializeListing } from './serialize.js';
 
 const SELECT = `
-  SELECT l.*, c.slug AS category_slug, c.name AS category_name,
+  SELECT l.*, c.slug AS category_slug, c.name AS category_name, c.icon AS category_icon,
          u.username AS seller_username, u.first_name AS seller_first_name,
          u.last_name AS seller_last_name, u.avatar_path AS seller_avatar_path,
          (s.user_id IS NOT NULL) AS is_saved

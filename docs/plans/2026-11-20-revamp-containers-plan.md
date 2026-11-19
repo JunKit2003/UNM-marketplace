@@ -31,7 +31,7 @@ JSON shapes (camelCase, ISO-8601 timestamps):
 
 - `User`: `{ id, username, firstName, lastName, displayName, email, phone, avatarUrl|null, isGuest, createdAt }` (`email`, `phone` only on `/auth/me` and `/me`; public seller = `{ id, username, displayName, avatarUrl }`).
 - `Category`: `{ id, slug, name, icon, count }`.
-- `Listing`: `{ id, title, description, price, condition, status: "active"|"sold", category: {id, slug, name}, images: [{id, url, position}], coverUrl|null, seller: PublicUser, isSaved, isOwner, createdAt, updatedAt }`.
+- `Listing`: `{ id, title, description, price, condition, status: "active"|"sold", category: {id, slug, name, icon}, images: [{id, url, position}], coverUrl|null, seller: PublicUser, isSaved, isOwner, createdAt, updatedAt }`.
 - `Page<T>`: `{ items: T[], page, pageSize, total, hasMore }`.
 - `Conversation`: `{ id, listing: {id, title, price, status, coverUrl}, otherUser: PublicUser, lastMessage: {body, senderId, createdAt}|null, unreadCount, updatedAt }`.
 - `Message`: `{ id, conversationId, senderId, body, createdAt, readAt|null }`.

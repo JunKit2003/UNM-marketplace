@@ -140,6 +140,9 @@ ThemeData buildTheme(Brightness brightness) {
     navigationBarTheme: NavigationBarThemeData(
       backgroundColor: dark ? const Color(0xE60B1020) : const Color(0xF2FFFFFF),
       indicatorColor: AppTokens.violet.withValues(alpha: 0.22),
+      iconTheme: WidgetStateProperty.resolveWith(
+        (states) => IconThemeData(color: states.contains(WidgetState.selected) ? (dark ? Colors.white : AppTokens.violet) : scheme.onSurfaceVariant),
+      ),
       labelTextStyle: WidgetStatePropertyAll(
         _ui(
           TextStyle(
@@ -154,6 +157,8 @@ ThemeData buildTheme(Brightness brightness) {
     navigationRailTheme: NavigationRailThemeData(
       backgroundColor: Colors.transparent,
       indicatorColor: AppTokens.violet.withValues(alpha: 0.22),
+      selectedIconTheme: IconThemeData(color: dark ? Colors.white : AppTokens.violet),
+      unselectedIconTheme: IconThemeData(color: scheme.onSurfaceVariant),
       selectedLabelTextStyle: _ui(
         TextStyle(
           fontSize: 12,

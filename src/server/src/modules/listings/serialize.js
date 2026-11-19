@@ -17,7 +17,7 @@ export function serializeListing(row, images, viewerId) {
     price: Number(row.price),
     condition: row.condition,
     status: row.status,
-    category: { id: row.category_id, slug: row.category_slug, name: row.category_name },
+    category: { id: row.category_id, slug: row.category_slug, name: row.category_name, icon: row.category_icon },
     images: imgs,
     coverUrl: imgs[0]?.url ?? null,
     seller: serializePublicUser({

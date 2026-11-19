@@ -28,7 +28,7 @@ describe('create listing', () => {
       price: 45,
       condition: 'Like new',
       status: 'active',
-      category: { slug: 'home-garden', name: 'Home & Garden' },
+      category: { slug: 'home-garden', name: 'Home & Garden', icon: 'chair' },
       seller: { username: 'amy1', displayName: 'Amy Tester1' },
       isOwner: true,
       isSaved: false,

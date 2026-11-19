@@ -6,6 +6,16 @@ import 'package:unm_marketplace/theme/app_theme.dart';
 /// Every label must use a bundled font. A style without a family falls back to
 /// Roboto from Google's CDN, which renders blank when that request fails.
 void main() {
+  test('selected navigation icons stay readable on the dark theme', () {
+    final t = buildTheme(Brightness.dark);
+    final bar = t.navigationBarTheme.iconTheme?.resolve({WidgetState.selected})?.color;
+    final rail = t.navigationRailTheme.selectedIconTheme?.color;
+    for (final c in [bar, rail]) {
+      expect(c, isNotNull);
+      expect(c!.computeLuminance(), greaterThan(0.5));
+    }
+  });
+
   for (final brightness in Brightness.values) {
     testWidgets('labels use bundled fonts ($brightness)', (tester) async {
       await tester.pumpWidget(
