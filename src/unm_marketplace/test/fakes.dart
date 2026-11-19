@@ -8,6 +8,7 @@ import 'package:unm_marketplace/core/realtime/chat_socket.dart';
 import 'package:unm_marketplace/core/repositories/auth_repository.dart';
 import 'package:unm_marketplace/core/repositories/chat_repository.dart';
 import 'package:unm_marketplace/core/repositories/listings_repository.dart';
+import 'package:unm_marketplace/features/sell/photo_picker.dart';
 import 'package:unm_marketplace/state/providers.dart';
 
 import 'samples.dart';
@@ -173,6 +174,7 @@ class Fakes {
   final listings = FakeListingsRepository();
   final chat = FakeChatRepository();
   final socket = FakeChatSocket();
+  List<PickedPhoto> nextPicked = [];
 
   List<Override> overrides() => [
         dioProvider.overrideWithValue(Dio()),
@@ -180,5 +182,6 @@ class Fakes {
         listingsRepositoryProvider.overrideWithValue(listings),
         chatRepositoryProvider.overrideWithValue(chat),
         chatSocketProvider.overrideWithValue(socket),
+        photoPickerProvider.overrideWithValue(() async => nextPicked),
       ];
 }
