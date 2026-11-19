@@ -21,6 +21,17 @@ describe('chat socket', () => {
     await expect(world.socketFor(null)).rejects.toThrow('unauthenticated');
   });
 
+  it('rejects a handshake from another site', async () => {
+    world = await chatWorld();
+    await expect(world.socketFor(world.users.buyer.cookie, { origin: 'https://evil.example' })).rejects.toThrow();
+  });
+
+  it('accepts a handshake from its own origin', async () => {
+    world = await chatWorld();
+    const s = await world.socketFor(world.users.buyer.cookie, { origin: world.base });
+    expect(s.connected).toBe(true);
+  });
+
   it('delivers a sent message to the other participant within 2 seconds', async () => {
     const { conv, buyer, seller, users } = await start();
     const incoming = once(seller, 'message:new', 2000);

@@ -22,9 +22,10 @@ export async function chatWorld({ configOverrides = {} } = {}) {
   const listing = (await postListing(users.seller.agent, { title: 'Desk lamp' })).body;
 
   const sockets = [];
-  const socketFor = (cookie) =>
+  const socketFor = (cookie, extra = {}) =>
     new Promise((resolve, reject) => {
-      const s = connect(base, { transports: ['websocket'], extraHeaders: cookie ? { cookie } : {}, reconnection: false });
+      const headers = { ...(cookie ? { cookie } : {}), ...extra };
+      const s = connect(base, { transports: ['websocket'], extraHeaders: headers, reconnection: false });
       sockets.push(s);
       s.on('connect', () => resolve(s));
       s.on('connect_error', reject);

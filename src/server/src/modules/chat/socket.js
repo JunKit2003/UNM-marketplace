@@ -9,8 +9,27 @@ const MESSAGES_PER_MINUTE = 60;
  * Socket.IO on the same HTTP server, sharing the Express session. Each socket joins
  * `user:<id>` so the chat service can reach every tab a user has open.
  */
+/**
+ * Only same-origin browsers may open a socket (blocks cross-site WebSocket hijacking).
+ * Requests without an Origin header (non-browser clients) still need a valid session.
+ */
+export function sameOrigin(req) {
+  const origin = req.headers.origin;
+  if (!origin) return true;
+  const host = req.headers['x-forwarded-host'] ?? req.headers.host;
+  try {
+    return new URL(origin).host === host;
+  } catch {
+    return false;
+  }
+}
+
 export function attachSocket(httpServer, { sessionMiddleware, chat }) {
-  const io = new Server(httpServer, { path: '/socket.io', serveClient: false });
+  const io = new Server(httpServer, {
+    path: '/socket.io',
+    serveClient: false,
+    allowRequest: (req, cb) => cb(null, sameOrigin(req)),
+  });
   io.engine.use(sessionMiddleware);
 
   io.use((socket, next) => {
