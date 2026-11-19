@@ -18,7 +18,7 @@ const MySQLStore = MySQLStoreFactory(session);
 export function createApp({ pool, config, sessionStore, routes = defaultRoutes, hooks = {}, services = {} } = {}) {
   const app = express();
   app.disable('x-powered-by');
-  if (config.trustProxy) app.set('trust proxy', 1);
+  if (config.trustProxy) app.set('trust proxy', config.trustProxy);
   app.locals.pool = pool;
   app.locals.config = config;
 

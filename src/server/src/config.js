@@ -17,7 +17,8 @@ const schema = z
     UPLOAD_DIR: z.string().default('/app/uploads'),
     SEED_DEMO: bool.default(true),
     DEMO_REPLY_DELAY_MS: z.coerce.number().int().min(0).default(1500),
-    TRUST_PROXY: bool.default(false),
+    // Number of reverse proxies in front of the api (0 = none). Local compose: 1, VPS: 2.
+    TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
     LOG_LEVEL: z.string().default('info'),
     BCRYPT_COST: z.coerce.number().int().min(4).max(15).default(12),
   })
