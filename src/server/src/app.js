@@ -4,6 +4,8 @@ import MySQLStoreFactory from 'express-mysql-session';
 import helmet from 'helmet';
 import path from 'node:path';
 import { errorHandler, notFoundHandler } from './http/errors.js';
+import { createRateLimits } from './http/rateLimits.js';
+import { routes as defaultRoutes } from './routes.js';
 
 const MySQLStore = MySQLStoreFactory(session);
 
@@ -11,7 +13,7 @@ const MySQLStore = MySQLStoreFactory(session);
  * Build the Express app. Feature routers register themselves through `routes`.
  * Returns the app plus the session middleware so Socket.IO can share sessions.
  */
-export function createApp({ pool, config, sessionStore, routes = defaultRoutes } = {}) {
+export function createApp({ pool, config, sessionStore, routes = defaultRoutes, hooks = {}, services = {} } = {}) {
   const app = express();
   app.disable('x-powered-by');
   if (config.trustProxy) app.set('trust proxy', 1);
@@ -50,7 +52,8 @@ export function createApp({ pool, config, sessionStore, routes = defaultRoutes }
       res.status(503).json({ ok: false });
     }
   });
-  for (const register of routes) register(api, { pool, config });
+  const limits = createRateLimits();
+  for (const register of routes) register(api, { pool, config, hooks, services, limits });
   api.use(notFoundHandler);
   app.use('/api', api);
 
@@ -60,7 +63,3 @@ export function createApp({ pool, config, sessionStore, routes = defaultRoutes }
   app.use(errorHandler);
   return { app, sessionMiddleware, store };
 }
-
-// Feature modules append to this list (see src/routes.js).
-const defaultRoutes = [];
-export { defaultRoutes };
