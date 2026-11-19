@@ -1,78 +1,46 @@
 name: unm_marketplace
-description: A new Flutter project.
-# The following line prevents the package from being accidentally published to
-# pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-
-# The following defines the version and build number for your application.
-# A version number is three numbers separated by dots, like 1.2.43
-# followed by an optional build number separated by a +.
-# Both the version and the builder number may be overridden in flutter
-# build by specifying --build-name and --build-number, respectively.
-# In Android, build-name is used as versionName while build-number used as versionCode.
-# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
-# Read more about iOS versioning at
-# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-# In Windows, build-name is used as the major, minor, and patch parts
-# of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+description: "Nott-A-Marketplace: buy, sell and swap on the UNM campus."
+publish_to: 'none'
+version: 2.0.0+1
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'  
+  sdk: ^3.12.0
 
 dependencies:
+  desktop_drop: ^0.8.4
+  dio: ^5.11.1
   flutter:
     sdk: flutter
-  dio: ^5.3.2
-  provider: ^6.0.0
-  http: ^0.13.3
-  google_fonts: ^4.0.1
-  cupertino_icons: ^1.0.2
-  stream_chat_flutter_core: ^7.0.1
-  jiffy: ^6.2.2
-  logger: ^2.0.2+1
-  collection: ^1.17.2
-  cached_network_image: ^3.3.1
-  dio_cookie_manager: ^3.1.1
-  cookie_jar: ^4.0.8
-  image_picker: ^1.0.7
-  intl: ^0.19.0
-  meta: ^1.9.1
-  universal_io: ^2.2.2
-  carousel_slider: ^4.2.1
-  dotted_border: ^2.1.0
+  flutter_animate: ^4.5.2
+  flutter_riverpod: ^3.5.0
+  flutter_web_plugins:
+    sdk: flutter
+  go_router: ^18.1.4
+  image_picker: ^1.2.4
+  intl: ^0.20.2
+  socket_io_client: ^3.1.6
+  url_launcher: ^6.3.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/DefaultProfilePicture.jpg
-    - assets\NoImageAvailable.jpg
-    - assets/images.png
-    - assets/all_image.png
-    - assets/SEimage.png
-    - assets/books_image.png
-    - assets/vehicles_image.png
-    - assets/property_rentals_image.png
-    - assets/home_garden_image.png
-    - assets/electronics_image.png
-    - assets/hobbies_image.png
-    - assets/clothing_accessories_image.png
-    - assets/family_image.png
-    - assets/entertainment_image.png
-    - assets/other_image.png
-    - assets/close_image.png
-    - assets/advertisement.png
-    - assets/mobile_image.png
-    - assets/mobile_advertisement.png
-    - assets/logo.jpg
-    - assets/university-of-nottingham.jpg
-    - assets/wpp2.png
-    - assets/wpp1.jpg
-    - assets/advertisement2.png
-    
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-400.ttf
+        - asset: assets/fonts/Inter-500.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-600.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-700.ttf
+          weight: 700
+    - family: SpaceGrotesk
+      fonts:
+        - asset: assets/fonts/SpaceGrotesk-500.ttf
+          weight: 500
+        - asset: assets/fonts/SpaceGrotesk-700.ttf
+          weight: 700

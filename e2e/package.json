@@ -1,0 +1,9 @@
+{
+  "name": "unm-marketplace-e2e",
+  "private": true,
+  "type": "module",
+  "description": "Browser walkthrough of the showcase against a running stack (see README).",
+  "devDependencies": {
+    "playwright": "^1.65.1"
+  }
+}

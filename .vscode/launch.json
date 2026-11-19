@@ -1,23 +1,23 @@
 {
-    "version": "0.2.0",
-    "configurations": [
-      {
-        "name": "Flutter Web",
-        "request": "launch",
-        "type": "dart",
-        "args": ["-d", "chrome", "--web-port=8000"]
-      },
-      {
-        "name": "Flutter Windows",
-        "request": "launch",
-        "type": "dart",
-        "args": ["-d", "windows"]
-      },
-      {
-        "name": "Flutter Android",
-        "request": "launch",
-        "type": "dart",
-        "args": ["-d", "emulator-5554"]
-      }
-    ]
-  }  
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // UI work only: the API expects the same origin, so for the full app use the
+      // compose stack at http://localhost:8080 (docker compose up -d --build web).
+      "name": "Flutter Web",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "src/unm_marketplace",
+      "program": "lib/main.dart",
+      "args": ["-d", "web-server", "--web-port=8000"]
+    },
+    {
+      "name": "Flutter Android",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "src/unm_marketplace",
+      "program": "lib/main.dart",
+      "args": ["-d", "emulator-5554"]
+    }
+  ]
+}

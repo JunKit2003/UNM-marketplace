@@ -1,0 +1,53 @@
+# Production stack on the VPS. CI copies this file and deploy/remote-deploy.sh into
+# $DEPLOY_PATH and runs: IMAGE_TAG=<commit sha> docker compose -f compose.prod.yaml up -d
+# The host nginx (TLS) proxies unm.junkit.my to WEB_BIND. See docs/deploy-handoff.md.
+name: unm-marketplace
+
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:?set DB_ROOT_PASSWORD in .env}
+      MYSQL_DATABASE: ${DB_NAME:-unm}
+      MYSQL_USER: ${DB_USER:-unm}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${DB_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  api:
+    image: ghcr.io/junkit2003/unm-marketplace-api:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      DB_HOST: db
+      DB_PORT: 3306
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  web:
+    image: ghcr.io/junkit2003/unm-marketplace-web:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    ports:
+      - "${WEB_BIND:-127.0.0.1:8090}:80"
+    depends_on:
+      - api
+
+volumes:
+  db-data:
+  uploads:

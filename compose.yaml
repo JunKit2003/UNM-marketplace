@@ -1,0 +1,73 @@
+# Local development stack: `cp .env.example .env && docker compose up -d --build`
+# Site: http://localhost:8080   Adminer: `docker compose --profile dev up -d adminer` → http://localhost:8081
+name: unm-marketplace
+
+services:
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: ${DB_NAME:-unm}
+      MYSQL_USER: ${DB_USER:-unm}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-unmpass}
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "127.0.0.1:${DB_PUBLISH_PORT:-3307}:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${DB_ROOT_PASSWORD:-rootpass}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  api:
+    build:
+      context: ./src/server
+      secrets: [npm_ca]
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-unm}
+      DB_USER: ${DB_USER:-unm}
+      DB_PASSWORD: ${DB_PASSWORD:-unmpass}
+      UPLOAD_DIR: /app/uploads
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  web:
+    build:
+      context: ./src/unm_marketplace
+      secrets: [npm_ca]
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      - api
+
+  adminer:
+    image: adminer:latest
+    profiles: ["dev"]
+    ports:
+      - "127.0.0.1:8081:8080"
+    depends_on:
+      - db
+
+# Extra CA bundle for TLS-inspecting networks (see README). Empty file = not used.
+secrets:
+  npm_ca:
+    file: ${NPM_CA_FILE:-./deploy/empty-ca.pem}
+
+volumes:
+  db-data:
+  uploads:

@@ -1,0 +1,274 @@
+[
+  {
+    "slug": "calculus-textbook",
+    "seller": "wei.jie",
+    "category": "books",
+    "title": "Calculus: Early Transcendentals (9th ed.)",
+    "price": 85,
+    "condition": "Lightly used",
+    "query": "textbook stack",
+    "description": "Used for Foundation Maths 1 and 2. A few pencil notes in chapter 3, otherwise clean. Saves you RM200 on a new copy."
+  },
+  {
+    "slug": "engineering-books",
+    "seller": "priya",
+    "category": "books",
+    "title": "Engineering Mathematics bundle (3 books)",
+    "price": 120,
+    "condition": "Well used",
+    "query": "pile of books",
+    "description": "Stroud's Engineering Mathematics, Advanced Engineering Mathematics and a Matlab guide. Highlighted, but every page is there."
+  },
+  {
+    "slug": "novel-set",
+    "seller": "aisyah",
+    "category": "books",
+    "title": "Haruki Murakami novel set",
+    "price": 60,
+    "condition": "Like new",
+    "query": "novels on shelf",
+    "description": "Norwegian Wood, Kafka on the Shore and 1Q84 (book 1). Read once each. Perfect for the semester break."
+  },
+  {
+    "slug": "macbook-air",
+    "seller": "wei.jie",
+    "category": "electronics",
+    "title": "MacBook Air M2 13\" 256 GB",
+    "price": 3200,
+    "condition": "Like new",
+    "query": "macbook laptop desk",
+    "description": "Midnight colour, 8 GB RAM, battery health 96%. Always used with a case. Comes with the original charger and box."
+  },
+  {
+    "slug": "headphones",
+    "seller": "priya",
+    "category": "electronics",
+    "title": "Earphones with in-line mic",
+    "price": 35,
+    "condition": "Like new",
+    "query": "headphones",
+    "description": "Clear sound and a mic that works well for online tutorials. Spare ear tips included."
+  },
+  {
+    "slug": "mechanical-keyboard",
+    "seller": "aisyah",
+    "category": "electronics",
+    "title": "Mechanical keyboard, brown switches",
+    "price": 180,
+    "condition": "Lightly used",
+    "query": "mechanical keyboard",
+    "description": "75% layout, hot-swappable, white backlight. Selling because I moved to a laptop-only setup."
+  },
+  {
+    "slug": "mirrorless-camera",
+    "seller": "wei.jie",
+    "category": "electronics",
+    "title": "Mirrorless camera kit with 15-45mm lens",
+    "price": 1800,
+    "condition": "Well used",
+    "query": "camera",
+    "status": "sold",
+    "description": "Great starter camera for the photography club. Two batteries, 64 GB card and a strap."
+  },
+  {
+    "slug": "desk-lamp",
+    "seller": "priya",
+    "category": "home-garden",
+    "title": "LED desk lamp with USB charging",
+    "price": 45,
+    "condition": "Like new",
+    "query": "desk lamp",
+    "description": "Three colour temperatures and five brightness levels. USB port in the base charges your phone overnight."
+  },
+  {
+    "slug": "rice-cooker",
+    "seller": "aisyah",
+    "category": "home-garden",
+    "title": "Rice cooker 1.0 L",
+    "price": 70,
+    "condition": "Lightly used",
+    "query": "rice cooker",
+    "description": "Perfect for hostel cooking, makes rice for 2–3 people. Non-stick pot in good shape, comes with the steaming tray."
+  },
+  {
+    "slug": "monstera",
+    "seller": "wei.jie",
+    "category": "home-garden",
+    "title": "Monstera plant with ceramic pot",
+    "price": 55,
+    "condition": "Brand new",
+    "query": "monstera plant pot",
+    "description": "About 60 cm tall and very healthy. Easy to care for, brightens up any room."
+  },
+  {
+    "slug": "study-chair",
+    "seller": "priya",
+    "category": "home-garden",
+    "title": "Ergonomic study chair",
+    "price": 220,
+    "condition": "Well used",
+    "query": "office chair",
+    "description": "Mesh back, adjustable height and armrests. Your back will thank you during finals week."
+  },
+  {
+    "slug": "jacket",
+    "seller": "wei.jie",
+    "category": "clothing-accessories",
+    "title": "Yellow utility jacket, size M",
+    "price": 95,
+    "condition": "Like new",
+    "query": "denim jacket",
+    "description": "Light, water-resistant and very bright, so you will never lose it in the library. Worn twice."
+  },
+  {
+    "slug": "backpack",
+    "seller": "priya",
+    "category": "clothing-accessories",
+    "title": "Leather backpack with laptop sleeve",
+    "price": 140,
+    "condition": "Lightly used",
+    "query": "backpack",
+    "description": "Fits a 15\" laptop. Lots of pockets. Small scuff on the bottom, otherwise like new."
+  },
+  {
+    "slug": "folding-bike",
+    "seller": "aisyah",
+    "category": "vehicles",
+    "title": "Foldable bicycle, 7 speeds",
+    "price": 480,
+    "condition": "Well used",
+    "query": "folding bicycle",
+    "description": "The fastest way between the hostels and the Trent Building. New tyres last month. Lock included."
+  },
+  {
+    "slug": "kick-scooter",
+    "seller": "wei.jie",
+    "category": "vehicles",
+    "title": "Foldable kick scooter",
+    "price": 150,
+    "condition": "Lightly used",
+    "query": "kick scooter",
+    "description": "Folds in two seconds and fits under a lecture-hall seat. Quick way from the hostels to the Trent Building."
+  },
+  {
+    "slug": "helmet",
+    "seller": "priya",
+    "category": "vehicles",
+    "title": "Motorcycle helmet, size L",
+    "price": 90,
+    "condition": "Lightly used",
+    "query": "motorcycle helmet",
+    "description": "SIRIM certified, clear visor. Never dropped."
+  },
+  {
+    "slug": "semenyih-room",
+    "seller": "aisyah",
+    "category": "property-rentals",
+    "title": "Room in Taman Tasik Semenyih, 5 min drive",
+    "price": 450,
+    "condition": "Like new",
+    "query": "bedroom interior",
+    "description": "RM450 per month. Furnished single room in a 3-room house with two other UNM students. Wi-Fi and water included."
+  },
+  {
+    "slug": "condo-room",
+    "seller": "wei.jie",
+    "category": "property-rentals",
+    "title": "Shared condo room near campus, Jan–Jun",
+    "price": 600,
+    "condition": "Like new",
+    "query": "apartment living room",
+    "description": "RM600 per month. Pool, gym and 24-hour security. Looking for a tidy housemate for the spring semester."
+  },
+  {
+    "slug": "guitar",
+    "seller": "priya",
+    "category": "hobbies",
+    "title": "Acoustic guitar with soft case",
+    "price": 350,
+    "condition": "Lightly used",
+    "query": "acoustic guitar",
+    "description": "Full-size dreadnought, warm sound, new strings. Comes with a capo and picks."
+  },
+  {
+    "slug": "badminton",
+    "seller": "aisyah",
+    "category": "hobbies",
+    "title": "Badminton racket pair + shuttles",
+    "price": 120,
+    "condition": "Lightly used",
+    "query": "badminton racket",
+    "description": "Two rackets with bag and a tube of shuttlecocks. Ready for the sports complex."
+  },
+  {
+    "slug": "game-console",
+    "seller": "wei.jie",
+    "category": "hobbies",
+    "title": "Handheld game console with 3 games",
+    "price": 1100,
+    "condition": "Like new",
+    "query": "game controller",
+    "description": "Screen protector on since day one. Includes three games and a carry case."
+  },
+  {
+    "slug": "board-games",
+    "seller": "priya",
+    "category": "family",
+    "title": "Board games bundle",
+    "price": 110,
+    "condition": "Lightly used",
+    "query": "board game",
+    "description": "Catan, Uno and Codenames. All pieces counted. Perfect for hostel game nights."
+  },
+  {
+    "slug": "vinyl",
+    "seller": "aisyah",
+    "category": "entertainment",
+    "title": "Vinyl records lot (10)",
+    "price": 200,
+    "condition": "Well used",
+    "query": "vinyl records",
+    "description": "Mix of jazz, city pop and indie. Sleeves have wear, the records play well."
+  },
+  {
+    "slug": "projector",
+    "seller": "wei.jie",
+    "category": "entertainment",
+    "title": "Mini projector for movie nights",
+    "price": 380,
+    "condition": "Lightly used",
+    "query": "projector",
+    "description": "1080p, HDMI and USB. Throws a 100\" picture on a hostel wall."
+  },
+  {
+    "slug": "stroller",
+    "seller": "priya",
+    "category": "family",
+    "title": "Lightweight baby stroller",
+    "price": 300,
+    "condition": "Lightly used",
+    "query": "pram",
+    "description": "Folds with one hand, rain cover included. For staff and postgrad families on campus."
+  },
+  {
+    "slug": "camping-tent",
+    "seller": "priya",
+    "category": "other",
+    "title": "Camping tent, 2 person",
+    "price": 130,
+    "condition": "Lightly used",
+    "query": "camping tent",
+    "description": "Used for one trip to Broga Hill. Easy to set up, waterproof."
+  },
+  {
+    "slug": "calculator",
+    "seller": "aisyah",
+    "category": "other",
+    "title": "Scientific calculator (exam approved)",
+    "price": 45,
+    "condition": "Lightly used",
+    "query": "calculator",
+    "status": "sold",
+    "description": "Approved for UNM exams. New battery."
+  }
+]

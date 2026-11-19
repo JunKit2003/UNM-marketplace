@@ -1,2 +1,6 @@
-src/server/.env
-src/server/node_modules
+.env
+**/node_modules
+.superpowers/
+.worktrees/
+**/build/
+**/.dart_tool/
