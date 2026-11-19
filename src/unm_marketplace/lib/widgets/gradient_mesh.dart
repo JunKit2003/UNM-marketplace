@@ -33,7 +33,8 @@ class _GradientMeshState extends State<GradientMesh>
     final dark = Theme.of(context).brightness == Brightness.dark;
     final reduceMotion = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
     if (reduceMotion && _t.isAnimating) _t.stop();
-    return MouseRegion(
+    // Clip: the blobs are larger than the box and would otherwise bleed over the page.
+    return ClipRect(child: MouseRegion(
       onHover: (e) {
         final size = context.size;
         if (size == null || size.isEmpty) return;
@@ -52,7 +53,7 @@ class _GradientMeshState extends State<GradientMesh>
         ),
         child: widget.child,
       ),
-    );
+    ));
   }
 }
 

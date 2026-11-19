@@ -4,17 +4,17 @@
 
 **Live demo: [unm.junkit.my](https://unm.junkit.my)** · press **Try the demo** for a guest account. No sign-up needed, and visitor data resets every night.
 
-![Browse page](docs/screenshots/browse-desktop.png)
+![Browse page](docs/screenshots/browse-desktop.jpg)
 
 <p>
-  <img src="docs/screenshots/listing-desktop.png" width="49%" alt="Listing page">
-  <img src="docs/screenshots/chat-desktop.png" width="49%" alt="Live chat">
+  <img src="docs/screenshots/listing-desktop.jpg" width="49%" alt="Listing page">
+  <img src="docs/screenshots/chat-desktop.jpg" width="49%" alt="Live chat">
 </p>
 <p>
-  <img src="docs/screenshots/browse-phone.png" width="24%" alt="Browse on a phone">
-  <img src="docs/screenshots/sell-phone.png" width="24%" alt="Sell flow on a phone">
-  <img src="docs/screenshots/chat-phone.png" width="24%" alt="Chat on a phone">
-  <img src="docs/screenshots/login-phone.png" width="24%" alt="Login on a phone">
+  <img src="docs/screenshots/browse-phone.jpg" width="24%" alt="Browse on a phone">
+  <img src="docs/screenshots/sell-phone.jpg" width="24%" alt="Sell flow on a phone">
+  <img src="docs/screenshots/chat-phone.jpg" width="24%" alt="Chat on a phone">
+  <img src="docs/screenshots/login-phone.jpg" width="24%" alt="Login on a phone">
 </p>
 
 ## Features

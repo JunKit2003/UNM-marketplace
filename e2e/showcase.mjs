@@ -64,8 +64,10 @@ async function waitText(page, t, timeout = 8000) {
   await text(page, t).waitFor({ state: 'attached', timeout });
 }
 async function shot(page, name) {
-  await page.waitForTimeout(1500);
-  await page.screenshot({ path: path.join(SHOTS, `${name}.png`) });
+  // Let photos download, decode and finish their fade-in.
+  await page.waitForFunction(() => [...document.images].every((i) => i.complete), null, { timeout: 15000 }).catch(() => {});
+  await page.waitForTimeout(3000);
+  await page.screenshot({ path: path.join(SHOTS, `${name}.jpg`), type: 'jpeg', quality: 84 });
 }
 async function api(ctx, method, url, body) {
   const r = await ctx.request[method](BASE + url, body ? { data: body } : undefined);
@@ -117,6 +119,20 @@ await check('RV03 protected pages send visitors to log in and remember where', a
   const from = new URL(vp.url()).searchParams.get('from');
   expect(new URL(vp.url()).pathname === '/login' && from === '/saved', `url is ${vp.url()}`);
 });
+
+// ---------- Phone (before any test data is created, for clean screenshots) ----------
+const phone = await newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+const pp = await phone.newPage();
+
+await check('phone: browse renders with bottom navigation', async () => {
+  await open(pp, '/');
+  await waitText(pp, 'Buy, sell and swap on campus.');
+  await text(pp, 'Browse').waitFor({ state: 'attached' });
+});
+await shot(pp, 'browse-phone');
+
+await open(pp, '/login');
+await shot(pp, 'login-phone');
 
 // ---------- Desktop guest (Try the demo) ----------
 await check('RV08 Try the demo signs in a fresh guest with starter content', async () => {
@@ -186,20 +202,7 @@ await check('RV06 outsiders cannot read a conversation', async () => {
   await outsider.close();
 });
 
-// ---------- Phone ----------
-const phone = await newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
-const pp = await phone.newPage();
-
-await check('phone: browse renders with bottom navigation', async () => {
-  await open(pp, '/');
-  await waitText(pp, 'Buy, sell and swap on campus.');
-  await text(pp, 'Browse').waitFor({ state: 'attached' });
-});
-await shot(pp, 'browse-phone');
-
-await open(pp, '/login');
-await shot(pp, 'login-phone');
-
+// ---------- Phone, signed in ----------
 await check('RV04 sell flow on a phone: photo → details → review → publish', async () => {
   await api(phone, 'post', '/api/auth/demo');
   await open(pp, '/sell');
