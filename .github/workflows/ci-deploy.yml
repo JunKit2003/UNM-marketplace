@@ -68,6 +68,12 @@ jobs:
       - run: flutter pub get
       - run: flutter analyze --no-fatal-infos
       - run: flutter test
+      - run: flutter build web --release --no-web-resources-cdn
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: flutter-web
+          path: src/unm_marketplace/build/web
+          if-no-files-found: error
 
   images:
     name: Build images
@@ -80,6 +86,10 @@ jobs:
       PUSH: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: flutter-web
+          path: src/unm_marketplace/ci-web
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
       - name: Log in to GHCR
         if: env.PUSH == 'true'
@@ -92,6 +102,7 @@ jobs:
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: src/unm_marketplace
+          build-args: FLUTTER_BUILD_STAGE=prebuilt
           load: true
           tags: unm-marketplace-web:ci
           cache-from: type=gha,scope=web
@@ -103,6 +114,7 @@ jobs:
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: src/unm_marketplace
+          build-args: FLUTTER_BUILD_STAGE=prebuilt
           push: true
           tags: |
             ${{ env.IMAGE_PREFIX }}-web:${{ github.sha }}
