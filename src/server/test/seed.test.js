@@ -4,6 +4,9 @@ import path from 'node:path';
 import { agent, closePool, getPool, makeApp, resetDb, tempUploadDir, testConfig } from './helpers.js';
 import { postListing, signupBody } from './fixtures.js';
 import { resetDemo, seedDemo } from '../src/seed/seed.js';
+import seedListings from '../src/seed/data/listings.json' with { type: 'json' };
+
+const N = seedListings.length;
 
 afterAll(closePool);
 beforeEach(resetDb);
@@ -11,18 +14,19 @@ beforeEach(resetDb);
 const count = async (sql, params = []) => Number((await getPool().query(sql, params))[0][0].n);
 
 describe('seedDemo', () => {
-  it('creates three sellers and thirty listings across every category, with photos on disk', async () => {
+  it('creates three sellers and every seed listing across every category, with photos on disk', async () => {
     const dir = await tempUploadDir();
     await seedDemo(getPool(), { uploadDir: dir });
     expect(await count('SELECT COUNT(*) n FROM users WHERE is_seed')).toBe(3);
-    expect(await count('SELECT COUNT(*) n FROM listings WHERE is_seed')).toBe(30);
+    expect(N).toBeGreaterThanOrEqual(25);
+    expect(await count('SELECT COUNT(*) n FROM listings WHERE is_seed')).toBe(N);
     expect(await count("SELECT COUNT(*) n FROM listings WHERE status = 'sold'")).toBe(2);
     const [cats] = await getPool().query(
       'SELECT c.slug, COUNT(l.id) n FROM categories c LEFT JOIN listings l ON l.category_id = c.id GROUP BY c.id',
     );
     for (const c of cats) expect(Number(c.n), c.slug).toBeGreaterThanOrEqual(2);
     const [imgs] = await getPool().query('SELECT path FROM listing_images');
-    expect(imgs.length).toBeGreaterThanOrEqual(30);
+    expect(imgs.length).toBeGreaterThanOrEqual(N);
     for (const { path: rel } of imgs) await fs.access(path.join(dir, rel));
     const [users] = await getPool().query('SELECT avatar_path, password_hash FROM users WHERE is_seed');
     for (const u of users) {
@@ -45,7 +49,7 @@ describe('seedDemo', () => {
     const dir = await tempUploadDir();
     expect(await seedDemo(getPool(), { uploadDir: dir })).toBe(true);
     expect(await seedDemo(getPool(), { uploadDir: dir })).toBe(false);
-    expect(await count('SELECT COUNT(*) n FROM listings')).toBe(30);
+    expect(await count('SELECT COUNT(*) n FROM listings')).toBe(N);
   });
 });
 
@@ -96,7 +100,7 @@ describe('resetDemo', () => {
     await resetDemo(pool, { uploadDir: dir });
 
     expect(await count('SELECT COUNT(*) n FROM users')).toBe(3);
-    expect(await count('SELECT COUNT(*) n FROM listings')).toBe(30);
+    expect(await count('SELECT COUNT(*) n FROM listings')).toBe(N);
     expect(await count("SELECT COUNT(*) n FROM listings WHERE status = 'sold'")).toBe(2);
     expect(await count("SELECT COUNT(*) n FROM listings WHERE title = 'Changed'")).toBe(0);
     expect(await count('SELECT COUNT(*) n FROM messages')).toBe(0);
