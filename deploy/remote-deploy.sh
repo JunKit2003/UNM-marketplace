@@ -6,7 +6,13 @@
 #   SKIP_PULL=1 ./remote-deploy.sh <tag>    use images already on this machine (local testing)
 set -euo pipefail
 
-TAG=${1:?usage: remote-deploy.sh <image-tag>}
+TAG=${1:?usage: remote-deploy.sh <image-tag> [ghcr-user]}
+if [ -n "${2:-}" ]; then
+  DOCKER_CONFIG=$(mktemp -d)
+  export DOCKER_CONFIG
+  trap 'rm -f -- "$DOCKER_CONFIG/config.json"; rmdir -- "$DOCKER_CONFIG"' EXIT
+  docker login ghcr.io -u "$2" --password-stdin
+fi
 cd "$(dirname "$0")"
 [ -f .env ] || { echo "error: .env is missing in $(pwd) (see docs/deploy-handoff.md)"; exit 1; }
 
@@ -17,7 +23,7 @@ BIND=${BIND:-127.0.0.1:8090}
 TIMEOUT=${HEALTH_TIMEOUT:-90}
 
 deploy() {
-  if [ "${SKIP_PULL:-0}" != 1 ]; then IMAGE_TAG=$1 "${COMPOSE[@]}" pull api web; fi
+  if [ "${SKIP_PULL:-0}" != 1 ]; then IMAGE_TAG=$1 "${COMPOSE[@]}" pull api web || return 1; fi
   IMAGE_TAG=$1 "${COMPOSE[@]}" up -d --remove-orphans
 }
 
@@ -39,7 +45,7 @@ fi
 
 echo "release $TAG failed its health check"
 if [ -n "$PREV" ] && [ "$PREV" != "$TAG" ]; then
-  if deploy "$PREV" && healthy; then
+  if { deploy "$PREV" || SKIP_PULL=1 deploy "$PREV"; } && healthy; then
     echo "rolled back to $PREV"
   else
     echo "ROLLBACK FAILED: the site may be down. Check: docker compose -f compose.prod.yaml logs"
