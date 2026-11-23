@@ -23,6 +23,13 @@ fail=0
 check() { if eval "$2"; then echo "ok   - $1"; else echo "FAIL - $1"; fail=1; fi; }
 B="http://127.0.0.1:$PORT"
 
+check "loopback health check serves the Flutter shell" \
+  'docker exec "$NET-web" wget -qO- http://127.0.0.1/healthz | grep -q flutter_bootstrap.js'
+check "health check is restricted to loopback" \
+  '[ "$(curl -s -o /dev/null -w "%{http_code}" "$B/healthz")" = 403 ]'
+check "health probes stay out of the access log" \
+  'logs=$(docker logs "$NET-web" 2>&1) && ! grep -Eq "GET /healthz HTTP/[0-9.]+. [0-9]{3} " <<< "$logs"'
+
 check "deep link /listing/42 serves the app" \
   '[ "$(curl -s -o /dev/null -w "%{http_code}" $B/listing/42)" = 200 ] && curl -s $B/listing/42 | grep -q flutter_bootstrap.js'
 check "deep link /messages/7 serves the app" 'curl -s $B/messages/7 | grep -q flutter_bootstrap.js'
@@ -42,4 +49,6 @@ check "index.html is revalidated" 'curl -sI $B/ | grep -qi "cache-control: no-ca
 check "main.dart.js is served gzipped" 'curl -sI -H "Accept-Encoding: gzip" $B/main.dart.js | grep -qi "content-encoding: gzip"'
 check "uploads up to 40 MB are accepted by nginx" \
   '[ "$(head -c 20000000 /dev/zero | curl -s -o /dev/null -w "%{http_code}" -X POST --data-binary @- $B/api/listings)" = 404 ]'
+check "regular requests are still logged" \
+  'docker logs "$NET-web" 2>&1 | grep -q "GET /listing/42 "'
 exit $fail
